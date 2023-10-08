@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
 import { TAdminMenu, TCommonData } from '~/src/data/types/common.data';
 import { TUser, TUserResponse } from '~/src/users/types/users';
-import { Articles, News } from '.prisma/client';
+import { Articles } from '.prisma/client';
 import { TRegion, TRegionResponse } from '~/src/data/types/regions';
 import { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
 import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
+import { TNews, TNewsResponse } from '~/src/data/types/news';
 //import { FetchError } from 'ofetch';
 
 export const useData = defineStore('data', {
@@ -12,7 +13,7 @@ export const useData = defineStore('data', {
 		const path: string = '/api/admin/data';
 		const user: globalThis.Ref<TUser | undefined> = ref(undefined);
 		const menu: globalThis.Ref<TAdminMenu | undefined> = ref(undefined);
-		const news: globalThis.Ref<News[] | undefined> = ref(undefined);
+		const news: globalThis.Ref<TNews[] | undefined> = ref(undefined);
 		const users: globalThis.Ref<TUser[] | undefined> = ref(undefined);
 		const regions: globalThis.Ref<TRegion[] | undefined> = ref(undefined);
 		const ownership: globalThis.Ref<TOwnership[] | undefined> = ref(undefined);
@@ -248,7 +249,7 @@ export const useData = defineStore('data', {
 			return true;
 		},
 		/**
-		 * Сохранение, добавление региона
+		 * Сохранение, добавление типа инициативы
 		 */
 		async updateInitiativeTypes(type: TInitiativeTypes): Promise<TInitiativeTypesResponse | false> {
 			const { data, error } =
@@ -267,7 +268,7 @@ export const useData = defineStore('data', {
 			return typesResponse;
 		},
 		/**
-		 * Обновление данных о регионе в массиве
+		 * Обновление данных о типе инициативы в массиве
 		 * @param type
 		 */
 		updateInitiativeTypesData(type?: TInitiativeTypes): void {
@@ -289,7 +290,7 @@ export const useData = defineStore('data', {
 			})
 		},
 		/**
-		 * Удаление региона
+		 * Удаление Типа инициативы
 		 * @param type
 		 */
 		async deleteInitiativeTypes(type: TInitiativeTypes): Promise<boolean> {
@@ -306,6 +307,69 @@ export const useData = defineStore('data', {
 			if (deleted && this.types) {
 				this.types = this.types.filter((item: TInitiativeTypes): boolean => item.id !== type.id);
 				alert(`Тип инициативы «${type.name}» удалён`);
+			}
+			return true;
+		},
+
+		/**
+		 * Сохранение, добавление новости
+		 */
+		async updateNews(news: TNews): Promise<TNewsResponse | false> {
+			const { data, error } =
+				await useFetch(`${this.path}/news`, {
+					method: 'post',
+					body: news,
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			const newsResponse: TNewsResponse = unref(data.value) as TNewsResponse;
+			if (!newsResponse.errors) {
+				this.updateNewsData(newsResponse.news);
+			}
+			return newsResponse;
+		},
+		/**
+		 * Обновление данных о регионе в массиве
+		 * @param news
+		 */
+		updateNewsData(news?: TNews): void {
+			if (typeof this.news === 'undefined') {
+				this.news = [];
+			}
+			if (news) {
+				const index: number = this.news.findIndex((item: TNews): boolean => item.id === news.id);
+				if (index >= 0) {
+					this.news[index] = {...news};
+				} else {
+					this.news = [{...news}, ...this.news];
+				}
+			}
+			this.news = this.news.sort((a: TNews, b: TNews): number => {
+				if (a.date > b.date) return 1;
+				if (b.date > a.date) return -1;
+				return 0;
+			})
+		},
+		/**
+		 * Удаление новости
+		 * @param news
+		 */
+		async deleteNews(news: TNews): Promise<boolean> {
+			const { data, error } =
+				await useFetch(`${this.path}/news`, {
+					method: 'delete',
+					body: news,
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			const deleted: boolean = unref(data.value) as boolean;
+			if (deleted && this.news) {
+				this.news = this.news.filter((item: TNews): boolean => item.id !== news.id);
+				alert(`Новость «${news.title}» удалена`);
 			}
 			return true;
 		},
