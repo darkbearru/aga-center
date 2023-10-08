@@ -13,15 +13,9 @@ export class UsersRepository implements IUsersRepository {
 			skip,
 			take,
 			orderBy: [
-				{
-					isAdmin: 'desc',
-				},
-				{
-					isModerator: 'desc',
-				},
-				{
-					fio: 'asc',
-				},
+				{ isAdmin: 'desc' },
+				{ isModerator: 'desc' },
+				{ fio: 'asc' },
 			]
 		})
     }

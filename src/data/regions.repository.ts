@@ -1,6 +1,6 @@
 import { IRegionsRepository } from '~/src/data/regions.repositiory.interface';
 import { PrismaClient } from '@prisma/client';
-import { TRegion } from '~/src/users/types/regions';
+import { TRegion } from '~/src/data/types/regions';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -9,7 +9,8 @@ export class RegionsRepository implements IRegionsRepository {
 		return prisma.regions.create({
 			data: {
 				name: region.name,
-				slug: region.slug
+				slug: region.slug,
+				isActive: region.isActive,
 			}
 		});
 	}
@@ -30,9 +31,10 @@ export class RegionsRepository implements IRegionsRepository {
 	async list(): Promise<TRegion[] | undefined> {
 		try {
 			return await prisma.regions.findMany({
-				orderBy: {
-					name: 'asc'
-				}
+				orderBy: [
+					{ isActive: 'desc' },
+					{ name: 'asc' },
+				]
 			});
 		} catch (e) {
 			return undefined
@@ -58,15 +60,12 @@ export class RegionsRepository implements IRegionsRepository {
 	}
 
 	async checkSlug(region: TRegion): Promise<boolean> {
-		const res = prisma.regions.findFirst({
+		const idQuery = typeof region.id !== 'undefined' ? { id: { not: region.id } } : {};
+		const res = await prisma.regions.findFirst({
 			where: {
 				AND: [
 					{ slug: region.slug },
-					{
-						id: {
-							not: region.id
-						}
-					},
+					idQuery,
 				]
 			}
 		});

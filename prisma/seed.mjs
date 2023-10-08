@@ -12,6 +12,14 @@ async function main() {
 			confirmCode: '',
 		},
 	});
+	// Добавление региона по-умолчанию
+	await prisma.regions.create({
+		data: {
+			name: 'Агинск',
+			slug: 'aginsk',
+			isActive: true,
+		},
+	});
 }
 main()
 	.then(async () => {
