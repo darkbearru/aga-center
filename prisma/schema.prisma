@@ -65,8 +65,8 @@ model Contacts {
 // Тип собственности компании ИП, ООО и т.п.
 model TypeOwnership {
     id        Int       @id @default(autoincrement())
-    nameShort String?   @db.VarChar(20)
-    nameFull  String?   @db.VarChar(100)
+    nameShort String    @db.VarChar(20)
+    nameFull  String    @db.VarChar(100)
     createdAt DateTime  @default(now())
     changedAt DateTime  @default(now())
     Company   Company[]

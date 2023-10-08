@@ -1,4 +1,4 @@
-import { TRegion } from '~/src/users/types/regions';
+import { TRegion } from '~/src/data/types/regions';
 
 export interface IRegionsRepository {
 	list(): Promise<TRegion[] | undefined>;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import UsersList from '~/components/layout/admin/UsersList.vue';
+import UsersList from '~/components/layout/admin/users/UsersList.vue';
 import Button from '~/components/ui/Button.vue';
 import IconUserPlus from 'assets/svg/icon-user-plus.svg';
 import Popup from '~/components/ui/Popup.vue';

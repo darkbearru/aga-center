@@ -7,7 +7,12 @@ import { TUser, TUserResponse } from '~/src/users/types/users';
 import { emailValidate } from '~/src/services/validation/validation';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { IRegionsRepository } from '~/src/data/regions.repositiory.interface';
-import { TRegion, TRegionResponse } from '~/src/users/types/regions';
+import { TRegion, TRegionResponse } from '~/src/data/types/regions';
+import { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
+import { IOwnershipRepository } from '~/src/data/ownership.repository.interface';
+import { IInitiativeTypesRepository } from '~/src/data/initiative.types.repository.inerface';
+import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
+import { TNews, TNewsResponse } from '~/src/data/types/news';
 
 export class AdminService implements IAdminService {
 	constructor(
@@ -15,14 +20,19 @@ export class AdminService implements IAdminService {
 		private newsRepository: INewsRepository,
 		private usersRepository: IUsersRepository,
 		private regionsRepository: IRegionsRepository,
+		private ownershipRepository: IOwnershipRepository,
+		private initiativeTypesRepository: IInitiativeTypesRepository,
 	) {
 	}
+
 
 	async data(): Promise<TCommonData> {
 		const menu: TAdminMenu = {};
 		let news: News[] | undefined = undefined;
 		let users: TUser[] | undefined = undefined;
 		let regions: TRegion[] | undefined = undefined;
+		let ownership: TOwnership[] | undefined = undefined;
+		let types: TInitiativeTypes[] | undefined = undefined;
 		let articles: Articles[] | undefined = undefined;
 		if (this.user.isAdmin) {
 			menu['/client'] = 'Новости';
@@ -34,6 +44,9 @@ export class AdminService implements IAdminService {
 			news = await this.getNewsList();
 			users = await this.getUsersList();
 			regions = await this.regionsRepository.list();
+			ownership = await this.ownershipRepository.list();
+			types = await this.initiativeTypesRepository.list();
+
 		}
 		if (this.user.isAdmin || this.user.isModerator) {
 			menu['/client/moderation'] = 'Модерация';
@@ -50,7 +63,47 @@ export class AdminService implements IAdminService {
 			users,
 			articles,
 			regions,
+			ownership,
+			types
 		}
+	}
+
+	async newsSave(news: TNews): Promise<TNewsResponse> {
+		const check: boolean = await this.newsRepository.check(news);
+		const response: TNewsResponse = {
+			errors: undefined,
+			news
+		}
+		if (!check) {
+			response.errors = {
+				title: `Новость с заголовком «${news.title}» уже существует`
+			}
+		}
+		if (!news.title.trim()) {
+			response.errors = {...response.errors, title: 'Не указан заголовок новости'}
+		}
+		if (!news.slug.trim()) {
+			response.errors = {...response.errors, slug: 'Не указан идентификатор новости'}
+		}
+		if (!news?.text?.trim()) {
+			response.errors = {...response.errors, text: 'Не указан текст новости'}
+		}
+		if(response.errors) return response;
+
+		if (!news.id) {
+			response.news = await this.newsRepository.add(news);
+		} else {
+			if (await this.newsRepository.save(news)) {
+				response.news = news
+			} else {
+				response.errors = {other: 'Ошибка сохранения данных'}
+			}
+		}
+		return response;
+	}
+
+	async newsDelete(news: TNews): Promise<boolean> {
+		return await this.newsRepository.delete(news);
 	}
 
 	async userSave(user: TUser): Promise<TUserResponse> {
@@ -69,7 +122,6 @@ export class AdminService implements IAdminService {
 		if (response.errors) return response;
 
 		const res = await this.usersRepository.checkEmail(user?.email, user?.id);
-		console.log(res);
 		if (res) {
 			response.errors = {
 				email: 'Пользователь с данным email уже существует'
@@ -128,13 +180,15 @@ export class AdminService implements IAdminService {
 		if (!region.name.trim()) {
 			response.errors = {...response.errors, name: 'Не указано название региона'}
 		}
+		if(response.errors) return response;
+
 		if (!region.id) {
 			response.region = await this.regionsRepository.add(region);
 		} else {
 			if (await this.regionsRepository.save(region)) {
 				response.region = region
 			} else {
-				response.errors = {...response.errors, other: 'Ошибка сохранения данных'}
+				response.errors = {other: 'Ошибка сохранения данных'}
 			}
 		}
 		return response;
@@ -143,5 +197,69 @@ export class AdminService implements IAdminService {
 		return await this.regionsRepository.delete(region);
 	}
 
+	async ownershipSave(ownership: TOwnership): Promise<TOwnershipResponse> {
+		const check: boolean = await this.ownershipRepository.check(ownership);
+		const response: TOwnershipResponse = {
+			errors: undefined,
+			ownership
+		}
+		if (!check) {
+			response.errors = {
+				nameShort: `Форма собственности «${ownership.nameShort}» уже существует`
+			}
+		}
+		if (!ownership.nameShort.trim()) {
+			response.errors = {...response.errors, nameShort: 'Не указано сокращенное название формы собственности'}
+		}
+		if (!ownership.nameFull.trim()) {
+			response.errors = {...response.errors, nameFull: 'Не указано полное название формы собственности'}
+		}
+		if(response.errors) return response;
+
+		if (!ownership.id) {
+			response.ownership = await this.ownershipRepository.add(ownership);
+		} else {
+			if (await this.ownershipRepository.save(ownership)) {
+				response.ownership = ownership
+			} else {
+				response.errors = {other: 'Ошибка сохранения данных'}
+			}
+		}
+		return response;
+	}
+	async ownershipDelete(ownership: TOwnership): Promise<boolean> {
+		return await this.ownershipRepository.delete(ownership);
+	}
+
+	async initiativeTypesSave(type: TInitiativeTypes): Promise<TInitiativeTypesResponse> {
+		const check: boolean = await this.initiativeTypesRepository.check(type);
+		const response: TInitiativeTypesResponse = {
+			errors: undefined,
+			type
+		}
+		if (!check) {
+			response.errors = {
+				name: `Тип инициативы «${type.name}» уже существует`
+			}
+		}
+		if (!type.name.trim()) {
+			response.errors = {...response.errors, name: 'Не указано название типа инициативы'}
+		}
+		if(response.errors) return response;
+
+		if (!type.id) {
+			response.type = await this.initiativeTypesRepository.add(type);
+		} else {
+			if (await this.initiativeTypesRepository.save(type)) {
+				response.type = type
+			} else {
+				response.errors = {other: 'Ошибка сохранения данных'}
+			}
+		}
+		return response;
+	}
+	async initiativeTypesDelete(type: TInitiativeTypes): Promise<boolean> {
+		return await this.initiativeTypesRepository.delete(type);
+	}
 
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useData } from '~/components/stores/useData';
 import { TUser } from '~/src/users/types/users';
-import UsersListItem from '~/components/layout/admin/UsersListItem.vue';
+import UsersListItem from '~/components/layout/admin/users/UsersListItem.vue';
 
 const data = useData();
 const usersList = ref(data.users);
@@ -17,9 +17,7 @@ const onDelete = (item: TUser) => {
 }
 
 const update = () => {
-	console.log('Update');
 	usersList.value = data.users;
-	console.log(usersList.value);
 }
 defineExpose({update});
 
