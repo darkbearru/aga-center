@@ -9,9 +9,9 @@ export default defineEventHandler(
 		if (!event.context.params?.params) return 'no params';
 		const params: string[] = event.context.params?.params.split('/');
 		const userService: UsersService = new UsersService(
-			new EmailService(),
 			new UsersRepository(),
 			new TokenService(),
+			new EmailService(),
 			event
 		);
 		return await userService.validate({

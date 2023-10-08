@@ -9,7 +9,7 @@ import LogosList from '~/components/layout/LogosList.vue';
   <div class="bg-white">
 	  <Header />
 	  <TitlePicture />
-    <slot />
+    <NuxtPage />
 		<Footer>
 			<LogosList />
 		</Footer>

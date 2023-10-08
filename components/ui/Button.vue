@@ -1,11 +1,14 @@
 <script setup lang="ts">
 
+defineProps({
+	to: String
+})
 </script>
 
 <template>
-	<button class="rounded-sm px-4 py-1">
+	<NuxtLink class="rounded-sm px-4 py-1 whitespace-nowrap cursor-pointer" :to="to">
 		<slot />
-	</button>
+	</NuxtLink>
 </template>
 
 <style scoped>

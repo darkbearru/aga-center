@@ -9,9 +9,9 @@ export default defineEventHandler(
 		const email = getRouterParam(event, 'email');
 		if (!email) return {};
 		const userService: UsersService = new UsersService(
-			new EmailService(),
 			new UsersRepository(),
 			new TokenService(),
+			new EmailService(),
 			event
 		);
 		return await userService.login(email);
