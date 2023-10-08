@@ -1,24 +1,25 @@
 import { IUsersService } from '~/src/users/users.service.interface';
 import { TUser, TUserRegistration } from '~/src/users/types/users';
-import { TUsersPayload, TUsersPayloadJWT } from '~/src/users/users.payload';
-import { IEmailService } from '~/src/services/email/email.service.interface';
-import { IUsersRepository } from '~/src/users/users.repository.interface';
-import { ITokenService } from '~/src/services/jwt/token.service.interface';
+import { TUsersPayload } from '~/src/users/users.payload';
 import { TTokensList } from '~/src/services/jwt/token.types';
 import { H3Event } from 'h3';
+import { TEmailResponse } from '~/src/services/email/email.types';
+import { IUsersRepository } from '~/src/users/users.repository.interface';
+import { ITokenService } from '~/src/services/jwt/token.service.interface';
+import { IEmailService } from '~/src/services/email/email.service.interface';
 
 export class UsersService implements IUsersService {
-	private readonly event: H3Event;
+	private readonly event?: H3Event;
 	constructor(
-		private emailService: IEmailService,
 		private usersRepository: IUsersRepository,
 		private tokenService: ITokenService,
+		private emailService: IEmailService,
 		event?: H3Event,
 	) {
 		this.event = event || useRequestEvent();
 	}
 
-	async create(body?: TUserRegistration): Promise<TUser | TUsersPayloadJWT | undefined> {
+	async create(body?: TUserRegistration): Promise<TUser | undefined> {
 		if (!body || !body.email) {
 			throw createError({
 				statusCode: 400,
@@ -26,14 +27,14 @@ export class UsersService implements IUsersService {
 			});
 		}
 		const code: string = this.makeCode();
-		if (!body.code || !body?.fio) {
+		if (!body?.code || !body?.fio) {
 			const user: TUser | undefined = await this.usersRepository.createUser(body.email, code);
 			if (!user) {
 				await this.usersRepository.saveCode(body.email, code);
 			}
 			await this.sendEmail(body.email, code);
 
-			if (body.code) return undefined;
+			if (body?.code) return undefined;
 			return {id: 0, email: body.email, fio: ''};
 		}
 		const logged: TUser | undefined = await this.usersRepository.registration(body);
@@ -43,22 +44,20 @@ export class UsersService implements IUsersService {
 				message: 'Bad Request',
 			});
 		}
-		const payload: TUsersPayload = {id: logged.id, email: logged.email, fio: logged.fio};
+		const payload: TUsersPayload = {id: logged?.id, email: logged.email, fio: logged?.fio};
 		const tokens: TTokensList = await this.tokenService.generate(payload);
-		this.tokenService.save(this.event, tokens.refresh);
-		return {
-			...payload,
-			accessToken: tokens.access
-		}
 
+		if (this.event) this.tokenService.save(tokens, this.event);
+
+		return payload;
 	}
 
 	delete(id: number): Promise<boolean> {
 		return Promise.resolve(false);
 	}
 
-	get(id: number): Promise<TUser | undefined> {
-		return Promise.resolve(undefined);
+	async get(id: number): Promise<TUser | null> {
+		return await this.usersRepository.info(id);
 	}
 
 	async login(email: string): Promise<string | undefined> {
@@ -68,7 +67,7 @@ export class UsersService implements IUsersService {
 		return 'OK';
 	}
 
-	async validate(user: TUser): Promise<TUsersPayloadJWT | undefined> {
+	async validate(user: TUser): Promise<TUsersPayload | undefined> {
 		const founded: TUser | null = await this.usersRepository.authorize(user.email, user.confirmCode || '0');
 		if (!founded) {
 			throw createError({
@@ -78,11 +77,9 @@ export class UsersService implements IUsersService {
 		}
 		const payload: TUsersPayload = {id: founded.id, email: founded.email, fio: founded.fio};
 		const tokens: TTokensList = await this.tokenService.generate(payload);
-		this.tokenService.save(this.event, tokens.refresh);
-		return {
-			...payload,
-			accessToken: tokens.access
-		}
+		if (this.event) this.tokenService.save(tokens, this.event);
+
+		return payload;
 	}
 
 	totalCount(): Promise<number> {
@@ -94,7 +91,8 @@ export class UsersService implements IUsersService {
 	}
 
 	private async sendEmail(email: string, code: string): Promise<TUser> {
-		const result = await this.emailService.send({
+
+		const result: TEmailResponse = await this.emailService.send({
 			to: email,
 			from: process.env.MAIL_FROM || '',
 			subject: 'Код подтверждения',
@@ -108,16 +106,21 @@ export class UsersService implements IUsersService {
 		});
 	}
 
-	check(accessToken: string): TUsersPayload | undefined {
-		const payload = this.tokenService.check(accessToken, process.env.JWT_ACCESS_SECRET || '');
-		if (!payload) throw createError({
-			statusCode: 401,
-			message: "Unauthorized",
-		});
-		console.log(payload);
-		if (typeof payload !== "string") {
-			return payload as TUsersPayload;
+	async check(accessToken: string): Promise<TUser | null> {
+		const payload = this.tokenService.checkAccess(accessToken);
+		if (payload && typeof payload !== "string") {
+			return await this.get(payload.id);
 		}
+		return null;
+	}
+
+	async refresh(): Promise<TUser | null> {
+		if (!this.event) return null;
+		const payload = this.tokenService.checkRefresh(this.event);
+		if (payload && typeof payload !== "string") {
+			return await this.get(payload.id);
+		}
+		return null;
 	}
 
 }

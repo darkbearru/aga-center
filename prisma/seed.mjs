@@ -5,7 +5,7 @@ async function main() {
 	// Добавление пользователя по-умолчанию
 	await prisma.users.create({
 		data: {
-			email: 'a.abramenko@chita.ru',
+			email: 'a.abramenko.chita.ru@gmail.com',
 			fio: 'Абраменко Алексей',
 			isAdmin: true,
 			isModerator: true,

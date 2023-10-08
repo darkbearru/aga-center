@@ -8,12 +8,12 @@ import ReviewsList from '~/components/content/ReviewsList.vue';
 <template>
 	<div class="grid grid-cols-12 md:gap-8 mt-4 md:mt-0 w-full max-w-screen-xl mx-auto my-0">
 		<ContentAndHeader class="order-2 md:order-1 col-span-12 md:col-span-3" title="Новости проекта">
-			<LastNews />
+			<LastNews/>
 		</ContentAndHeader>
 		<ContentAndHeader class="order-1 md:order-2 col-span-12 md:col-span-9" title="Список инициатив">
 		</ContentAndHeader>
 		<ContentAndHeader class="order-3 md:order-3 col-span-12" title="Отзывы">
-			<ReviewsList />
+			<ReviewsList/>
 		</ContentAndHeader>
 	</div>
 </template>

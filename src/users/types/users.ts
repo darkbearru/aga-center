@@ -21,6 +21,15 @@ export type TUser = {
 	changedAt?: Date,
 }
 
+export type TUserResponse = {
+	errors?: {
+		email?: string,
+		fio?: string,
+		other?: string
+	}
+	user: TUser,
+}
+
 export type TUserRegistration = {
 	email: string,
 	fio?: string,

@@ -5,6 +5,34 @@ import { TUser, TUserRegistration } from '~/src/users/types/users';
 const prisma = new PrismaClient();
 
 export class UsersRepository implements IUsersRepository {
+    async count(): Promise<number> {
+		return prisma.users.count({});
+    }
+    async list(skip: number = 0, take: number = 20): Promise<TUser[] | undefined> {
+		return prisma.users.findMany({
+			skip,
+			take,
+			orderBy: [
+				{
+					isAdmin: 'desc',
+				},
+				{
+					isModerator: 'desc',
+				},
+				{
+					fio: 'asc',
+				},
+			]
+		})
+    }
+    async info(id: number): Promise<TUser | null> {
+		return prisma.users.findFirst({
+			where: {
+				id: id,
+			}
+		});
+    }
+
 	async registration(body?: TUserRegistration): Promise<TUser | undefined> {
 		await this.deleteOldCodes();
 		try {
@@ -32,13 +60,17 @@ export class UsersRepository implements IUsersRepository {
 	 * @param code
 	 */
 	async saveCode(email: string, code: string): Promise<void> {
-		await prisma.users.update({
-			where: { email: email },
-			data: {
-				confirmCode: code,
-				changedAt: new Date()
-			}
-		});
+		try {
+			await prisma.users.update({
+				where: { email: email },
+				data: {
+					confirmCode: code,
+					changedAt: new Date()
+				}
+			});
+		} catch(e) {
+
+		}
 	}
 
 	/**
@@ -62,6 +94,52 @@ export class UsersRepository implements IUsersRepository {
 		});
 	}
 
+	async save(user: TUser): Promise<TUser> {
+		if (!user?.id) {
+			return prisma.users.create({
+				data: {
+					email: user.email,
+					fio: user.fio,
+					isNew: false,
+					isAdmin: user.isAdmin,
+					isModerator: user.isModerator,
+				}
+			});
+		}
+		return prisma.users.update({
+			data: {
+				email: user.email,
+				fio: user.fio,
+				isAdmin: user.isAdmin,
+				isModerator: user.isModerator,
+			},
+			where: {
+				id: user.id
+			}
+		});
+	}
+
+	async delete(id: number): Promise<TUser> {
+		return prisma.users.delete({
+			where: { id }
+		})
+	}
+
+	async checkEmail(email: string, id?: number): Promise<TUser | null> {
+		return prisma.users.findFirst({
+			where: {
+				AND: [
+					{ email },
+					{
+						id: {
+							not: id
+						}
+					},
+				]
+			}
+		});
+	}
+
 	/**
 	 * Авторизация пользователя и генерация JWT
 	 * @param email
@@ -77,6 +155,7 @@ export class UsersRepository implements IUsersRepository {
 		});
 	}
 
+
 	private async deleteOldCodes(): Promise<void> {
 		const timeout = new Date();
 		timeout.setTime(timeout.getTime() - 30 * 60000);
@@ -91,5 +170,6 @@ export class UsersRepository implements IUsersRepository {
 			}
 		})
 	}
+
 
 }

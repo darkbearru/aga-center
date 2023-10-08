@@ -13,10 +13,10 @@ export class TokenService implements ITokenService {
 	private readonly accessLifetime: string;
 
 	constructor() {
-		this.accessSecret = process.env.JWT_ACCESS_SECRET || 'SECRET';
-		this.accessLifetime = process.env.JWT_ACCESS_LIFETIME || '30m';
-		this.refreshSecret = process.env.JWT_REFRESH_SECRET || 'REFRESH_SECRET';
-		this.refreshLifetime = process.env.JWT_REFRESH_LIFETIME || '30d';
+		this.accessSecret = process?.env?.JWT_ACCESS_SECRET || 'SECRET';
+		this.accessLifetime = process?.env?.JWT_ACCESS_LIFETIME || '30m';
+		this.refreshSecret = process?.env?.JWT_REFRESH_SECRET || 'REFRESH_SECRET';
+		this.refreshLifetime = process?.env?.JWT_REFRESH_LIFETIME || '30d';
 	}
 
 	/**
@@ -24,12 +24,22 @@ export class TokenService implements ITokenService {
 	 * @param token
 	 * @param secret
 	 */
-	check(token: string, secret: string): JwtPayload | string | false {
+	private check(token: string, secret: string): JwtPayload | string | false {
 		try {
 			return jwt.verify(token, secret);
 		} catch (e) {
 			return false;
 		}
+	}
+
+	public checkAccess(token: string): JwtPayload | string | false {
+		return this.check(token, this.accessSecret);
+	}
+
+	public checkRefresh(event: H3Event): JwtPayload | string | false {
+		const token = getCookie(event, 'rf_token');
+		if (!token) return false;
+		return this.refresh(token, event);
 	}
 
 	/**
@@ -67,27 +77,34 @@ export class TokenService implements ITokenService {
 	}
 
 	/**
-	 * СОхранение Refresh токена в куки
+	 * СОхранение Access и Refresh токенов в куки
+	 * @param tokens
 	 * @param event
-	 * @param token
 	 */
-	save(event: H3Event, token: string): void {
-		setCookie(event, 'rf_token', token, {
-			httpOnly: true,
-			maxAge: ms(this.refreshLifetime),
+	save(tokens: TTokensList, event?: H3Event): void {
+		if (!event) return;
+		this.saveAccess(tokens.access, event);
+		this.saveRefresh(tokens.refresh, event);
+	}
+
+	private saveAccess(token: string, event: H3Event): void {
+		const exp: Date = new Date();
+		exp.setTime(Date.now() + ms(this.accessLifetime));
+		this.saveTokenCookie('ac_token', token, event, exp, false);
+	}
+
+	private saveRefresh(token: string, event: H3Event): void {
+		if (!event) return;
+		const exp: Date = new Date();
+		exp.setTime(Date.now() + ms(this.refreshLifetime));
+		this.saveTokenCookie('rf_token', token, event, exp, true);
+	}
+
+	private saveTokenCookie(tokenName: string, tokenValue: string, event: H3Event, expires: Date, httpOnly: boolean = true): void {
+		setCookie(event, tokenName, tokenValue, {
+			httpOnly,
+			expires,
 		});
-		// console.log(useCookies);
-		// console.log(cookies);
-/*
-		const cookie = useCookies(
-			'rf_token',
-			{
-				httpOnly: true,
-				maxAge: ms(this.refreshLifetime)
-			}
-		);
-		cookie.value = token;
-*/
 	}
 
 	/**
@@ -95,13 +112,15 @@ export class TokenService implements ITokenService {
 	 * @param event
 	 * @param token
 	 */
-	async refresh(event: H3Event, token: string): Promise<TTokensResponse | null> {
-		const data = this.check(token, process.env.JWT_REFRESH_SECRET || 'REFRESH_SECRET');
+	async refresh(token: string, event?: H3Event): Promise<TTokensResponse | null> {
+		if (!event) return null;
+		const data = this.check(token, this.refreshSecret);
 		if (typeof data !== 'string' && data !== false) {
 			const { exp, iat, ...userData } = data;
 			const payload: TUsersPayload = userData as TUsersPayload;
 			const jwt: TTokensList = await this.generate(payload);
-			this.save(event, jwt.refresh);
+			this.saveAccess(jwt.access, event);
+			this.saveRefresh(jwt.refresh, event);
 			return { ...payload, accessToken: jwt.access };
 		}
 		return null;

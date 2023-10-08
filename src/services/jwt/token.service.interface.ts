@@ -6,12 +6,9 @@ import { H3Event } from 'h3';
 
 export interface ITokenService {
 	make(payload: TUsersPayload, secret: string, expiresIn: string): Promise<string>;
-
 	generate(user: TUser): Promise<TTokensList>;
-
-	check(token: string, secret: string): JwtPayload | string | false;
-
-	save(event: H3Event, token: string): void;
-
-	refresh(event: H3Event, token: string): Promise<TTokensResponse | null>;
+	checkAccess(token: string): JwtPayload | string | false;
+	checkRefresh(event: H3Event): JwtPayload | string | false;
+	save(tokens: TTokensList, event?: H3Event): void;
+	refresh(token: string, event?: H3Event): Promise<TTokensResponse | null>;
 }

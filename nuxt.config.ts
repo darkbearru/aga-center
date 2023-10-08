@@ -8,6 +8,8 @@ export default defineNuxtConfig({
     '@nuxtjs/google-fonts',
     'nuxt-svgo',
     'nuxt-security',
+    '@pinia/nuxt',
+    '@formkit/nuxt',
   ],
   app: {
     head: {
@@ -41,9 +43,17 @@ export default defineNuxtConfig({
     headNext: true
   },
   devtools: {
-    enabled: true,
+    enabled: false,
     timeline: {
       enabled: true,
     },
   },
+  image: {
+  },
+  vite: {
+    clearScreen: true,
+  },
+  formkit: {
+    autoImport: true
+  }
 })

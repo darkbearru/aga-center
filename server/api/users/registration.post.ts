@@ -9,9 +9,9 @@ export default defineEventHandler(
 	async (event: H3Event) => {
 		const body: TUserRegistration = await readBody(event);
 		const userService: UsersService = new UsersService(
-			new EmailService(),
 			new UsersRepository(),
 			new TokenService(),
+			new EmailService(),
 			event
 		);
 		return await userService.create(body);

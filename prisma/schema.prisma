@@ -24,6 +24,15 @@ model Users {
     company     Company[]
 }
 
+// Список регионов
+model Regions {
+    id          Int          @id @default(autoincrement())
+    name        String       @db.VarChar(100)
+    slug        String       @unique @db.VarChar(20)
+    isActive    Boolean      @default(false)
+    initiatives Initiative[]
+}
+
 // Список компаний
 model Company {
     id              Int            @id @default(autoincrement())
@@ -31,6 +40,7 @@ model Company {
     nameFull        String?        @db.VarChar(255)
     nameShort       String?        @db.VarChar(50)
     requsites       String?        @db.Text
+    isApproved      Boolean        @default(false)
     Users           Users?         @relation(fields: [usersId], references: [id])
     usersId         Int?
     typeOwnership   TypeOwnership? @relation(fields: [typeOwnershipId], references: [id])
@@ -39,7 +49,6 @@ model Company {
     changedAt       DateTime       @default(now())
     contacts        Contacts[]
     initiatives     Initiative[]
-    Moderation      Moderation?
     reviews         Reviews[]
 }
 
@@ -63,21 +72,13 @@ model TypeOwnership {
     Company   Company[]
 }
 
-// Список модерации, сюда входят компании и инициативы
-model Moderation {
-    id        Int      @id @default(autoincrement())
-    Company   Company  @relation(fields: [companyId], references: [id])
-    companyId Int      @unique
-    createdAt DateTime @default(now())
-    changedAt DateTime @default(now())
-}
-
 model Initiative {
     id                Int              @id @default(autoincrement())
     status            Boolean          @default(false)
     direction         Int              @default(0)
     name              String?          @db.VarChar(100)
     text              String?          @db.Text
+    isApproved        Boolean          @default(false)
     Company           Company?         @relation(fields: [companyId], references: [id])
     companyId         Int?
     Photos            Photos[]
@@ -86,6 +87,8 @@ model Initiative {
     initiativeTypesId Int?
     createdAt         DateTime         @default(now())
     changedAt         DateTime         @default(now())
+    Regions           Regions?         @relation(fields: [regionsId], references: [id])
+    regionsId         Int?
 }
 
 model InitiativeTypes {
@@ -100,6 +103,10 @@ model Photos {
     title        String?     @db.VarChar(100)
     Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
     initiativeId Int?
+    News         News?       @relation(fields: [newsId], references: [id])
+    newsId       Int?
+    Articles     Articles?   @relation(fields: [articlesId], references: [id])
+    articlesId   Int?
 }
 
 model Reviews {
@@ -120,4 +127,26 @@ model Reviews {
 model Client {
     id      Int       @id @default(autoincrement())
     Reviews Reviews[]
+}
+
+model News {
+    id        Int      @id @default(autoincrement())
+    active    Boolean  @default(false)
+    title     String   @db.VarChar(255)
+    slug      String   @unique @db.VarChar(50)
+    text      String?  @db.Text
+    Photos    Photos[]
+    createdAt DateTime @default(now())
+    changedAt DateTime @default(now())
+}
+
+model Articles {
+    id        Int      @id @default(autoincrement())
+    active    Boolean  @default(false)
+    title     String
+    slug      String
+    text      String?  @db.Text
+    Photos    Photos[]
+    createdAt DateTime @default(now())
+    changedAt DateTime @default(now())
 }
