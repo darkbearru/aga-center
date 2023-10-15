@@ -74,6 +74,7 @@ const deleteOwnership = async (ownership: TOwnership): Promise<void> => {
 				id="ownership_form"
 				type="form"
 				:submit-label="inputId ? 'Сохранить' : 'Добавить'"
+				:config="{ validationVisibility: 'submit' }"
 				@submit="popupSubmit"
 				>
 					<FormKit

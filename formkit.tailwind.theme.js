@@ -114,7 +114,7 @@ export default {
 	},
 	select: {
 		inner:
-			'flex relative max-w-md items-center rounded mb-1 ring-1 ring-gray-400 focus-within:ring-blue-500 focus-within:ring-2 [&>span:first-child]:focus-within:text-blue-500',
+			'flex relative max-w-md items-center rounded mb-1 ring-1 ring-gray-400 focus-within:ring-main focus-within:ring-2 focus-within:ring-2 [&>span:first-child]:focus-within:text-blue-500 bg-white',
 		input:
 			'w-full pl-3 pr-8 py-2 border-none text-base text-gray-700 placeholder-gray-400 formkit-multiple:p-0 data-[placeholder="true"]:text-gray-400 formkit-multiple:data-[placeholder="true"]:text-inherit',
 		selectIcon:
@@ -123,7 +123,7 @@ export default {
 	},
 	textarea: {
 		inner:
-			'flex max-w-md rounded mb-1 ring-1 ring-gray-400 focus-within:ring-blue-500 [&>label:first-child]:focus-within:text-blue-500',
+			'flex max-w-md rounded mb-1 ring-1 ring-gray-400 focus-within:ring-main focus-within:ring-2 [&>label:first-child]:focus-within:text-main bg-white',
 		input:
 			'block w-full h-32 px-3 py-3 border-none text-base text-gray-700 placeholder-gray-400 focus:shadow-outline',
 	},

@@ -83,6 +83,7 @@ const createSlug = () => {
 					id="regions_form"
 					type="form"
 					:submit-label="inputId ? 'Сохранить' : 'Добавить'"
+					:config="{ validationVisibility: 'submit' }"
 					@submit="popupSubmit"
 				>
 					<FormKit

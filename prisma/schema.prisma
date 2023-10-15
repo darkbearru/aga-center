@@ -2,152 +2,151 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-	provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-	provider = "mysql"
-	url      = env("DATABASE_URL")
+    provider = "mysql"
+    url      = env("DATABASE_URL")
 }
 
 // Пользователи
 model Users {
-	id          Int       @id @default(autoincrement())
-	email       String    @unique
-	fio         String?   @db.VarChar(100)
-	isNew       Boolean   @default(false)
-	isAdmin     Boolean   @default(false)
-	isModerator Boolean   @default(false)
-	confirmCode String?   @db.VarChar(32)
-	createdAt   DateTime  @default(now())
-	changedAt   DateTime  @default(now())
-	company     Company[]
+    id          Int       @id @default(autoincrement())
+    email       String    @unique
+    fio         String?   @db.VarChar(100)
+    isNew       Boolean   @default(false)
+    isAdmin     Boolean   @default(false)
+    isModerator Boolean   @default(false)
+    confirmCode String?   @db.VarChar(32)
+    createdAt   DateTime  @default(now())
+    changedAt   DateTime  @default(now())
+    company     Company[]
 }
 
 // Список регионов
 model Regions {
-	id          Int          @id @default(autoincrement())
-	name        String       @db.VarChar(100)
-	slug        String       @unique @db.VarChar(20)
-	isActive    Boolean      @default(false)
-	initiatives Initiative[]
+    id          Int          @id @default(autoincrement())
+    name        String       @db.VarChar(100)
+    slug        String       @unique @db.VarChar(20)
+    isActive    Boolean      @default(false)
+    initiatives Initiative[]
 }
 
 // Список компаний
 model Company {
-	id              Int            @id @default(autoincrement())
-	status          Boolean        @default(false)
-	nameFull        String?        @db.VarChar(255)
-	nameShort       String?        @db.VarChar(50)
-	requsites       String?        @db.Text
-	isApproved      Boolean        @default(false)
-	Users           Users?         @relation(fields: [usersId], references: [id])
-	usersId         Int?
-	typeOwnership   TypeOwnership? @relation(fields: [typeOwnershipId], references: [id])
-	typeOwnershipId Int?
-	createdAt       DateTime       @default(now())
-	changedAt       DateTime       @default(now())
-	contacts        Contacts[]
-	initiatives     Initiative[]
-	reviews         Reviews[]
+    id              Int            @id @default(autoincrement())
+    nameFull        String         @db.VarChar(255)
+    nameShort       String?        @db.VarChar(50)
+    requsites       String         @db.Text
+    isApproved      Boolean        @default(false)
+    Users           Users?         @relation(fields: [usersId], references: [id])
+    usersId         Int?
+    typeOwnership   TypeOwnership? @relation(fields: [typeOwnershipId], references: [id])
+    typeOwnershipId Int?
+    createdAt       DateTime       @default(now())
+    changedAt       DateTime       @default(now())
+    contacts        Contacts[]
+    initiatives     Initiative[]
+    reviews         Reviews[]
 }
 
 model Contacts {
-	id        Int      @id @default(autoincrement())
-	type      Int      @default(0)
-	value     String?  @db.VarChar(100)
-	Company   Company? @relation(fields: [companyId], references: [id])
-	companyId Int?
-	createdAt DateTime @default(now())
-	changedAt DateTime @default(now())
+    id        Int      @id @default(autoincrement())
+    type      String
+    value     String?  @db.VarChar(100)
+    Company   Company? @relation(fields: [companyId], references: [id])
+    companyId Int?
+    createdAt DateTime @default(now())
+    changedAt DateTime @default(now())
 }
 
 // Тип собственности компании ИП, ООО и т.п.
 model TypeOwnership {
-	id        Int       @id @default(autoincrement())
-	nameShort String    @db.VarChar(20)
-	nameFull  String    @db.VarChar(100)
-	createdAt DateTime  @default(now())
-	changedAt DateTime  @default(now())
-	Company   Company[]
+    id        Int       @id @default(autoincrement())
+    nameShort String    @db.VarChar(20)
+    nameFull  String    @db.VarChar(100)
+    createdAt DateTime  @default(now())
+    changedAt DateTime  @default(now())
+    Company   Company[]
 }
 
 model Initiative {
-	id                Int              @id @default(autoincrement())
-	status            Boolean          @default(false)
-	direction         Int              @default(0)
-	name              String?          @db.VarChar(100)
-	text              String?          @db.Text
-	isApproved        Boolean          @default(false)
-	Company           Company?         @relation(fields: [companyId], references: [id])
-	companyId         Int?
-	Photos            Photos[]
-	Reviews           Reviews[]
-	InitiativeTypes   InitiativeTypes? @relation(fields: [initiativeTypesId], references: [id])
-	initiativeTypesId Int?
-	createdAt         DateTime         @default(now())
-	changedAt         DateTime         @default(now())
-	Regions           Regions?         @relation(fields: [regionsId], references: [id])
-	regionsId         Int?
+    id                Int              @id @default(autoincrement())
+    status            Boolean          @default(false)
+    direction         Int              @default(0)
+    name              String?          @db.VarChar(100)
+    text              String?          @db.Text
+    isApproved        Boolean          @default(false)
+    Company           Company?         @relation(fields: [companyId], references: [id])
+    companyId         Int?
+    Photos            Photos[]
+    Reviews           Reviews[]
+    InitiativeTypes   InitiativeTypes? @relation(fields: [initiativeTypesId], references: [id])
+    initiativeTypesId Int?
+    createdAt         DateTime         @default(now())
+    changedAt         DateTime         @default(now())
+    Regions           Regions?         @relation(fields: [regionsId], references: [id])
+    regionsId         Int?
 }
 
 model InitiativeTypes {
-	id          Int          @id @default(autoincrement())
-	name        String
-	initiatives Initiative[]
+    id          Int          @id @default(autoincrement())
+    name        String
+    initiatives Initiative[]
 }
 
 model Photos {
-	id           Int         @id @default(autoincrement())
-	path         String
-	title        String?     @db.VarChar(100)
-	Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
-	initiativeId Int?
-	News         News?       @relation(fields: [newsId], references: [id])
-	newsId       Int?
-	Articles     Articles?   @relation(fields: [articlesId], references: [id])
-	articlesId   Int?
+    id           Int         @id @default(autoincrement())
+    path         String
+    title        String?     @db.VarChar(100)
+    Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
+    initiativeId Int?
+    News         News?       @relation(fields: [newsId], references: [id])
+    newsId       Int?
+    Articles     Articles?   @relation(fields: [articlesId], references: [id])
+    articlesId   Int?
 }
 
 model Reviews {
-	id           Int         @id @default(autoincrement())
-	Company      Company?    @relation(fields: [companyId], references: [id])
-	companyId    Int?
-	Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
-	initiativeId Int?
-	title        String?
-	review       String?     @db.Text
-	rate         Int?        @default(0)
-	client       Client?     @relation(fields: [clientId], references: [id])
-	clientId     Int?
-	createdAt    DateTime    @default(now())
-	changedAt    DateTime    @default(now())
+    id           Int         @id @default(autoincrement())
+    Company      Company?    @relation(fields: [companyId], references: [id])
+    companyId    Int?
+    Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
+    initiativeId Int?
+    title        String?
+    review       String?     @db.Text
+    rate         Int?        @default(0)
+    client       Client?     @relation(fields: [clientId], references: [id])
+    clientId     Int?
+    createdAt    DateTime    @default(now())
+    changedAt    DateTime    @default(now())
 }
 
 model Client {
-	id      Int       @id @default(autoincrement())
-	Reviews Reviews[]
+    id      Int       @id @default(autoincrement())
+    Reviews Reviews[]
 }
 
 model News {
-	id        Int      @id @default(autoincrement())
-	active    Boolean  @default(false)
-	title     String   @db.VarChar(255)
-	slug      String   @unique @db.VarChar(50)
-	text      String?  @db.Text
-	date      DateTime @default(now())
-	Photos    Photos[]
-	createdAt DateTime @default(now())
-	changedAt DateTime @default(now())
+    id        Int      @id @default(autoincrement())
+    active    Boolean  @default(false)
+    title     String   @db.VarChar(255)
+    slug      String   @unique @db.VarChar(50)
+    text      String?  @db.Text
+    date      DateTime @default(now())
+    Photos    Photos[]
+    createdAt DateTime @default(now())
+    changedAt DateTime @default(now())
 }
 
 model Articles {
-	id        Int      @id @default(autoincrement())
-	active    Boolean  @default(false)
-	title     String
-	slug      String
-	text      String?  @db.Text
-	Photos    Photos[]
-	createdAt DateTime @default(now())
-	changedAt DateTime @default(now())
+    id        Int      @id @default(autoincrement())
+    active    Boolean  @default(false)
+    title     String
+    slug      String
+    text      String?  @db.Text
+    Photos    Photos[]
+    createdAt DateTime @default(now())
+    changedAt DateTime @default(now())
 }

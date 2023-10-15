@@ -2,6 +2,7 @@
 
 import { TCommonData } from '~/src/data/types/common.data';
 import News from '~/components/layout/admin/News.vue';
+import Companies from '~/components/layout/admin/Companies.vue';
 
 definePageMeta({
 	middleware: ["auth"],
@@ -17,11 +18,10 @@ defineProps({
 
 <template>
 	<div v-if="(data as TCommonData)?.news">
-		Layout: Admin page
 		<News />
 	</div>
 	<div v-else>
-		Layout: Client page
+		<Companies />
 	</div>
 </template>
 

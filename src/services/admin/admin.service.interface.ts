@@ -4,6 +4,7 @@ import { TRegion, TRegionResponse } from '~/src/data/types/regions';
 import { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
 import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
 import { TNews, TNewsResponse } from '~/src/data/types/news';
+import { TCompany, TCompanyResponse } from '~/src/data/types/company';
 
 export interface IAdminService {
 	data(): Promise<TCommonData>;
@@ -17,4 +18,6 @@ export interface IAdminService {
 	ownershipDelete(ownership: TOwnership): Promise<boolean>;
 	initiativeTypesSave(type: TInitiativeTypes): Promise<TInitiativeTypesResponse>;
 	initiativeTypesDelete(type: TInitiativeTypes): Promise<boolean>;
+	companySave(company: TCompany): Promise<TCompanyResponse>;
+	companyDelete(company: TCompany): Promise<boolean>;
 }

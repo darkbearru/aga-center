@@ -13,6 +13,8 @@ import { IOwnershipRepository } from '~/src/data/ownership.repository.interface'
 import { IInitiativeTypesRepository } from '~/src/data/initiative.types.repository.inerface';
 import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
 import { TNews, TNewsResponse } from '~/src/data/types/news';
+import { TCompany, TCompanyResponse, TContacts } from '~/src/data/types/company';
+import { ICompanyRepository } from '~/src/data/company.repository.interface';
 
 export class AdminService implements IAdminService {
 	constructor(
@@ -22,6 +24,7 @@ export class AdminService implements IAdminService {
 		private regionsRepository: IRegionsRepository,
 		private ownershipRepository: IOwnershipRepository,
 		private initiativeTypesRepository: IInitiativeTypesRepository,
+		private companyRepository: ICompanyRepository,
 	) {
 	}
 
@@ -31,9 +34,10 @@ export class AdminService implements IAdminService {
 		let news: News[] | undefined = undefined;
 		let users: TUser[] | undefined = undefined;
 		let regions: TRegion[] | undefined = undefined;
-		let ownership: TOwnership[] | undefined = undefined;
 		let types: TInitiativeTypes[] | undefined = undefined;
+		let companies: TCompany[] | undefined = undefined;
 		let articles: Articles[] | undefined = undefined;
+		const ownership: TOwnership[] | undefined = await this.ownershipRepository.list();
 		if (this.user.isAdmin) {
 			menu['/client'] = 'Новости';
 			menu['/client/articles'] = 'Статьи';
@@ -44,7 +48,6 @@ export class AdminService implements IAdminService {
 			news = await this.getNewsList();
 			users = await this.getUsersList();
 			regions = await this.regionsRepository.list();
-			ownership = await this.ownershipRepository.list();
 			types = await this.initiativeTypesRepository.list();
 
 		}
@@ -52,8 +55,9 @@ export class AdminService implements IAdminService {
 			menu['/client/moderation'] = 'Модерация';
 		}
 		if (!this.user.isAdmin && !this.user.isModerator) {
-			menu['/client/company'] = 'Компания';
+			menu['/client'] = 'Компания';
 			menu['/client/initiatives'] = 'Инициативы';
+			companies = await this.companyRepository.list(this.user);
 		}
 		menu['/client/profile'] = 'Профиль';
 		return {
@@ -64,7 +68,8 @@ export class AdminService implements IAdminService {
 			articles,
 			regions,
 			ownership,
-			types
+			types,
+			companies
 		}
 	}
 
@@ -91,7 +96,12 @@ export class AdminService implements IAdminService {
 		if(response.errors) return response;
 
 		if (!news.id) {
-			response.news = await this.newsRepository.add(news);
+			const result = await this.newsRepository.add(news);
+			if (typeof result !== 'boolean') {
+				response.news = result;
+			} else {
+				response.errors = {other: 'Ошибка добавления данных'}
+			}
 		} else {
 			if (await this.newsRepository.save(news)) {
 				response.news = news
@@ -260,6 +270,65 @@ export class AdminService implements IAdminService {
 	}
 	async initiativeTypesDelete(type: TInitiativeTypes): Promise<boolean> {
 		return await this.initiativeTypesRepository.delete(type);
+	}
+
+	async companyDelete(company: TCompany): Promise<boolean> {
+		return await this.companyRepository.delete(company);
+	}
+
+	async companySave(company: TCompany): Promise<TCompanyResponse> {
+		const check: boolean = await this.companyRepository.check(company);
+		const response: TCompanyResponse = {
+			errors: undefined,
+			company
+		}
+		if (!check) {
+			response.errors = {
+				nameFull: `Компания «${company.nameFull}» уже существует`
+			}
+		}
+		if (!company.nameFull.trim()) {
+			response.errors = {...response.errors, nameFull: 'Не указано наименование компании'}
+		}
+		if (!company.nameShort?.trim()) {
+			response.errors = {...response.errors, nameShort: 'Не указано краткое наименование компании'}
+		}
+		if (!company.requsites?.trim()) {
+			response.errors = {...response.errors, requsites: 'Не указаны реквизиты компании'}
+		}
+		if (!company.contacts) {
+			response.errors = {...response.errors, contacts: 'Не указана контактная информация'}
+		}
+		if(response.errors) return response;
+
+		company.user = {
+			id: this.user.id,
+			email: this.user.email,
+			fio: this.user.fio
+		};
+
+		if (!company.id) {
+			company.contacts = company.contacts?.filter(item => !item.isDeleted);
+			const res= await this.companyRepository.add(company);
+			if (res) {
+				response.company = res;
+			} else {
+				response.errors = {other: 'Ошибка сохранения данных'}
+			}
+		} else {
+			const deletedContacts: TContacts | undefined = company.contacts?.filter(item => item.isDeleted);
+			company.contacts = company.contacts?.filter(item => !item.isDeleted);
+			if (deletedContacts) {
+				await this.companyRepository.deleteContacts(deletedContacts);
+			}
+
+			if (await this.companyRepository.save(company)) {
+				response.company = company
+			} else {
+				response.errors = {other: 'Ошибка сохранения данных'}
+			}
+		}
+		return response;
 	}
 
 }
