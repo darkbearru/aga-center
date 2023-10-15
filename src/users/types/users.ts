@@ -1,13 +1,4 @@
-
-export type TCompany = {
-	id?: number,
-	status: boolean,
-	nameFull: string,
-	nameShort: string
-	requsites: string,
-}
-
-export type TCompanies = TCompany[];
+import { TCompany } from '~/src/data/types/company';
 
 export type TUser = {
 	id?: number,
@@ -16,7 +7,7 @@ export type TUser = {
 	isAdmin?: boolean,
 	isModerator?: boolean,
 	confirmCode?: string | null,
-	companies?: TCompanies,
+	companies?: TCompany[],
 	createdAt?: Date,
 	changedAt?: Date,
 }

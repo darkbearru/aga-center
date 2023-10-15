@@ -4,6 +4,7 @@ import { TRegion } from '~/src/data/types/regions';
 import { TOwnership } from '~/src/data/types/ownership';
 import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import { TNews } from '~/src/data/types/news';
+import { TCompany } from '~/src/data/types/company';
 
 export type TAdminMenu = Record<string, string>;
 
@@ -16,4 +17,5 @@ export type TCommonData = {
 	regions?: TRegion[],
 	ownership?: TOwnership[],
 	types?: TInitiativeTypes[],
+	companies?: TCompany[]
 }

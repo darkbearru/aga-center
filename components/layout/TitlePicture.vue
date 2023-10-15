@@ -14,10 +14,10 @@ const img = useImage();
 				aspect="42/9"
 				format="webp"
 				quality="85"
-				:placeholder="img(`/images/hills_and_sky.jpg`, {fit: 'contain', format: 'webp', height: 50, blur: 3, quality: 50 })"
+				sizes="xs:1400 sm:2800 md:3733 lg:4667 xl:5880"
 				loading="lazy"
+				:placeholder="img(`/images/hills_and_sky.jpg`, {fit: 'contain', format: 'webp', height: 50, blur: 3, quality: 50 })"
 			/>
-<!--			sizes="xs:1400 sm:2800 md:3733 lg:4667 xl:5880"-->
 			<div class="title-footer"></div>
 			<SearchBlock/>
 		</div>

@@ -6,7 +6,7 @@ defineProps({
 </script>
 
 <template>
-	<NuxtLink class="rounded-sm px-4 py-1 whitespace-nowrap cursor-pointer" :to="to">
+	<NuxtLink class="rounded px-4 py-1 whitespace-nowrap cursor-pointer" :to="to">
 		<slot />
 	</NuxtLink>
 </template>

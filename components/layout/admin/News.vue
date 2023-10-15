@@ -91,6 +91,7 @@ const createSlug = () => {
 					id="news_form"
 					type="form"
 					:submit-label="inputId ? 'Сохранить' : 'Добавить'"
+					:config="{ validationVisibility: 'submit' }"
 					@submit="popupSubmit"
 				>
 					<FormKit

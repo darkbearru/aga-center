@@ -6,6 +6,7 @@ import { TRegion, TRegionResponse } from '~/src/data/types/regions';
 import { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
 import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
 import { TNews, TNewsResponse } from '~/src/data/types/news';
+import { TCompany, TCompanyResponse } from '~/src/data/types/company';
 //import { FetchError } from 'ofetch';
 
 export const useData = defineStore('data', {
@@ -18,9 +19,10 @@ export const useData = defineStore('data', {
 		const regions: globalThis.Ref<TRegion[] | undefined> = ref(undefined);
 		const ownership: globalThis.Ref<TOwnership[] | undefined> = ref(undefined);
 		const types: globalThis.Ref<TInitiativeTypes[] | undefined> = ref(undefined);
+		const companies: globalThis.Ref<TCompany[] | undefined> = ref(undefined);
 		const articles: globalThis.Ref<Articles[] | undefined> = ref(undefined);
 		const accessToken = useCookie('ac_token');
-		return { path, user, menu, news, users, regions, ownership, types, articles, accessToken }
+		return { path, user, menu, news, users, regions, ownership, types, companies, articles, accessToken }
 	},
 	actions: {
 		async get(): Promise<boolean> {
@@ -41,6 +43,7 @@ export const useData = defineStore('data', {
 			this.ownership = list.ownership;
 			this.types = list.types;
 			this.articles = list.articles;
+			this.companies = list.companies;
 			return true;
 		},
 		/**
@@ -248,6 +251,14 @@ export const useData = defineStore('data', {
 			}
 			return true;
 		},
+
+		getOwnershipById(id: Number): TOwnership | undefined {
+			if (!this.ownership) return undefined;
+			const idx: number = this.ownership.findIndex((value: TOwnership): boolean => value.id === id);
+			if (idx >= 0) return this.ownership[idx];
+			return undefined;
+		},
+
 		/**
 		 * Сохранение, добавление типа инициативы
 		 */
@@ -370,6 +381,73 @@ export const useData = defineStore('data', {
 			if (deleted && this.news) {
 				this.news = this.news.filter((item: TNews): boolean => item.id !== news.id);
 				alert(`Новость «${news.title}» удалена`);
+			}
+			return true;
+		},
+
+		/**
+		 * Сохранение, добавление новости
+		 */
+		async updateCompany(company: TCompany): Promise<TCompanyResponse | false> {
+			const { data, error } =
+				await useFetch(`${this.path}/company`, {
+					method: 'post',
+					body: company,
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			const companyResponse: TCompanyResponse = unref(data.value) as TCompanyResponse;
+			if (!companyResponse.errors) {
+				this.updateCompanyData(companyResponse.company);
+			}
+			return companyResponse;
+		},
+		/**
+		 * Обновление данных о регионе в массиве
+		 * @param company
+		 */
+		updateCompanyData(company?: TCompany): void {
+			if (typeof this.companies === 'undefined') {
+				this.companies = [];
+			}
+			if (company) {
+				const index: number = this.companies.findIndex((item: TCompany): boolean => item.id === company.id);
+				if (index >= 0) {
+					this.companies[index] = {...company};
+				} else {
+					this.companies = [{...company}, ...this.companies];
+				}
+			}
+			this.companies = this.companies.sort((a: TCompany, b: TCompany): number => {
+				if (a.nameShort > b.nameShort) return 1;
+				if (b.nameShort > a.nameShort) return -1;
+				return 0;
+			})
+		},
+		/**
+		 * Удаление новости
+		 * @param company
+		 */
+		async deleteCompany(company: TCompany): Promise<boolean> {
+			if (this.companies?.length === 1) {
+				alert('Нельзя удалить единственную компанию');
+				return false;
+			}
+			const { data, error } =
+				await useFetch(`${this.path}/company`, {
+					method: 'delete',
+					body: company,
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			const deleted: boolean = unref(data.value) as boolean;
+			if (deleted && this.companies) {
+				this.companies = this.companies.filter((item: TCompany): boolean => item.id !== company.id);
+				alert(`Компания «${company.nameFull}» удалена`);
 			}
 			return true;
 		},

@@ -5,6 +5,7 @@ import { RegionsRepository } from '~/src/data/regions.repository';
 import { H3Event } from 'h3';
 import { OwnershipRepository } from '~/src/data/ownership.repository';
 import { InitiativeTypesRepository } from '~/src/data/initiative.types.repository';
+import { CompanyRepository } from '~/src/data/company.repository';
 
 export function initAdminService(event: H3Event): AdminService {
 	return new AdminService(
@@ -14,5 +15,6 @@ export function initAdminService(event: H3Event): AdminService {
 		new RegionsRepository(),
 		new OwnershipRepository(),
 		new InitiativeTypesRepository(),
+		new CompanyRepository(),
 	);
 }
