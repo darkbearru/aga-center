@@ -5,6 +5,7 @@ import { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
 import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
 import { TNews, TNewsResponse } from '~/src/data/types/news';
 import { TCompany, TCompanyResponse } from '~/src/data/types/company';
+import { TInitiative, TInitiativeResponse } from '~/src/data/types/initiatives';
 
 export interface IAdminService {
 	data(): Promise<TCommonData>;
@@ -20,4 +21,6 @@ export interface IAdminService {
 	initiativeTypesDelete(type: TInitiativeTypes): Promise<boolean>;
 	companySave(company: TCompany): Promise<TCompanyResponse>;
 	companyDelete(company: TCompany): Promise<boolean>;
+	initiativeSave(item: TInitiative): Promise<TInitiativeResponse>;
+	initiativeDelete(item: TInitiative): Promise<boolean>;
 }

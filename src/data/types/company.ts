@@ -37,7 +37,7 @@ export type TCompany = {
 	isApproved?: boolean,
 	contacts?: TContacts,
 	ownership?: TOwnership,
-	user: TUser,
+	user?: TUser,
 }
 export type TCompanyResponse = {
 	errors?: {

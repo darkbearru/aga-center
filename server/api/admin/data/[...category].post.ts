@@ -8,6 +8,7 @@ import { TOwnership } from '~/src/data/types/ownership';
 import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import { TNews } from '~/src/data/types/news';
 import { TCompany } from '~/src/data/types/company';
+import { TInitiative } from '~/src/data/types/initiatives';
 
 export default defineEventHandler(
 	async (event: H3Event) => {
@@ -38,6 +39,10 @@ export default defineEventHandler(
 			case 'company' : {
 				const company: TCompany = await readBody(event);
 				return await adminService.companySave(company);
+			}
+			case 'initiative' : {
+				const item: TInitiative = await readBody(event);
+				return await adminService.initiativeSave(item);
 			}
 		}
 		return '';

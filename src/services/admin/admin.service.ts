@@ -15,6 +15,8 @@ import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/ini
 import { TNews, TNewsResponse } from '~/src/data/types/news';
 import { TCompany, TCompanyResponse, TContacts } from '~/src/data/types/company';
 import { ICompanyRepository } from '~/src/data/company.repository.interface';
+import { TInitiative, TInitiativeResponse } from '~/src/data/types/initiatives';
+import { IInitiativeRepository } from '~/src/data/initiative.repository.interface';
 
 export class AdminService implements IAdminService {
 	constructor(
@@ -25,6 +27,7 @@ export class AdminService implements IAdminService {
 		private ownershipRepository: IOwnershipRepository,
 		private initiativeTypesRepository: IInitiativeTypesRepository,
 		private companyRepository: ICompanyRepository,
+		private initiativeRepository: IInitiativeRepository,
 	) {
 	}
 
@@ -37,6 +40,7 @@ export class AdminService implements IAdminService {
 		let types: TInitiativeTypes[] | undefined = undefined;
 		let companies: TCompany[] | undefined = undefined;
 		let articles: Articles[] | undefined = undefined;
+		let initiatives: TInitiative[] | undefined = undefined;
 		const ownership: TOwnership[] | undefined = await this.ownershipRepository.list();
 		if (this.user.isAdmin) {
 			menu['/client'] = 'Новости';
@@ -55,9 +59,10 @@ export class AdminService implements IAdminService {
 			menu['/client/moderation'] = 'Модерация';
 		}
 		if (!this.user.isAdmin && !this.user.isModerator) {
-			menu['/client'] = 'Компания';
-			menu['/client/initiatives'] = 'Инициативы';
+			menu['/client'] = 'Компания / Инициативы';
+			menu['/client/orders'] = 'Заявки';
 			companies = await this.companyRepository.list(this.user);
+			initiatives = await this.initiativeRepository.list(this.user);
 		}
 		menu['/client/profile'] = 'Профиль';
 		return {
@@ -69,7 +74,8 @@ export class AdminService implements IAdminService {
 			regions,
 			ownership,
 			types,
-			companies
+			companies,
+			initiatives
 		}
 	}
 
@@ -331,4 +337,43 @@ export class AdminService implements IAdminService {
 		return response;
 	}
 
+	async initiativeDelete(item: TInitiative): Promise<boolean> {
+		return await this.initiativeRepository.delete(item, this.user);
+	}
+
+	async initiativeSave(item: TInitiative): Promise<TInitiativeResponse> {
+		const check: boolean = await this.initiativeRepository.check(item);
+		const response: TInitiativeResponse = {
+			errors: undefined,
+			initiative: item
+		}
+		if (!check) {
+			response.errors = {
+				name: `Инициатива «${item.name}» в регионе «${item.region.name}» уже существует`
+			}
+		}
+		if (!item.name.trim()) {
+			response.errors = {...response.errors, name: 'Не указано наименование инициативы'}
+		}
+		if (!item.text?.trim()) {
+			response.errors = {...response.errors, text: 'Не указан текст описания инициативы'}
+		}
+		if(response.errors) return response;
+
+		if (!item.id) {
+			const res= await this.initiativeRepository.add(item);
+			if (res) {
+				response.initiative = res;
+			} else {
+				response.errors = {other: 'Ошибка сохранения данных'}
+			}
+		} else {
+			if (await this.initiativeRepository.save(item, this.user)) {
+				response.initiative = item
+			} else {
+				response.errors = {other: 'Ошибка сохранения данных'}
+			}
+		}
+		return response;
+	}
 }

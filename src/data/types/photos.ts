@@ -1,6 +1,5 @@
-export type TPhotoItem = {
+export type TPhotos = {
+	id?: number,
 	path: string,
 	title: string,
 }
-
-export type TPhotos = TPhotoItem[];

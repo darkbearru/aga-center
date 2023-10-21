@@ -4,14 +4,14 @@ import { TCompany, TContact, TContacts } from '~/src/data/types/company';
 import ContactsCreateOrConnectWithoutCompanyInput = Prisma.ContactsCreateOrConnectWithoutCompanyInput;
 import ContactsWhereInput = Prisma.ContactsWhereInput;
 import { TUser } from '~/src/users/types/users';
+import CompanyWhereUniqueInput = Prisma.CompanyWhereUniqueInput;
 
-const prisma: PrismaClient = new PrismaClient({ log: ['query'] });
+const prisma: PrismaClient = new PrismaClient();
 
 export class CompanyRepository implements ICompanyRepository {
 	async add(company: TCompany): Promise<TCompany | undefined> {
 		try {
 			const contacts: ContactsCreateOrConnectWithoutCompanyInput[] = this.contactsConnectOrCreate(company?.contacts);
-			console.log('add', company);
 			const created =  await prisma.company.create({
 				data: {
 					nameFull: company.nameFull,
@@ -25,7 +25,7 @@ export class CompanyRepository implements ICompanyRepository {
 						connect: { id: company.ownership?.id }
 					},
 					Users: {
-						connect: { id: company.user.id }
+						connect: { id: company.user?.id }
 					}
 				}
 			});
@@ -116,9 +116,11 @@ export class CompanyRepository implements ICompanyRepository {
 
 	async delete(company: TCompany): Promise<boolean> {
 		try {
+			// let t: CompanyWhereUniqueInput;
 			await prisma.company.delete({
 				where: {
-					id: company.id
+					id: company.id,
+					usersId: company.user?.id,
 				}
 			});
 			return true;
@@ -180,7 +182,7 @@ export class CompanyRepository implements ICompanyRepository {
 
 	async save(company: TCompany): Promise<boolean> {
 		console.log('Save');
-		console.log(company.user.id);
+		console.log(company.user?.id);
 		try {
 			const contacts: ContactsCreateOrConnectWithoutCompanyInput[] = this.contactsConnectOrCreate(company?.contacts);
 			await prisma.company.update({
@@ -199,7 +201,7 @@ export class CompanyRepository implements ICompanyRepository {
 						connect: { id: company.ownership?.id }
 					},
 					Users: {
-						connect: { id: company.user.id }
+						connect: { id: company.user?.id }
 					}
 				}
 			});

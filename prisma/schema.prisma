@@ -22,6 +22,8 @@ model Users {
     createdAt   DateTime  @default(now())
     changedAt   DateTime  @default(now())
     company     Company[]
+    order       Order[]
+    reviews     Reviews[]
 }
 
 // Список регионов
@@ -75,7 +77,7 @@ model Initiative {
     id                Int              @id @default(autoincrement())
     status            Boolean          @default(false)
     direction         Int              @default(0)
-    name              String?          @db.VarChar(100)
+    name              String?          @db.VarChar(255)
     text              String?          @db.Text
     isApproved        Boolean          @default(false)
     Company           Company?         @relation(fields: [companyId], references: [id])
@@ -88,12 +90,22 @@ model Initiative {
     changedAt         DateTime         @default(now())
     Regions           Regions?         @relation(fields: [regionsId], references: [id])
     regionsId         Int?
+    Order             Order[]
 }
 
 model InitiativeTypes {
-    id          Int          @id @default(autoincrement())
-    name        String
-    initiatives Initiative[]
+    id         Int          @id @default(autoincrement())
+    name       String
+    Initiative Initiative[]
+}
+
+model Order {
+    id           Int         @id @default(autoincrement())
+    status       Int         @default(0)
+    Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
+    initiativeId Int?
+    Users        Users?      @relation(fields: [usersId], references: [id])
+    usersId      Int?
 }
 
 model Photos {
@@ -110,22 +122,17 @@ model Photos {
 
 model Reviews {
     id           Int         @id @default(autoincrement())
-    Company      Company?    @relation(fields: [companyId], references: [id])
-    companyId    Int?
     Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
     initiativeId Int?
     title        String?
     review       String?     @db.Text
     rate         Int?        @default(0)
-    client       Client?     @relation(fields: [clientId], references: [id])
-    clientId     Int?
     createdAt    DateTime    @default(now())
     changedAt    DateTime    @default(now())
-}
-
-model Client {
-    id      Int       @id @default(autoincrement())
-    Reviews Reviews[]
+    Company      Company?    @relation(fields: [companyId], references: [id])
+    companyId    Int?
+    Users        Users?      @relation(fields: [usersId], references: [id])
+    usersId      Int?
 }
 
 model News {

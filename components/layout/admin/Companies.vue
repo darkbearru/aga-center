@@ -8,6 +8,7 @@ import PopupContainer from '~/components/ui/PopupContainer.vue';
 import Button from '~/components/ui/Button.vue';
 import IconPlus from 'assets/svg/icon-plus.svg';
 import IconEdit from 'assets/svg/icon-edit.svg';
+import Initiatives from '~/components/layout/admin/Initiatives.vue';
 
 
 const titlePopup = ref('Добавить компанию')
@@ -92,6 +93,8 @@ refreshCompanies();
 				<IconPlus filled class="w-6 h-6" />
 			</Button>
 		</div>
+
+		<Initiatives />
 
 		<PopupContainer ref="popup">
 			<Popup class="bg-gray-light/60 w-full min-w-[300px] max-w-[500px] pb-0" :title="titlePopup" @close="popupClose">
