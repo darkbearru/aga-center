@@ -8,8 +8,10 @@
   "prisma": {
     "seed": "node prisma/seed.mjs"
   },
+  "main": ".output/server/index.mjs",
   "private": true,
   "scripts": {
+    "start": "node .output/server/index.mjs",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
