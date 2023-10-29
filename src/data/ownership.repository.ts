@@ -1,12 +1,11 @@
 import { IOwnershipRepository } from '~/src/data/ownership.repository.interface';
 import { TOwnership } from '~/src/data/types/ownership';
-import { PrismaClient } from '@prisma/client';
+import { prismaClient } from '~/src/utils/prismaClient';
 
-const prisma: PrismaClient = new PrismaClient();
 
 export class OwnershipRepository implements IOwnershipRepository {
 	async add(ownership: TOwnership): Promise<TOwnership> {
-		return prisma.typeOwnership.create({
+		return prismaClient.typeOwnership.create({
 			data: {
 				nameShort: ownership.nameShort,
 				nameFull: ownership.nameFull,
@@ -16,7 +15,7 @@ export class OwnershipRepository implements IOwnershipRepository {
 
 	async check(ownership: TOwnership): Promise<boolean> {
 		const idQuery = typeof ownership.id !== 'undefined' ? { id: { not: ownership.id } } : {};
-		const res = await prisma.typeOwnership.findFirst({
+		const res = await prismaClient.typeOwnership.findFirst({
 			where: {
 				AND: [
 					{ nameShort: ownership.nameShort },
@@ -29,7 +28,7 @@ export class OwnershipRepository implements IOwnershipRepository {
 
 	async delete(ownership: TOwnership): Promise<boolean> {
 		try {
-			await prisma.typeOwnership.delete({
+			await prismaClient.typeOwnership.delete({
 				where: {
 					id: ownership.id
 				}
@@ -42,7 +41,7 @@ export class OwnershipRepository implements IOwnershipRepository {
 
 	async list(): Promise<TOwnership[] | undefined> {
 		try {
-			return await prisma.typeOwnership.findMany({
+			return await prismaClient.typeOwnership.findMany({
 				orderBy: { nameShort: 'asc' },
 			});
 		} catch (e) {
@@ -52,7 +51,7 @@ export class OwnershipRepository implements IOwnershipRepository {
 
 	async save(ownership: TOwnership): Promise<boolean> {
 		try {
-			await prisma.typeOwnership.update({
+			await prismaClient.typeOwnership.update({
 				data: {
 					nameShort: ownership.nameShort,
 					nameFull: ownership.nameFull,

@@ -1,15 +1,14 @@
 import { IUsersRepository } from '~/src/users/users.repository.interface';
-import { PrismaClient } from '@prisma/client';
 import { TUser, TUserRegistration } from '~/src/users/types/users';
+import { prismaClient } from '~/src/utils/prismaClient';
 
-const prisma = new PrismaClient();
 
 export class UsersRepository implements IUsersRepository {
     async count(): Promise<number> {
-		return prisma.users.count({});
+		return prismaClient.users.count({});
     }
     async list(skip: number = 0, take: number = 20): Promise<TUser[] | undefined> {
-		return prisma.users.findMany({
+		return prismaClient.users.findMany({
 			skip,
 			take,
 			orderBy: [
@@ -20,7 +19,7 @@ export class UsersRepository implements IUsersRepository {
 		})
     }
     async info(id: number): Promise<TUser | null> {
-		return prisma.users.findFirst({
+		return prismaClient.users.findFirst({
 			where: {
 				id: id,
 			}
@@ -30,7 +29,7 @@ export class UsersRepository implements IUsersRepository {
 	async registration(body?: TUserRegistration): Promise<TUser | undefined> {
 		await this.deleteOldCodes();
 		try {
-			return await prisma.users.update({
+			return await prismaClient.users.update({
 				where: {
 					email: body?.email,
 					confirmCode: body?.code,
@@ -55,7 +54,7 @@ export class UsersRepository implements IUsersRepository {
 	 */
 	async saveCode(email: string, code: string): Promise<void> {
 		try {
-			await prisma.users.update({
+			await prismaClient.users.update({
 				where: { email: email },
 				data: {
 					confirmCode: code,
@@ -73,13 +72,13 @@ export class UsersRepository implements IUsersRepository {
 	 * @param code
 	 */
 	async createUser(email: string, code: string): Promise<TUser|undefined> {
-		const user: TUser | null = await prisma.users.findFirst({
+		const user: TUser | null = await prismaClient.users.findFirst({
 			where: {
 				email: email
 			}
 		});
 		if (user) return undefined
-		return prisma.users.create({
+		return prismaClient.users.create({
 			data: {
 				email: email,
 				confirmCode: code,
@@ -90,7 +89,7 @@ export class UsersRepository implements IUsersRepository {
 
 	async save(user: TUser): Promise<TUser> {
 		if (!user?.id) {
-			return prisma.users.create({
+			return prismaClient.users.create({
 				data: {
 					email: user.email,
 					fio: user.fio,
@@ -100,7 +99,7 @@ export class UsersRepository implements IUsersRepository {
 				}
 			});
 		}
-		return prisma.users.update({
+		return prismaClient.users.update({
 			data: {
 				email: user.email,
 				fio: user.fio,
@@ -114,13 +113,13 @@ export class UsersRepository implements IUsersRepository {
 	}
 
 	async delete(id: number): Promise<TUser> {
-		return prisma.users.delete({
+		return prismaClient.users.delete({
 			where: { id }
 		})
 	}
 
 	async checkEmail(email: string, id?: number): Promise<TUser | null> {
-		return prisma.users.findFirst({
+		return prismaClient.users.findFirst({
 			where: {
 				AND: [
 					{ email },
@@ -142,7 +141,7 @@ export class UsersRepository implements IUsersRepository {
 	 */
 	async authorize(email: string, code: string): Promise<TUser | null> {
 		await this.deleteOldCodes();
-		return prisma.users.findFirst({
+		return prismaClient.users.findFirst({
 			where: {
 				email: email,
 				confirmCode: code
@@ -154,7 +153,7 @@ export class UsersRepository implements IUsersRepository {
 	private async deleteOldCodes(): Promise<void> {
 		const timeout = new Date();
 		timeout.setTime(timeout.getTime() - 30 * 60000);
-		await prisma.users.updateMany({
+		await prismaClient.users.updateMany({
 			where: {
 				changedAt: {
 					lte: timeout

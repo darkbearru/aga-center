@@ -1,12 +1,12 @@
 import { IInitiativeTypesRepository } from '~/src/data/initiative.types.repository.inerface';
 import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import { PrismaClient } from '@prisma/client';
-
-const prisma: PrismaClient = new PrismaClient();
+import { prismaClient } from '~/src/utils/prismaClient';
 
 export class InitiativeTypesRepository implements IInitiativeTypesRepository {
+
+
 	async add(type: TInitiativeTypes): Promise<TInitiativeTypes> {
-		return prisma.initiativeTypes.create({
+		return prismaClient.initiativeTypes.create({
 			data: {
 				name: type.name,
 			}
@@ -15,7 +15,7 @@ export class InitiativeTypesRepository implements IInitiativeTypesRepository {
 
 	async check(type: TInitiativeTypes): Promise<boolean> {
 		const idQuery = typeof type.id !== 'undefined' ? { id: { not: type.id } } : {};
-		const res = await prisma.initiativeTypes.findFirst({
+		const res = await prismaClient.initiativeTypes.findFirst({
 			where: {
 				AND: [
 					{ name: type.name },
@@ -28,7 +28,7 @@ export class InitiativeTypesRepository implements IInitiativeTypesRepository {
 
 	async delete(type: TInitiativeTypes): Promise<boolean> {
 		try {
-			await prisma.initiativeTypes.delete({
+			await prismaClient.initiativeTypes.delete({
 				where: {
 					id: type.id
 				}
@@ -41,7 +41,7 @@ export class InitiativeTypesRepository implements IInitiativeTypesRepository {
 
 	async list(): Promise<TInitiativeTypes[] | undefined> {
 		try {
-			return await prisma.initiativeTypes.findMany({
+			return await prismaClient.initiativeTypes.findMany({
 				orderBy: { name: 'asc' },
 			});
 		} catch (e) {
@@ -51,7 +51,7 @@ export class InitiativeTypesRepository implements IInitiativeTypesRepository {
 
 	async save(type: TInitiativeTypes): Promise<boolean> {
 		try {
-			await prisma.initiativeTypes.update({
+			await prismaClient.initiativeTypes.update({
 				data: {
 					name: type.name,
 				},
