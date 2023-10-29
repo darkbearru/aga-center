@@ -3,8 +3,6 @@ import ButtonRow from '~/components/ui/ButtonRow.vue';
 import IconLogin from 'assets/svg/icon-login.svg';
 import Popup from '~/components/ui/Popup.vue';
 import Button from '~/components/ui/Button.vue';
-import TextInput from '~/components/ui/TextInput.vue';
-import { codeValidate, emailValidate } from '~/src/services/validation/validation';
 import LoadingBg from '~/components/ui/LoadingBg.vue';
 import { useAuth } from '~/components/stores/useAuth';
 import { setErrors } from '@formkit/core';

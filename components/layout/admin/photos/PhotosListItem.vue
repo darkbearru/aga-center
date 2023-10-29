@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { TPhotoItem } from '~/src/data/types/photos';
+import type { TPhotoItem } from '~/src/data/types/photos';
 import IconTrash from 'assets/svg/icon-trash.svg';
 import IconRestore from 'assets/svg/icon-restore.svg';
 

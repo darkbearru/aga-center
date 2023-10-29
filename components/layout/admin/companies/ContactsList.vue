@@ -1,8 +1,7 @@
 <script setup lang="ts">
 
-import {
-	ContactsType,
-	ContactsTypeNames,
+import { ContactsType, ContactsTypeNames } from '~/src/data/types/company';
+import type {
 	TContactsType,
 	TContacts,
 	TContact,

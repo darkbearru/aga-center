@@ -1,7 +1,7 @@
-import { TUsersPayload } from '~/src/users/users.payload';
-import { TTokensResponse, TTokensList } from '~/src/services/jwt/token.types';
-import { TUser } from '~/src/users/types/users';
-import { JwtPayload } from 'jsonwebtoken';
+import { type TUsersPayload } from '~/src/users/users.payload';
+import { type TTokensResponse, type TTokensList } from '~/src/services/jwt/token.types';
+import { type TUser } from '~/src/users/types/users';
+import { type JwtPayload } from 'jsonwebtoken';
 import { H3Event } from 'h3';
 
 export interface ITokenService {

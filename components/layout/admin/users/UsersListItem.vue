@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { TUser } from '~/src/users/types/users';
+import type { TUser } from '~/src/users/types/users';
 import IconEdit from 'assets/svg/icon-edit.svg';
 import IconTrash from 'assets/svg/icon-trash.svg';
 import IconAdmin from 'assets/svg/icon-user-cog.svg';

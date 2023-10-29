@@ -6,7 +6,7 @@ import Popup from '~/components/ui/Popup.vue';
 import PopupContainer from '~/components/ui/PopupContainer.vue';
 import { useData } from '~/components/stores/useData';
 import { setErrors } from '@formkit/core';
-import { TOwnership } from '~/src/data/types/ownership';
+import type { TOwnership } from '~/src/data/types/ownership';
 
 const titlePopup = ref('Добавить форму собственности')
 const popup = ref();

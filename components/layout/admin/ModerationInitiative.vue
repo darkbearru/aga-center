@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
 import { useData } from '~/components/stores/useData';
-import { TCompany } from '~/src/data/types/company';
+import type { TCompany } from '~/src/data/types/company';
 import ListItem from '~/components/layout/admin/moderation/ListItem.vue';
 import ModerationPopup from '~/components/layout/admin/moderation/ModerationPopup.vue';
-import { TInitiative } from '~/src/data/types/initiatives';
+import type { TInitiative } from '~/src/data/types/initiatives';
 import PhotosList from '~/components/layout/admin/photos/PhotosList.vue';
 
 const userData = useData();

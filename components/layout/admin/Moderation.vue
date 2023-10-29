@@ -1,10 +1,11 @@
 <script setup lang="ts">
 
 import { useData } from '~/components/stores/useData';
-import { ContactsTypeNames, TCompany, TContact, TContactsType } from '~/src/data/types/company';
+import { ContactsTypeNames } from '~/src/data/types/company';
+import type { TCompany, TContact, TContactsType } from '~/src/data/types/company';
 import ListItem from '~/components/layout/admin/moderation/ListItem.vue';
 import ModerationPopup from '~/components/layout/admin/moderation/ModerationPopup.vue';
-import { TInitiative } from '~/src/data/types/initiatives';
+import type { TInitiative } from '~/src/data/types/initiatives';
 
 const props = defineProps({ mode: String })
 const userData = useData();

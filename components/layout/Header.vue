@@ -4,7 +4,7 @@ import Menu from '~/components/layout/Menu.vue';
 import Login from '~/components/layout/Login.vue';
 import LoginPopup from '~/components/ui/LoginPopup.vue';
 import { useAuth } from '~/components/stores/useAuth';
-import { TUsersPayload } from '~/src/users/users.payload';
+import type { TUsersPayload } from '~/src/users/users.payload';
 
 const loginPopup = ref();
 const loginBtn = ref();

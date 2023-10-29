@@ -1,5 +1,5 @@
-import { IEmailService } from '~/src/services/email/email.service.interface';
-import { TEmail, TEmailResponse } from '~/src/services/email/email.types';
+import { type IEmailService } from '~/src/services/email/email.service.interface';
+import { type TEmail, type TEmailResponse } from '~/src/services/email/email.types';
 import * as nodemailer from 'nodemailer';
 
 export class EmailService implements IEmailService {

@@ -1,8 +1,8 @@
-import { ITokenService } from './token.service.interface';
+import { type ITokenService } from './token.service.interface';
 import jwt from 'jsonwebtoken';
-import { JwtPayload } from 'jsonwebtoken';
-import { TTokensList, TTokensResponse } from './token.types';
-import { TUsersPayload } from '~/src/users/users.payload';
+import { type JwtPayload } from 'jsonwebtoken';
+import { type TTokensList, type TTokensResponse } from './token.types';
+import { type TUsersPayload } from '~/src/users/users.payload';
 import ms from 'ms';
 import { H3Event } from 'h3';
 

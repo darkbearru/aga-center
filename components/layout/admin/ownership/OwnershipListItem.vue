@@ -2,7 +2,7 @@
 
 import IconEdit from 'assets/svg/icon-edit.svg';
 import IconTrash from 'assets/svg/icon-trash.svg';
-import { TOwnership } from '~/src/data/types/ownership';
+import type { TOwnership } from '~/src/data/types/ownership';
 const props = defineProps({
 	item: Object
 });

@@ -1,4 +1,4 @@
-import { TUsersPayload } from '~/src/users/users.payload';
+import { type TUsersPayload } from '~/src/users/users.payload';
 
 export type TTokensList = {
 	access: string;

@@ -7,7 +7,7 @@ import PopupContainer from '~/components/ui/PopupContainer.vue';
 import { useData } from '~/components/stores/useData';
 import { setErrors } from '@formkit/core';
 import { slugify } from '~/src/utils/slugify';
-import { TNews } from '~/src/data/types/news';
+import type { TNews } from '~/src/data/types/news';
 
 const titlePopup = ref('Добавить новость')
 const popup = ref();

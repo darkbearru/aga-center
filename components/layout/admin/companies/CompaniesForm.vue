@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
-import { TCompany, TContacts } from '~/src/data/types/company';
+import type { TCompany, TContacts } from '~/src/data/types/company';
 import { useData } from '~/components/stores/useData';
-import { TOwnership } from '~/src/data/types/ownership';
+import type { TOwnership } from '~/src/data/types/ownership';
 import ContactsList from '~/components/layout/admin/companies/ContactsList.vue';
 import { useAuth } from '~/components/stores/useAuth';
 import { setErrors } from '@formkit/core';

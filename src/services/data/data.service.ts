@@ -1,16 +1,12 @@
-import { IDataService } from '~/src/services/data/data.service.interface';
-import { TClientData, TClientDataError } from '~/src/data/types/common.data';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import { TInitiative, TInitiativeList } from '~/src/data/types/initiatives';
-import { TNews } from '~/src/data/types/news';
-import { Users } from '.prisma/client';
-import { INewsRepository } from '~/src/data/news.repository.interface';
-import { IUsersRepository } from '~/src/users/users.repository.interface';
-import { IRegionsRepository } from '~/src/data/regions.repositiory.interface';
-import { IOwnershipRepository } from '~/src/data/ownership.repository.interface';
-import { IInitiativeTypesRepository } from '~/src/data/initiative.types.repository.inerface';
-import { ICompanyRepository } from '~/src/data/company.repository.interface';
-import { IInitiativeRepository } from '~/src/data/initiative.repository.interface';
+import { type IDataService } from '~/src/services/data/data.service.interface';
+import { type TClientData, type TClientDataError } from '~/src/data/types/common.data';
+import { type TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import { type TInitiativeList } from '~/src/data/types/initiatives';
+import { type TNews } from '~/src/data/types/news';
+import { type INewsRepository } from '~/src/data/news.repository.interface';
+import { type IRegionsRepository } from '~/src/data/regions.repositiory.interface';
+import { type IInitiativeTypesRepository } from '~/src/data/initiative.types.repository.inerface';
+import {type  IInitiativeRepository } from '~/src/data/initiative.repository.interface';
 
 export class DataService implements IDataService {
 	private onPage: number = 20;

@@ -2,9 +2,8 @@
 
 import IconPlus from 'assets/svg/icon-plus.svg';
 import Button from '~/components/ui/Button.vue';
-import {
-	ContactsType,
-	ContactsTypeNames,
+import { ContactsTypeNames, ContactsType } from '~/src/data/types/company';
+import type {
 	TContact,
 	TFormkitContactOption,
 } from '~/src/data/types/company';

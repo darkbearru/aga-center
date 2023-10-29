@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useData } from '~/components/stores/useData';
 import RegionsListItem from '~/components/layout/admin/regions/RegionsListItem.vue';
-import { TRegion } from '~/src/data/types/regions';
+import type { TRegion } from '~/src/data/types/regions';
 
 const data = useData();
 const regionsList = ref(data.regions);

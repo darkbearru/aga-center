@@ -1,18 +1,13 @@
 import { defineStore } from 'pinia';
-import { TAdminMenu, TCommonData } from '~/src/data/types/common.data';
-import { TUser, TUserResponse } from '~/src/users/types/users';
-import { Articles } from '.prisma/client';
-import { TRegion, TRegionResponse } from '~/src/data/types/regions';
-import { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
-import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
-import { TNews, TNewsResponse } from '~/src/data/types/news';
-import { TCompany, TCompanyResponse } from '~/src/data/types/company';
-import {
-	TInitiative,
-	TInitiativeDeleteResponse,
-	TInitiativeResponse,
-	TInitiativeWithID
-} from '~/src/data/types/initiatives';
+import type { TAdminMenu, TCommonData } from '~/src/data/types/common.data';
+import type { TUser, TUserResponse } from '~/src/users/types/users';
+import type { Articles } from '.prisma/client';
+import type { TRegion, TRegionResponse } from '~/src/data/types/regions';
+import type { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
+import type { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
+import type { TNews, TNewsResponse } from '~/src/data/types/news';
+import type { TCompany, TCompanyResponse } from '~/src/data/types/company';
+import type { TInitiative, TInitiativeDeleteResponse, TInitiativeResponse, TInitiativeWithID } from '~/src/data/types/initiatives';
 
 export const useData = defineStore('data', {
 	state: () => {

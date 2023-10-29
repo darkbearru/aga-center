@@ -1,5 +1,5 @@
-import { TCompany } from '~/src/data/types/company';
-import { TUsersPayload } from '~/src/users/users.payload';
+import { type TCompany } from '~/src/data/types/company';
+import { type TUsersPayload } from '~/src/users/users.payload';
 
 export type TUser = {
 	id?: number,

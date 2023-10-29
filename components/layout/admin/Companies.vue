@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { useData } from '~/components/stores/useData';
-import { TCompany, TFormkitOption } from '~/src/data/types/company';
+import type { TCompany, TFormkitOption } from '~/src/data/types/company';
 import CompaniesForm from '~/components/layout/admin/companies/CompaniesForm.vue';
 import Popup from '~/components/ui/Popup.vue';
 import PopupContainer from '~/components/ui/PopupContainer.vue';

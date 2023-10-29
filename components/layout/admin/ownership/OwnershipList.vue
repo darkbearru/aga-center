@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useData } from '~/components/stores/useData';
-import { TOwnership } from '~/src/data/types/ownership';
+import type { TOwnership } from '~/src/data/types/ownership';
 import OwnershipListItem from '~/components/layout/admin/ownership/OwnershipListItem.vue';
 
 const data = useData();
