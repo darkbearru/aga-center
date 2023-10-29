@@ -24,7 +24,7 @@ export class TokenService implements ITokenService {
 	 * @param token
 	 * @param secret
 	 */
-	private check(token: string, secret: string): JwtPayload | string | false {
+	private async check(token: string, secret: string): Promise<JwtPayload | string | boolean | null> {
 		try {
 			return jwt.verify(token, secret);
 		} catch (e) {
@@ -32,14 +32,14 @@ export class TokenService implements ITokenService {
 		}
 	}
 
-	public checkAccess(token: string): JwtPayload | string | false {
-		return this.check(token, this.accessSecret);
+	public async checkAccess(token: string): Promise<JwtPayload | string | boolean | null> {
+		return await this.check(token, this.accessSecret);
 	}
 
-	public checkRefresh(event: H3Event): JwtPayload | string | false {
+	public async checkRefresh(event: H3Event): Promise<JwtPayload | string | boolean | null> {
 		const token = getCookie(event, 'rf_token');
 		if (!token) return false;
-		return this.refresh(token, event);
+		return await this.refresh(token, event);
 	}
 
 	/**
@@ -114,8 +114,8 @@ export class TokenService implements ITokenService {
 	 */
 	async refresh(token: string, event?: H3Event): Promise<TTokensResponse | null> {
 		if (!event) return null;
-		const data = this.check(token, this.refreshSecret);
-		if (typeof data !== 'string' && data !== false) {
+		const data = await this.check(token, this.refreshSecret);
+		if (typeof data !== 'string' && data && typeof data !== 'boolean') {
 			const { exp, iat, ...userData } = data;
 			const payload: TUsersPayload = userData as TUsersPayload;
 			const jwt: TTokensList = await this.generate(payload);
@@ -124,5 +124,10 @@ export class TokenService implements ITokenService {
 			return { ...payload, accessToken: jwt.access };
 		}
 		return null;
+	}
+
+	public logout(event: H3Event): void {
+		deleteCookie(event, 'ac_token');
+		deleteCookie(event, 'rf_token');
 	}
 }

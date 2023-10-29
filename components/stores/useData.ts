@@ -7,8 +7,12 @@ import { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
 import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
 import { TNews, TNewsResponse } from '~/src/data/types/news';
 import { TCompany, TCompanyResponse } from '~/src/data/types/company';
-import { TInitiative, TInitiativeResponse } from '~/src/data/types/initiatives';
-//import { FetchError } from 'ofetch';
+import {
+	TInitiative,
+	TInitiativeDeleteResponse,
+	TInitiativeResponse,
+	TInitiativeWithID
+} from '~/src/data/types/initiatives';
 
 export const useData = defineStore('data', {
 	state: () => {
@@ -24,7 +28,12 @@ export const useData = defineStore('data', {
 		const initiatives: globalThis.Ref<TInitiative[] | undefined> = ref(undefined);
 		const articles: globalThis.Ref<Articles[] | undefined> = ref(undefined);
 		const accessToken = useCookie('ac_token');
-		return { path, user, menu, news, users, regions, ownership, types, companies, articles, initiatives, accessToken }
+		return {
+			path, user, menu, news, users,
+			regions, ownership, types,
+			companies, articles, initiatives,
+			accessToken
+		}
 	},
 	actions: {
 		async get(): Promise<boolean> {
@@ -458,14 +467,15 @@ export const useData = defineStore('data', {
 		/**
 		 * Сохранение, добавление Инициативы
 		 */
-		async updateInitiative(item: TInitiative): Promise<TInitiativeResponse | false> {
+		async updateInitiative(item: FormData | TInitiativeWithID): Promise<TInitiativeResponse | false> {
+			const headers: Record<string, string> = {
+				Authorization: `Bearer ${this.accessToken}`,
+			}
 			const { data, error } =
 				await useFetch(`${this.path}/initiative`, {
 					method: 'post',
 					body: item,
-					headers: {
-						Authorization: `Bearer ${this.accessToken}`,
-					},
+					headers,
 				});
 			if (error.value) return false;
 			const response: TInitiativeResponse = unref(data.value) as TInitiativeResponse;
@@ -510,12 +520,88 @@ export const useData = defineStore('data', {
 					},
 				});
 			if (error.value) return false;
-			const deleted: boolean = unref(data.value) as boolean;
-			if (deleted && this.initiatives) {
+			const deleted: TInitiativeDeleteResponse = unref(data.value) as TInitiativeDeleteResponse;
+			if (deleted.status && this.initiatives) {
 				this.initiatives = this.initiatives.filter((item: TInitiative): boolean => item.id !== initiative.id);
 				alert(`Инициатива «${initiative.name}» удалена`);
+			} else {
+				if (deleted.errors) {
+					alert(deleted.errors);
+				} else {
+					if (!deleted.status) alert('Ошибка удаления инициативы');
+				}
 			}
 			return true;
 		},
+
+		async approveCompany(id: number): Promise<boolean> {
+			const { data, error } =
+				await useFetch(`${this.path}/moderate_company`, {
+					method: 'post',
+					body: {
+						id,
+						approved: true
+					},
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			this.companies = data.value as TCompany[];
+			return true;
+		},
+
+		async declineCompany(id: number, reason: string): Promise<boolean> {
+			const { data, error } =
+				await useFetch(`${this.path}/moderate_company`, {
+					method: 'post',
+					body: {
+						id,
+						declined: true,
+						reason
+					},
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			this.companies = data.value as TCompany[];
+			return true;
+		},
+
+		async approveInitiative(id: number): Promise<boolean> {
+			const { data, error } =
+				await useFetch(`${this.path}/moderate_initiative`, {
+					method: 'post',
+					body: {
+						id,
+						approved: true
+					},
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			this.initiatives = data.value as TInitiative[];
+			return true;
+		},
+
+		async declineInitiative(id: number, reason: string): Promise<boolean> {
+			const { data, error } =
+				await useFetch(`${this.path}/moderate_initiative`, {
+					method: 'post',
+					body: {
+						id,
+						declined: true,
+						reason
+					},
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			this.initiatives = data.value as TInitiative[];
+			return true;
+		}
 	}
 });

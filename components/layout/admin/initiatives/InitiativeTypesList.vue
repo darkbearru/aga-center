@@ -24,7 +24,7 @@ defineExpose({update});
 </script>
 
 <template>
-	<InitiativeTypesListItem v-for="item in typesList" :item="item" :key="item.id" @click="onClick" @delete="onDelete"/>
+	<InitiativeTypesListItem v-for="item in typesList" :item="item" :key="`types${item.id}`" @click="onClick" @delete="onDelete"/>
 </template>
 
 <style scoped>

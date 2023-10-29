@@ -85,8 +85,8 @@ const createSlug = () => {
 
 		<NewsList @click="popupOpen" @delete="deleteNews" ref="newsList" />
 
-		<PopupContainer ref="popup">
-			<Popup class="bg-gray-light/60 w-full min-w-[300px] max-w-[800px] pb-0" :title="titlePopup" @close="popupClose">
+		<PopupContainer ref="popup" @close="popupClose">
+			<Popup class="bg-gray-light/60 w-full min-w-[300px] max-w-[800px] max-h-full pb-0" :title="titlePopup" @close="popupClose">
 				<FormKit
 					id="news_form"
 					type="form"

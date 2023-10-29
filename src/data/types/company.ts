@@ -35,10 +35,20 @@ export type TCompany = {
 	nameShort: string,
 	requsites?: string,
 	isApproved?: boolean,
+	isDeclined?: boolean,
+	declineReason?: string,
 	contacts?: TContacts,
 	ownership?: TOwnership,
 	user?: TUser,
 }
+
+export type TCompanyItem = {
+	id?: number,
+	nameFull: string,
+	nameShort: string | null,
+	typeOwnership?: TOwnership | null,
+}
+
 export type TCompanyResponse = {
 	errors?: {
 		nameFull?: string,
@@ -50,10 +60,15 @@ export type TCompanyResponse = {
 	company: TCompany
 }
 
-export type TFormkitCompanyOption = {
+export type TFormkitOption = {
 	label: string,
 	value: number,
+	attr?: {
+		default?: boolean,
+		disabled?: boolean
+	}
 }
+
 
 export type TFormkitContactOption = {
 	label: string,

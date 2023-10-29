@@ -12,7 +12,6 @@ export async function authMiddleware(accessToken: string, event: H3Event): Promi
 		new EmailService(),
 		event
 	);
-
 	let user: TUser | null = await userService.check(accessToken);
 	if (!user) {
 		user = await userService.refresh();

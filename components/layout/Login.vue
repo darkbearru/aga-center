@@ -3,14 +3,15 @@ import Button from '~/components/ui/Button.vue';
 import IconLogin from '~/assets/svg/icon-login.svg';
 
 
-defineExpose({ hidePopup });
-defineProps({
+defineExpose({ hidePopup, update });
+const props = defineProps({
 	loggedUser: {
-		type: Object,
-		default: undefined,
+		type: Boolean,
+		default: false
 	}
 });
 
+const isLogged = ref(props.loggedUser);
 const emit = defineEmits(['showPopup']);
 const isPopupShow = ref(false);
 
@@ -26,11 +27,15 @@ function hidePopup(): void {
 function togglePopup(): void {
 	isPopupShow.value = !isPopupShow.value;
 }
+
+function update(logged: boolean): void {
+	isLogged.value = logged;
+}
 </script>
 
 <template>
 	<div class="flex order-2 md:order-3 items-center justify-end md:justify-end w-6/12 md:w-2/12 pr-8">
-		<div v-if="!loggedUser">
+		<div v-if="!isLogged">
 			<Button class="btn-main" :class="isPopupShow ? 'hide' : ''" title="Войти" @click="showPopup">
 				<IconLogin filled /><span class="hidden md:inline">Войти</span>
 			</Button>

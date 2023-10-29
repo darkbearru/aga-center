@@ -28,6 +28,7 @@ export class EmailService implements IEmailService {
 					resolve(result);
 				}
 			});
+			transporter.close();
 		});
 	}
 

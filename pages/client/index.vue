@@ -9,10 +9,13 @@ definePageMeta({
 	layout: "client",
 });
 
-defineProps({
+const props = defineProps({
 	data: Object
 })
 
+useHead({
+	title: (props.data as TCommonData)?.news ? 'АГА. Список новостей' : 'Список компаний / инициатив'
+});
 
 </script>
 

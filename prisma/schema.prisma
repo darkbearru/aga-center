@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-    provider = "mysql"
-    url      = env("DATABASE_URL")
+    provider          = "mysql"
+    url               = env("DATABASE_URL")
+    shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 // Пользователи
@@ -42,6 +43,8 @@ model Company {
     nameShort       String?        @db.VarChar(50)
     requsites       String         @db.Text
     isApproved      Boolean        @default(false)
+    isDeclined      Boolean        @default(false)
+    declineReason   String?        @db.VarChar(255)
     Users           Users?         @relation(fields: [usersId], references: [id])
     usersId         Int?
     typeOwnership   TypeOwnership? @relation(fields: [typeOwnershipId], references: [id])
@@ -80,6 +83,9 @@ model Initiative {
     name              String?          @db.VarChar(255)
     text              String?          @db.Text
     isApproved        Boolean          @default(false)
+    isDeleted         Boolean          @default(false)
+    isDeclined        Boolean          @default(false)
+    declineReason     String?          @db.VarChar(255)
     Company           Company?         @relation(fields: [companyId], references: [id])
     companyId         Int?
     Photos            Photos[]
@@ -102,6 +108,7 @@ model InitiativeTypes {
 model Order {
     id           Int         @id @default(autoincrement())
     status       Int         @default(0)
+    messages     Json?
     Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
     initiativeId Int?
     Users        Users?      @relation(fields: [usersId], references: [id])
@@ -129,10 +136,10 @@ model Reviews {
     rate         Int?        @default(0)
     createdAt    DateTime    @default(now())
     changedAt    DateTime    @default(now())
-    Company      Company?    @relation(fields: [companyId], references: [id])
-    companyId    Int?
     Users        Users?      @relation(fields: [usersId], references: [id])
     usersId      Int?
+    Company      Company?    @relation(fields: [companyId], references: [id])
+    companyId    Int?
 }
 
 model News {

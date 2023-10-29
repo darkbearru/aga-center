@@ -21,3 +21,14 @@ export type TCommonData = {
 	companies?: TCompany[]
 	initiatives?: TInitiative[]
 }
+
+export type TClientData = {
+	news?: TNews[],
+	types?: TInitiativeTypes[],
+	regions?: TRegion[],
+	initiatives?: TInitiative[]
+}
+
+export type TClientDataError = {
+	message: string;
+}

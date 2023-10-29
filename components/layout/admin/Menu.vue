@@ -14,7 +14,7 @@ const route = useRoute();
 			:key="url"
 			:to="url"
 			class="w-full py-2 px-4 text-white hover:text-second rounded"
-			:class="route.path === url ? ' bg-second hover:text-white' : ''"
+			:class="((route.path.substring(0, url.toString().length) === url && url !== '/client') || (route.path === url)) ? ' bg-second hover:text-white' : ''"
 		>
 			{{ title }}
 		</NuxtLink>

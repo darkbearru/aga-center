@@ -1,23 +1,23 @@
 import { ICompanyRepository } from '~/src/data/company.repository.interface';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { TCompany, TContact, TContacts } from '~/src/data/types/company';
-import ContactsCreateOrConnectWithoutCompanyInput = Prisma.ContactsCreateOrConnectWithoutCompanyInput;
 import ContactsWhereInput = Prisma.ContactsWhereInput;
 import { TUser } from '~/src/users/types/users';
-import CompanyWhereUniqueInput = Prisma.CompanyWhereUniqueInput;
 
 const prisma: PrismaClient = new PrismaClient();
 
 export class CompanyRepository implements ICompanyRepository {
 	async add(company: TCompany): Promise<TCompany | undefined> {
 		try {
-			const contacts: ContactsCreateOrConnectWithoutCompanyInput[] = this.contactsConnectOrCreate(company?.contacts);
+			const contacts: Prisma.ContactsCreateOrConnectWithoutCompanyInput[] = this.contactsConnectOrCreate(company?.contacts);
 			const created =  await prisma.company.create({
 				data: {
 					nameFull: company.nameFull,
 					nameShort: company.nameShort,
 					requsites: company.requsites || '',
 					isApproved: false,
+					isDeclined: false,
+					declineReason: '',
 					contacts: {
 						connectOrCreate: contacts,
 					},
@@ -31,14 +31,13 @@ export class CompanyRepository implements ICompanyRepository {
 			});
 			return await this.select(created.id);
 		} catch (e) {
-			console.log('Error!!!');
 			console.log(e);
 			return undefined;
 		}
 	}
 
-	private contactsConnectOrCreate(contacts: TContacts | undefined): ContactsCreateOrConnectWithoutCompanyInput[] {
-		const result: ContactsCreateOrConnectWithoutCompanyInput[] = [];
+	private contactsConnectOrCreate(contacts: TContacts | undefined): Prisma.ContactsCreateOrConnectWithoutCompanyInput[] {
+		const result: Prisma.ContactsCreateOrConnectWithoutCompanyInput[] = [];
 		contacts?.forEach(item => {
 			result.push({
 				where: { id: item.id || 0},
@@ -58,6 +57,8 @@ export class CompanyRepository implements ICompanyRepository {
 				nameFull: true,
 				nameShort: true,
 				requsites: true,
+				isDeclined: true,
+				declineReason: true,
 				contacts: {
 					select: {
 						id: true,
@@ -88,6 +89,8 @@ export class CompanyRepository implements ICompanyRepository {
 			requsites: result?.requsites || '',
 			contacts: result?.contacts as TContacts,
 			isApproved: false,
+			isDeclined: result?.isDeclined || false,
+			declineReason: result?.declineReason || '',
 			ownership: {
 				id: result?.typeOwnership?.id || 0,
 				nameShort: result?.typeOwnership?.nameShort || '',
@@ -136,6 +139,8 @@ export class CompanyRepository implements ICompanyRepository {
 				nameFull: true,
 				nameShort: true,
 				requsites: true,
+				isDeclined: true,
+				declineReason: true,
 				contacts: {
 					select: {
 						id: true,
@@ -171,6 +176,8 @@ export class CompanyRepository implements ICompanyRepository {
 					nameFull: company.nameFull,
 					nameShort: company.nameShort,
 					requsites: company.requsites,
+					isDeclined: company.isDeclined,
+					declineReason: company.declineReason,
 					contacts: company.contacts,
 					ownership: company.typeOwnership,
 					user: company.Users
@@ -181,10 +188,8 @@ export class CompanyRepository implements ICompanyRepository {
 	}
 
 	async save(company: TCompany): Promise<boolean> {
-		console.log('Save');
-		console.log(company.user?.id);
 		try {
-			const contacts: ContactsCreateOrConnectWithoutCompanyInput[] = this.contactsConnectOrCreate(company?.contacts);
+			const contacts: Prisma.ContactsCreateOrConnectWithoutCompanyInput[] = this.contactsConnectOrCreate(company?.contacts);
 			await prisma.company.update({
 				where: {
 					id: company?.id
@@ -194,6 +199,7 @@ export class CompanyRepository implements ICompanyRepository {
 					nameShort: company.nameShort,
 					requsites: company.requsites || '',
 					isApproved: false,
+					isDeclined: false,
 					contacts: {
 						connectOrCreate: contacts,
 					},
@@ -228,5 +234,88 @@ export class CompanyRepository implements ICompanyRepository {
 		}
 	}
 
+	async moderationList(): Promise<TCompany[] | undefined> {
+		const result = await prisma.company.findMany({
+			where: {
+				isApproved: false,
+				isDeclined: false,
+			},
+			select: {
+				id: true,
+				nameFull: true,
+				nameShort: true,
+				requsites: true,
+				declineReason: true,
+				contacts: {
+					select: {
+						id: true,
+						type: true,
+						value: true
+					}
+				},
+				typeOwnership: {
+					select: {
+						id: true,
+						nameShort: true,
+						nameFull: true,
+					}
+				},
+				Users: {
+					select: {
+						id: true,
+						fio: true,
+						email: true
+					}
+				}
+			}
+		});
+		if (result) {
+			return result.map((company) => {
+				return {
+					id: company.id,
+					nameFull: company.nameFull,
+					nameShort: company.nameShort,
+					declineReason: company.declineReason,
+					requsites: company.requsites,
+					contacts: company.contacts,
+					ownership: company.typeOwnership,
+					user: company.Users
+				}
+			}) as TCompany[];
+		}
+	}
+
+	async moderationApprove(id: number): Promise<boolean> {
+		try {
+			await prisma.company.update({
+				where: { id },
+				data: {
+					isApproved: true,
+					isDeclined: false,
+					declineReason: ''
+				}
+			});
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	async moderationDecline(id: number, reason: string): Promise<boolean> {
+		try {
+			await prisma.company.update({
+				where: { id },
+				data: {
+					isApproved: false,
+					isDeclined: true,
+					declineReason: reason
+				}
+			});
+			return true;
+		} catch (e) {
+			return false;
+		}
+
+	};
 
 }

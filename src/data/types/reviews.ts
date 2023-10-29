@@ -7,14 +7,12 @@ export type TReviews = {
 	rate?: number,
 	initiative?: TInitiative,
 }
-/*
-    id           Int         @id @default(autoincrement())
-    Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
-    initiativeId Int?
-    title        String?
-    review       String?     @db.Text
-    rate         Int?        @default(0)
-    client       Client?     @relation(fields: [clientId], references: [id])
-    clientId     Int?
 
-*/
+export type TReviewListItem = {
+	id: number,
+	createdAt: Date,
+	title: string | null,
+	review: string | null,
+	rate: number | null
+}
+export type TReviewList = TReviewListItem[];

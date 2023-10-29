@@ -5,7 +5,7 @@ import { genesisIcons } from '@formkit/icons'
 import formkitTailwindTheme from './formkit.tailwind.theme'
 import { createProPlugin, rating, toggle, mask } from '@formkit/pro'
 
-const proPlugin = createProPlugin('fk-2b575b1e3', {
+const proPlugin = createProPlugin('fk-b803cdf1b1', {
 	rating, toggle, mask
 })
 

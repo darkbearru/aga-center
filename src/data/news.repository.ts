@@ -1,11 +1,10 @@
 import { INewsRepository } from '~/src/data/news.repository.interface';
-import { News, Prisma } from '.prisma/client';
+import { Prisma } from '.prisma/client';
 import { PrismaClient } from '@prisma/client';
 import { TPhotoItem, TPhotos } from '~/src/data/types/photos';
-import PhotosWhereUniqueInput = Prisma.PhotosWhereUniqueInput;
 import { TNews } from './types/news';
 
-type TPhotosLink = { create: { path: string, title: string }, where: PhotosWhereUniqueInput }[];
+type TPhotosLink = { create: { path: string, title: string }, where: Prisma.PhotosWhereUniqueInput }[];
 
 const prisma = new PrismaClient();
 
@@ -39,7 +38,7 @@ export class NewsRepository implements INewsRepository {
 		return result;
 	}
 
-	async list(skip: number = 0, take: number = 20): Promise<News[] | undefined> {
+	async list(skip: number = 0, take: number = 20): Promise<TNews[] | undefined> {
 		try {
 			return await prisma.news.findMany({
 				where: { active: true },
@@ -101,7 +100,7 @@ export class NewsRepository implements INewsRepository {
 				items.push({
 					create: {
 						path: item.path,
-						title: item.title,
+						title: item.title || '',
 					},
 					where: { id },
 				});

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { useData } from '~/components/stores/useData';
-import { TCompany, TFormkitCompanyOption } from '~/src/data/types/company';
+import { TCompany, TFormkitOption } from '~/src/data/types/company';
 import CompaniesForm from '~/components/layout/admin/companies/CompaniesForm.vue';
 import Popup from '~/components/ui/Popup.vue';
 import PopupContainer from '~/components/ui/PopupContainer.vue';
@@ -14,24 +14,29 @@ import Initiatives from '~/components/layout/admin/Initiatives.vue';
 const titlePopup = ref('Добавить компанию')
 const popup = ref();
 const userData = useData();
-const companies = ref(userData.companies);
-const companiesList = ref<TFormkitCompanyOption[]>([]);
+const companies = ref<TCompany[]>(userData.companies || []);
+const companiesList = ref<TFormkitOption[]>([]);
 const companyCurrentID = ref(userData.companies ? userData.companies[0]?.id : 0);
 const companyCurrent = ref(userData.companies ? userData.companies[0] : undefined);
 const companyForm = ref();
+const companyFormStart = ref();
 
 
 const refreshCompanies = (): void => {
-	if (userData?.companies) {
+	if (userData?.companies?.length) {
 		companiesList.value = [];
 		userData?.companies.forEach(item => {
 			companiesList.value.push({
 				label: item.nameShort !== item.nameFull ? `${item.nameShort} (${item.nameFull})` : item.nameFull,
 				value: item.id || 0,
 			});
-		});
+		})
+		companies.value = userData?.companies as TCompany[];
+	} else {
+		companyFormStart.value?.setup();
 	}
 }
+
 
 const popupEdit = (): void => {
 	if (!userData?.companies) return;
@@ -66,15 +71,14 @@ const deleteCompany = async (company: TCompany): Promise<void> => {
 	});
 }
 
-refreshCompanies();
-
+onMounted(() => {
+	refreshCompanies();
+})
 </script>
 
 <template>
 
-	<div v-if="!companies">
-		<CompaniesForm :data="companies"/>
-	</div>
+	<CompaniesForm ref="companyFormStart" v-if="!companies.length" @save="refreshCompanies" />
 	<div v-else>
 		<div class="formkit-no-limits flex gap-2 items-end max-w-[600px]">
 			<div class="grow">
@@ -94,13 +98,14 @@ refreshCompanies();
 			</Button>
 		</div>
 
-		<Initiatives />
+		<Initiatives :company="companyCurrent" />
 
-		<PopupContainer ref="popup">
-			<Popup class="bg-gray-light/60 w-full min-w-[300px] max-w-[500px] pb-0" :title="titlePopup" @close="popupClose">
+		<PopupContainer ref="popup" @onClose="popupClose">
+			<Popup class="bg-gray-light/60 w-full max-h-full min-w-[300px] max-w-[600px] pb-0" :title="titlePopup" @close="popupClose">
 				<CompaniesForm ref="companyForm" @save="popupClose" @delete="deleteCompany"/>
 			</Popup>
 		</PopupContainer>
+
 	</div>
 
 </template>

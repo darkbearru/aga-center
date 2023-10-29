@@ -1,6 +1,6 @@
-import { TCompany } from '~/src/data/types/company';
+import { TCompany, TCompanyItem } from '~/src/data/types/company';
 import { TPhotos } from '~/src/data/types/photos';
-import { TReviews } from '~/src/data/types/reviews';
+import { TReviewList, TReviewListItem, TReviews } from '~/src/data/types/reviews';
 import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import { TRegion } from '~/src/data/types/regions';
 
@@ -11,13 +11,47 @@ export type TInitiative = {
 	name: string,
 	text: string,
 	isApproved: boolean,
+	isDeclined?: boolean,
+	declineReason?: string,
 	company: TCompany,
 	region: TRegion
 	type: TInitiativeTypes,
 	photos?: TPhotos,
 	reviews?: TReviews,
+	ordersCount?: number,
+	ordersActive?: number,
 }
 
+export type TInitiativeResult = {
+	id?: number,
+	status: boolean,
+	direction: number,
+	name: string,
+	text: string,
+	isApproved: boolean,
+	isDeclined?: boolean,
+	declineReason?: string,
+	Company: TCompany,
+	Regions: TRegion
+	InitiativeTypes: TInitiativeTypes,
+	Photos?: TPhotos,
+	reviews?: TReviews,
+	_count?: {
+		Order?: number,
+	}
+}
+
+export type TInitiativeWithID = {
+	id?: string,
+	status?: string,
+	direction: string,
+	name: string,
+	text: string,
+	company: string,
+	region: string
+	type: string,
+	photos?: TPhotos,
+}
 
 export type TInitiativeResponse = {
 	errors?: {
@@ -25,5 +59,21 @@ export type TInitiativeResponse = {
 		text?: string,
 		other?: string,
 	}
-	initiative: TInitiative,
+	initiative?: TInitiative,
+}
+
+export type TInitiativeDeleteResponse = {
+	errors?: string,
+	status: boolean
+}
+
+export type TInitiativeList = TInitiativeListItem[];
+
+export type TInitiativeListItem = {
+	id: number,
+	name: string | null,
+	text: string | null,
+	Photos: TPhotos | null,
+	Reviews: TReviewList | null,
+	Company: TCompanyItem | null,
 }

@@ -9,4 +9,7 @@ export interface ICompanyRepository {
 	check(company: TCompany): Promise<boolean>;
 	select(id: number): Promise<TCompany>;
 	deleteContacts(contacts: TContacts): Promise<void>;
+	moderationList(): Promise<TCompany[] | undefined>;
+	moderationApprove(id: number): Promise<boolean>;
+	moderationDecline(id: number, reason: string): Promise<boolean>;
 }

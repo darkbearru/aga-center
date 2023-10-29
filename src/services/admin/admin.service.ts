@@ -15,8 +15,16 @@ import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/ini
 import { TNews, TNewsResponse } from '~/src/data/types/news';
 import { TCompany, TCompanyResponse, TContacts } from '~/src/data/types/company';
 import { ICompanyRepository } from '~/src/data/company.repository.interface';
-import { TInitiative, TInitiativeResponse } from '~/src/data/types/initiatives';
+import {
+	TInitiative,
+	TInitiativeDeleteResponse,
+	TInitiativeResponse,
+	TInitiativeWithID
+} from '~/src/data/types/initiatives';
 import { IInitiativeRepository } from '~/src/data/initiative.repository.interface';
+import { TPhotoItem, TPhotos } from '~/src/data/types/photos';
+import ms from 'ms';
+import * as fs from 'fs';
 
 export class AdminService implements IAdminService {
 	constructor(
@@ -34,14 +42,14 @@ export class AdminService implements IAdminService {
 
 	async data(): Promise<TCommonData> {
 		const menu: TAdminMenu = {};
-		let news: News[] | undefined = undefined;
+		const regions: TRegion[] | undefined = await this.regionsRepository.list();
+		const types: TInitiativeTypes[] | undefined = await this.initiativeTypesRepository.list();
+		const ownership: TOwnership[] | undefined = await this.ownershipRepository.list();
+		let news: TNews[] | undefined = undefined;
 		let users: TUser[] | undefined = undefined;
-		let regions: TRegion[] | undefined = undefined;
-		let types: TInitiativeTypes[] | undefined = undefined;
 		let companies: TCompany[] | undefined = undefined;
 		let articles: Articles[] | undefined = undefined;
 		let initiatives: TInitiative[] | undefined = undefined;
-		const ownership: TOwnership[] | undefined = await this.ownershipRepository.list();
 		if (this.user.isAdmin) {
 			menu['/client'] = 'Новости';
 			menu['/client/articles'] = 'Статьи';
@@ -51,12 +59,11 @@ export class AdminService implements IAdminService {
 			menu['/client/types'] = 'Типы инициатив';
 			news = await this.getNewsList();
 			users = await this.getUsersList();
-			regions = await this.regionsRepository.list();
-			types = await this.initiativeTypesRepository.list();
-
 		}
 		if (this.user.isAdmin || this.user.isModerator) {
 			menu['/client/moderation'] = 'Модерация';
+			companies  = await this.companyRepository.moderationList();
+			initiatives = await this.initiativeRepository.moderationList();
 		}
 		if (!this.user.isAdmin && !this.user.isModerator) {
 			menu['/client'] = 'Компания / Инициативы';
@@ -65,6 +72,7 @@ export class AdminService implements IAdminService {
 			initiatives = await this.initiativeRepository.list(this.user);
 		}
 		menu['/client/profile'] = 'Профиль';
+		menu['/client/logout'] = 'Выйти';
 		return {
 			user: this.user,
 			menu,
@@ -163,7 +171,7 @@ export class AdminService implements IAdminService {
 		return null;
 	}
 
-	private async getNewsList(page: number = 0): Promise<News[] | undefined> {
+	private async getNewsList(page: number = 0): Promise<TNews[] | undefined> {
 		const onPage: number = Number(process.env?.NEWS_ON_PAGE) || 20;
 		const newsCount: number = await this.newsRepository.count();
 		const skip: number = Math.floor(newsCount / onPage) + (newsCount > onPage ? newsCount % onPage : 0);
@@ -293,7 +301,7 @@ export class AdminService implements IAdminService {
 				nameFull: `Компания «${company.nameFull}» уже существует`
 			}
 		}
-		if (!company.nameFull.trim()) {
+		if (!company.nameFull?.trim()) {
 			response.errors = {...response.errors, nameFull: 'Не указано наименование компании'}
 		}
 		if (!company.nameShort?.trim()) {
@@ -312,6 +320,7 @@ export class AdminService implements IAdminService {
 			email: this.user.email,
 			fio: this.user.fio
 		};
+		console.log(company);
 
 		if (!company.id) {
 			company.contacts = company.contacts?.filter(item => !item.isDeleted);
@@ -337,43 +346,124 @@ export class AdminService implements IAdminService {
 		return response;
 	}
 
-	async initiativeDelete(item: TInitiative): Promise<boolean> {
-		return await this.initiativeRepository.delete(item, this.user);
+	async initiativeDelete(item: TInitiative): Promise<TInitiativeDeleteResponse> {
+		const response : TInitiativeDeleteResponse = {
+			status: true,
+		}
+		const result = await this.initiativeRepository.delete(item, this.user);
+		if (typeof result === 'number') {
+			response.errors = `Удаление не возможно, у инициативы ${result} активных заявок`;
+			response.status = false;
+		} else {
+			response.status = result;
+		}
+		await this.initiativeRemoveOld();
+		return response;
 	}
 
-	async initiativeSave(item: TInitiative): Promise<TInitiativeResponse> {
-		const check: boolean = await this.initiativeRepository.check(item);
+
+	async initiativeSave(data: TInitiativeWithID): Promise<TInitiativeResponse> {
+		// const item: TInitiative = await this.savePhotos<TInitiative>(event);
+		const item: TInitiative | undefined = await this.initiativeRepository.check(data);
 		const response: TInitiativeResponse = {
 			errors: undefined,
 			initiative: item
 		}
-		if (!check) {
+		if (item) {
 			response.errors = {
 				name: `Инициатива «${item.name}» в регионе «${item.region.name}» уже существует`
 			}
 		}
-		if (!item.name.trim()) {
+		if (!data.name.trim()) {
 			response.errors = {...response.errors, name: 'Не указано наименование инициативы'}
 		}
-		if (!item.text?.trim()) {
+		if (!data.text?.trim()) {
 			response.errors = {...response.errors, text: 'Не указан текст описания инициативы'}
 		}
 		if(response.errors) return response;
 
-		if (!item.id) {
-			const res= await this.initiativeRepository.add(item);
+		if ((typeof data?.id === 'undefined') || (data?.id === '0')) {
+			const res= await this.initiativeRepository.add(data);
 			if (res) {
 				response.initiative = res;
 			} else {
 				response.errors = {other: 'Ошибка сохранения данных'}
 			}
 		} else {
-			if (await this.initiativeRepository.save(item, this.user)) {
+			const deletedPhotos: TPhotos | undefined = data.photos?.filter(item => item.isDeleted);
+			data.photos = data.photos?.filter(item => !item.isDeleted);
+
+			if (deletedPhotos) await this.deletePhotos(deletedPhotos);
+
+			const result = await this.initiativeRepository.save(data, this.user);
+			if (result) {
+				const item = await  this.initiativeRepository.select(Number(data.id));
 				response.initiative = item
 			} else {
 				response.errors = {other: 'Ошибка сохранения данных'}
 			}
 		}
+		await this.initiativeRemoveOld();
 		return response;
+	}
+
+	/**
+	 * Удаляем давно удалённые инициативы и их фото
+	 */
+	async initiativeRemoveOld(): Promise<void> {
+		const exp: Date = new Date();
+		const deletedPhotos: TPhotos = [];
+		console.log(process?.env?.DELETED_RECORDS_STORE_TIME || '90 days');
+		console.log(ms('-' + (process?.env?.DELETED_RECORDS_STORE_TIME || '90 days')));
+		exp.setTime(Date.now() + ms('-' + (process?.env?.DELETED_RECORDS_STORE_TIME || '90 days')));
+		const records: TInitiative[] | undefined = await this.initiativeRepository.selectDeleted(exp);
+		console.log('Records', records);
+		if (typeof records === 'undefined') return;
+		if (records?.length === 0) return;
+
+		console.log('initiativeRemoveOld');
+		console.log(records);
+		records.forEach((record: TInitiative) => {
+			if (record.photos) record.photos?.forEach((photo: TPhotoItem) => {
+				deletedPhotos.push(photo);
+			});
+		});
+		// console.log('Deleted ID', records.map(item => item.id || 0));
+		await this.initiativeRepository.deleteMany(records.map(item => item.id || 0));
+		await this.deletePhotos(deletedPhotos);
+	}
+
+	async deletePhotos(photos: TPhotos): Promise<void> {
+		console.log('Deleted Photos', photos);
+		// Удаляем в базе
+		return ;
+		await this.initiativeRepository.deletePhotos(photos);
+		// Удаляем на диске
+		const current = `${process.cwd()}/public`
+		photos.forEach(file => {
+			console.log(`Delete file ${file.path}`);
+			fs.unlink(`${current}${file.path}`, err => {
+				if (err) console.log('Error File delete', err);
+			})
+		});
+	}
+
+	async companyModeration(id: number, operation: string, reason?: string): Promise<TCompany[] | undefined> {
+		console.log(operation, reason);
+		if (operation === 'approved') {
+			await this.companyRepository.moderationApprove(id);
+		} else {
+			await this.companyRepository.moderationDecline(id, reason || 'Bad reason');
+		}
+		return await this.companyRepository.moderationList();
+	}
+
+	async initiativeModeration(id: number, operation: string, reason?: string): Promise<TInitiative[] | undefined> {
+		if (operation === 'approved') {
+			await this.initiativeRepository.moderationApprove(id);
+		} else {
+			await this.initiativeRepository.moderationDecline(id, reason || 'Bad reason');
+		}
+		return await this.initiativeRepository.moderationList();
 	}
 }
