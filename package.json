@@ -8,8 +8,10 @@
   "prisma": {
     "seed": "node prisma/seed.mjs"
   },
+  "main": ".output/server/index.mjs",
   "private": true,
   "scripts": {
+    "start": "node .output/server/index.mjs",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
@@ -33,7 +35,7 @@
     "nuxt": "^3.7.4",
     "nuxt-security": "^0.14.4",
     "nuxt-svgo": "^3.4.1",
-    "prisma": "^5.5.1"
+    "prisma": "^5.5.2"
   },
   "dependencies": {
     "@formkit/icons": "^1.2.1",
