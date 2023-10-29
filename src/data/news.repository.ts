@@ -1,17 +1,15 @@
 import { INewsRepository } from '~/src/data/news.repository.interface';
-import { Prisma } from '.prisma/client';
-import { PrismaClient } from '@prisma/client';
 import { TPhotoItem, TPhotos } from '~/src/data/types/photos';
 import { TNews } from './types/news';
+import { prismaClient } from '~/src/utils/prismaClient';
 
-type TPhotosLink = { create: { path: string, title: string }, where: Prisma.PhotosWhereUniqueInput }[];
+type TPhotosLink = { create: { path: string, title: string }, where: any }[];
 
-const prisma = new PrismaClient();
 
 export class NewsRepository implements INewsRepository {
     async check(news: TNews): Promise<boolean> {
 		const idQuery = typeof news.id !== 'undefined' ? { id: { not: news.id } } : {};
-		const res = await prisma.news.findFirst({
+		const res = await prismaClient.news.findFirst({
 			where: {
 				AND: [
 					{ title: news.title },
@@ -23,13 +21,13 @@ export class NewsRepository implements INewsRepository {
     }
 
 	async count(): Promise<number> {
-		return prisma.news.count({});
+		return prismaClient.news.count({});
 	}
 
 	async delete(news: TNews): Promise<boolean> {
 		let result = true;
 		try {
-			await prisma.news.delete({
+			await prismaClient.news.delete({
 				where: { id: news.id }
 			});
 		} catch (e) {
@@ -40,7 +38,7 @@ export class NewsRepository implements INewsRepository {
 
 	async list(skip: number = 0, take: number = 20): Promise<TNews[] | undefined> {
 		try {
-			return await prisma.news.findMany({
+			return await prismaClient.news.findMany({
 				where: { active: true },
 				skip,
 				take,
@@ -56,7 +54,7 @@ export class NewsRepository implements INewsRepository {
 	async add(news: TNews): Promise<TNews | boolean> {
 		const items: TPhotosLink = this.makePhotosLink(news.photos);
 		try {
-			return await prisma.news.create({
+			return await prismaClient.news.create({
 				data: {
 					title: news.title,
 					slug: news.slug,
@@ -75,7 +73,7 @@ export class NewsRepository implements INewsRepository {
 	async save(news: TNews): Promise<boolean> {
 		const items: TPhotosLink = this.makePhotosLink(news.photos, news.id);
 		try {
-			await prisma.news.update({
+			await prismaClient.news.update({
 				where: { id: news.id },
 				data: {
 					title: news.title,

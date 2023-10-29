@@ -59,7 +59,7 @@ export default defineNuxtConfig({
   devtools: {
     enabled: false,
     timeline: {
-      enabled: true,
+      enabled: false,
     },
   },
   image: {
@@ -69,5 +69,9 @@ export default defineNuxtConfig({
   },
   formkit: {
     autoImport: true
+  },
+  sourcemap: {
+    "server": false,
+    "client": false
   }
 })

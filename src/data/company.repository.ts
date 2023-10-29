@@ -1,16 +1,15 @@
 import { ICompanyRepository } from '~/src/data/company.repository.interface';
-import { Prisma, PrismaClient } from '@prisma/client';
 import { TCompany, TContact, TContacts } from '~/src/data/types/company';
-import ContactsWhereInput = Prisma.ContactsWhereInput;
 import { TUser } from '~/src/users/types/users';
+import { prismaClient } from '~/src/utils/prismaClient';
 
-const prisma: PrismaClient = new PrismaClient();
 
 export class CompanyRepository implements ICompanyRepository {
+
 	async add(company: TCompany): Promise<TCompany | undefined> {
 		try {
-			const contacts: Prisma.ContactsCreateOrConnectWithoutCompanyInput[] = this.contactsConnectOrCreate(company?.contacts);
-			const created =  await prisma.company.create({
+			const contacts = this.contactsConnectOrCreate(company?.contacts);
+			const created =  await prismaClient.company.create({
 				data: {
 					nameFull: company.nameFull,
 					nameShort: company.nameShort,
@@ -36,8 +35,8 @@ export class CompanyRepository implements ICompanyRepository {
 		}
 	}
 
-	private contactsConnectOrCreate(contacts: TContacts | undefined): Prisma.ContactsCreateOrConnectWithoutCompanyInput[] {
-		const result: Prisma.ContactsCreateOrConnectWithoutCompanyInput[] = [];
+	private contactsConnectOrCreate(contacts: TContacts | undefined): any[] {
+		const result: any[] = [];
 		contacts?.forEach(item => {
 			result.push({
 				where: { id: item.id || 0},
@@ -51,7 +50,7 @@ export class CompanyRepository implements ICompanyRepository {
 	}
 
 	async select(id: number): Promise<TCompany> {
-		const result = await prisma.company.findFirst({
+		const result = await prismaClient.company.findFirst({
 			where: { id },
 			select: {
 				nameFull: true,
@@ -106,7 +105,7 @@ export class CompanyRepository implements ICompanyRepository {
 
 	async check(company: TCompany): Promise<boolean> {
 		const idQuery = typeof company.id !== 'undefined' ? { id: { not: company.id } } : {};
-		const res = await prisma.company.findFirst({
+		const res = await prismaClient.company.findFirst({
 			where: {
 				AND: [
 					{ nameFull: company.nameFull },
@@ -120,7 +119,7 @@ export class CompanyRepository implements ICompanyRepository {
 	async delete(company: TCompany): Promise<boolean> {
 		try {
 			// let t: CompanyWhereUniqueInput;
-			await prisma.company.delete({
+			await prismaClient.company.delete({
 				where: {
 					id: company.id,
 					usersId: company.user?.id,
@@ -133,7 +132,7 @@ export class CompanyRepository implements ICompanyRepository {
 	}
 
 	async list(user: TUser): Promise<TCompany[] | undefined> {
-		const result = await prisma.company.findMany({
+		const result = await prismaClient.company.findMany({
 			select: {
 				id: true,
 				nameFull: true,
@@ -189,8 +188,8 @@ export class CompanyRepository implements ICompanyRepository {
 
 	async save(company: TCompany): Promise<boolean> {
 		try {
-			const contacts: Prisma.ContactsCreateOrConnectWithoutCompanyInput[] = this.contactsConnectOrCreate(company?.contacts);
-			await prisma.company.update({
+			const contacts = this.contactsConnectOrCreate(company?.contacts);
+			await prismaClient.company.update({
 				where: {
 					id: company?.id
 				},
@@ -224,9 +223,9 @@ export class CompanyRepository implements ICompanyRepository {
 			if (item.id) idList.push(item.id);
 		});
 		if (idList.length === 0) return;
-		const AND: ContactsWhereInput[] = idList.map(id => { return { id } });
+		const AND = idList.map(id => { return { id } });
 		try {
-			await prisma.contacts.deleteMany({
+			await prismaClient.contacts.deleteMany({
 				where: { AND }
 			})
 		} catch (e) {
@@ -235,7 +234,7 @@ export class CompanyRepository implements ICompanyRepository {
 	}
 
 	async moderationList(): Promise<TCompany[] | undefined> {
-		const result = await prisma.company.findMany({
+		const result = await prismaClient.company.findMany({
 			where: {
 				isApproved: false,
 				isDeclined: false,
@@ -287,7 +286,7 @@ export class CompanyRepository implements ICompanyRepository {
 
 	async moderationApprove(id: number): Promise<boolean> {
 		try {
-			await prisma.company.update({
+			await prismaClient.company.update({
 				where: { id },
 				data: {
 					isApproved: true,
@@ -303,7 +302,7 @@ export class CompanyRepository implements ICompanyRepository {
 
 	async moderationDecline(id: number, reason: string): Promise<boolean> {
 		try {
-			await prisma.company.update({
+			await prismaClient.company.update({
 				where: { id },
 				data: {
 					isApproved: false,

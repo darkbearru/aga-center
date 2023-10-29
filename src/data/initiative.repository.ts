@@ -1,12 +1,11 @@
 import { IInitiativeRepository } from '~/src/data/initiative.repository.interface';
 import { TInitiative, TInitiativeList, TInitiativeResult, TInitiativeWithID } from '~/src/data/types/initiatives';
-import { Prisma, PrismaClient } from '@prisma/client';
 import { TUser } from '~/src/users/types/users';
 import { TPhotoItem, TPhotos } from '~/src/data/types/photos';
 import { OrderStatus } from '~/src/data/types/order';
 import { TClientDataError } from '~/src/data/types/common.data';
+import { prismaClient } from '~/src/utils/prismaClient';
 
-const prisma: PrismaClient = new PrismaClient();
 // const prisma: PrismaClient = new PrismaClient({ log: ['query'] });
 
 const selectFields = {
@@ -83,9 +82,9 @@ const clientInitiativeFields = {
 
 export class InitiativeRepository implements IInitiativeRepository {
 	async add(item: TInitiativeWithID): Promise<TInitiative | undefined> {
-		const photos: Prisma.PhotosCreateOrConnectWithoutInitiativeInput[] = this.photosConnectOrCreate(item?.photos);
+		const photos = this.photosConnectOrCreate(item?.photos);
 
-		const created = await prisma.initiative.create({
+		const created = await prismaClient.initiative.create({
 			data: {
 				status: true,
 				direction: Number(item.direction),
@@ -118,8 +117,8 @@ export class InitiativeRepository implements IInitiativeRepository {
 		return await this.select(created.id);
 	}
 
-	private photosConnectOrCreate(photos?: TPhotos): Prisma.PhotosCreateOrConnectWithoutInitiativeInput[] {
-		const result: Prisma.PhotosCreateOrConnectWithoutInitiativeInput[] = [];
+	private photosConnectOrCreate(photos?: TPhotos): any[] {
+		const result: any[] = [];
 		photos?.forEach(item => {
 			result.push({
 				where: { id: item.id || 0},
@@ -134,7 +133,7 @@ export class InitiativeRepository implements IInitiativeRepository {
 
 
 	async select(id: number): Promise<TInitiative> {
-		const result = await prisma.initiative.findFirst({
+		const result = await prismaClient.initiative.findFirst({
 			where: { id },
 			select: selectFields,
 		});
@@ -143,7 +142,7 @@ export class InitiativeRepository implements IInitiativeRepository {
 
 	async check(item: TInitiativeWithID): Promise<TInitiative | undefined> {
 		const idQuery = typeof item.id !== 'undefined' ? { id: { not: Number(item.id) } } : {};
-		const res = await prisma.initiative.findFirst({
+		const res = await prismaClient.initiative.findFirst({
 			where: {
 				AND: [
 					{ name: item.name },
@@ -159,14 +158,14 @@ export class InitiativeRepository implements IInitiativeRepository {
 
 	async delete(item: TInitiative, user: TUser): Promise<boolean | number> {
 		try {
-			const activeCount: number = await prisma.order.count({
+			const activeCount: number = await prismaClient.order.count({
 				where: {
 					initiativeId: item.id,
 					status: OrderStatus.active
 				},
 			});
 			if (activeCount > 0) return activeCount;
-			await  prisma.initiative.update({
+			await prismaClient.initiative.update({
 				data: {
 					isDeleted: true,
 				},
@@ -185,7 +184,7 @@ export class InitiativeRepository implements IInitiativeRepository {
 
 	async list(user: TUser): Promise<TInitiative[] | undefined> {
 		try {
-			const result = await prisma.initiative.findMany({
+			const result = await prismaClient.initiative.findMany({
 				where: {
 					isDeleted: false,
 					Company: {
@@ -232,8 +231,8 @@ export class InitiativeRepository implements IInitiativeRepository {
 
 	async save(item: TInitiativeWithID, user: TUser): Promise<boolean> {
 		try {
-			const photos: Prisma.PhotosCreateOrConnectWithoutInitiativeInput[] = this.photosConnectOrCreate(item?.photos);
-			await prisma.initiative.update({
+			const photos = this.photosConnectOrCreate(item?.photos);
+			await prismaClient.initiative.update({
 				data: {
 					status: item.status === 'true',
 					direction: Number(item.direction),
@@ -268,13 +267,13 @@ export class InitiativeRepository implements IInitiativeRepository {
 		if (!photos.length) return;
 
 		const idList: number[] = [];
-		let where: Prisma.PhotosWhereInput;
+		let where;
 		if (photos.length > 1) {
 			photos.forEach((item: TPhotoItem) => {
 				if (item.id) idList.push(item.id);
 			});
 			if (idList.length === 0) return;
-			const OR: Prisma.PhotosWhereInput[] = idList.map(id => { return { id } });
+			const OR = idList.map(id => { return { id } });
 			where = { OR };
 			console.log('deletePhotos', OR);
 		} else {
@@ -283,7 +282,7 @@ export class InitiativeRepository implements IInitiativeRepository {
 		console.log('deletePhotos', where);
 
 		try {
-			const result = await prisma.photos.deleteMany({ where });
+			await prismaClient.photos.deleteMany({ where });
 		} catch (e) {
 			console.log(e);
 		}
@@ -308,7 +307,7 @@ export class InitiativeRepository implements IInitiativeRepository {
 			}
 		});
 		try {
-			const result = await prisma.initiative.findMany({
+			const result = await prismaClient.initiative.findMany({
 				where: {
 					isDeleted: true,
 					changedAt: {
@@ -332,9 +331,9 @@ export class InitiativeRepository implements IInitiativeRepository {
 	}
 
 	async deleteMany(idList: number[]): Promise<void> {
-		let where: Prisma.InitiativeWhereInput;
+		let where;
 		if (idList.length > 1) {
-			const OR: Prisma.InitiativeWhereInput[] = idList.map(id => { return { id } });
+			const OR = idList.map(id => { return { id } });
 			where = { OR };
 			console.log('deleteMany 1', OR);
 		} else {
@@ -343,15 +342,17 @@ export class InitiativeRepository implements IInitiativeRepository {
 		console.log('deleteMany 2');
 		console.log({ where });
 		return ;
+/*
 		try {
-			await prisma.initiative.deleteMany({ where });
+			await prismaClient.initiative.deleteMany({ where });
 		} catch (e) {
 		}
+*/
 	}
 
 	async listByText(text: string, direction: number = 0): Promise<TInitiativeList | TClientDataError> {
 		try {
-			return await prisma.initiative.findMany({
+			return await prismaClient.initiative.findMany({
 				select: clientInitiativeFields,
 				where: {
 					status: true,
@@ -382,7 +383,7 @@ export class InitiativeRepository implements IInitiativeRepository {
 
 	async listByType(typeId: number): Promise<TInitiativeList | TClientDataError> {
 		try {
-			return await prisma.initiative.findMany({
+			return await prismaClient.initiative.findMany({
 				select: clientInitiativeFields,
 				where: {
 					status: true,
@@ -401,7 +402,7 @@ export class InitiativeRepository implements IInitiativeRepository {
 	}
 
 	async moderationList(): Promise<TInitiative[] | undefined> {
-		const result = await prisma.initiative.findMany({
+		const result = await prismaClient.initiative.findMany({
 			where: {
 				isApproved: false,
 				isDeleted: false,
@@ -414,7 +415,7 @@ export class InitiativeRepository implements IInitiativeRepository {
 
 	async moderationApprove(id: number): Promise<boolean> {
 		try {
-			await prisma.initiative.update({
+			await prismaClient.initiative.update({
 				where: { id },
 				data: {
 					isApproved: true,
@@ -430,7 +431,7 @@ export class InitiativeRepository implements IInitiativeRepository {
 
 	async moderationDecline(id: number, reason: string): Promise<boolean> {
 		try {
-			await prisma.initiative.update({
+			await prismaClient.initiative.update({
 				where: { id },
 				data: {
 					isApproved: false,
