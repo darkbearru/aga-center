@@ -127,7 +127,8 @@ export class UsersRepository implements IUsersRepository {
 					{
 						id: {
 							not: id
-						}
+						},
+						isNew: false,
 					},
 				]
 			}

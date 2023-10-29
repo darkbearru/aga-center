@@ -38,10 +38,12 @@ for (const key in contacts) {
 
 function addItem(): void {
 	contactsList.value.push({
+		id: 0,
 		type: ContactsType.phone,
 		value: ''
 	});
 }
+
 
 function deleteItem(index: number): void {
 	contactsList.value[index].isDeleted = true;
@@ -76,7 +78,7 @@ function update(contacts?: TContacts): void {
 
 <template>
 
-	<div v-for="(item, index) in contactsList" :key="item?.id" class="formkit-no-limits">
+	<div v-for="(item, index) in contactsList" :key="`contacts_${item?.id}`" class="formkit-no-limits">
 		<ContactsListItem
 			v-if="!item.isDeleted"
 			:item="item"

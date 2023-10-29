@@ -7,7 +7,12 @@ import { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
 import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
 import { TNews, TNewsResponse } from '~/src/data/types/news';
 import { TCompany, TCompanyResponse } from '~/src/data/types/company';
-//import { FetchError } from 'ofetch';
+import {
+	TInitiative,
+	TInitiativeDeleteResponse,
+	TInitiativeResponse,
+	TInitiativeWithID
+} from '~/src/data/types/initiatives';
 
 export const useData = defineStore('data', {
 	state: () => {
@@ -20,9 +25,15 @@ export const useData = defineStore('data', {
 		const ownership: globalThis.Ref<TOwnership[] | undefined> = ref(undefined);
 		const types: globalThis.Ref<TInitiativeTypes[] | undefined> = ref(undefined);
 		const companies: globalThis.Ref<TCompany[] | undefined> = ref(undefined);
+		const initiatives: globalThis.Ref<TInitiative[] | undefined> = ref(undefined);
 		const articles: globalThis.Ref<Articles[] | undefined> = ref(undefined);
 		const accessToken = useCookie('ac_token');
-		return { path, user, menu, news, users, regions, ownership, types, companies, articles, accessToken }
+		return {
+			path, user, menu, news, users,
+			regions, ownership, types,
+			companies, articles, initiatives,
+			accessToken
+		}
 	},
 	actions: {
 		async get(): Promise<boolean> {
@@ -44,6 +55,7 @@ export const useData = defineStore('data', {
 			this.types = list.types;
 			this.articles = list.articles;
 			this.companies = list.companies;
+			this.initiatives = list.initiatives;
 			return true;
 		},
 		/**
@@ -60,11 +72,11 @@ export const useData = defineStore('data', {
 					},
 				});
 			if (error.value) return false;
-			const userResponse: TUserResponse = unref(data.value) as TUserResponse;
-			if (!userResponse.errors) {
-				this.updateUsersData(userResponse.user);
+			const response: TUserResponse = unref(data.value) as TUserResponse;
+			if (!response.errors) {
+				this.updateUsersData(response.user);
 			}
-			return userResponse;
+			return response;
 		},
 		/**
 		 * Обновление данных о пользователя в массиве
@@ -131,11 +143,11 @@ export const useData = defineStore('data', {
 					},
 				});
 			if (error.value) return false;
-			const regionResponse: TRegionResponse = unref(data.value) as TRegionResponse;
-			if (!regionResponse.errors) {
-				this.updateRegionsData(regionResponse.region);
+			const response: TRegionResponse = unref(data.value) as TRegionResponse;
+			if (!response.errors) {
+				this.updateRegionsData(response.region);
 			}
-			return regionResponse;
+			return response;
 		},
 		/**
 		 * Обновление данных о регионе в массиве
@@ -202,11 +214,11 @@ export const useData = defineStore('data', {
 					},
 				});
 			if (error.value) return false;
-			const ownershipResponse: TOwnershipResponse = unref(data.value) as TOwnershipResponse;
-			if (!ownershipResponse.errors) {
-				this.updateOwnershipData(ownershipResponse.ownership);
+			const response: TOwnershipResponse = unref(data.value) as TOwnershipResponse;
+			if (!response.errors) {
+				this.updateOwnershipData(response.ownership);
 			}
-			return ownershipResponse;
+			return response;
 		},
 		/**
 		 * Обновление данных о регионе в массиве
@@ -272,11 +284,11 @@ export const useData = defineStore('data', {
 					},
 				});
 			if (error.value) return false;
-			const typesResponse: TInitiativeTypesResponse = unref(data.value) as TInitiativeTypesResponse;
-			if (!typesResponse.errors) {
-				this.updateInitiativeTypesData(typesResponse.type);
+			const response: TInitiativeTypesResponse = unref(data.value) as TInitiativeTypesResponse;
+			if (!response.errors) {
+				this.updateInitiativeTypesData(response.type);
 			}
-			return typesResponse;
+			return response;
 		},
 		/**
 		 * Обновление данных о типе инициативы в массиве
@@ -335,11 +347,11 @@ export const useData = defineStore('data', {
 					},
 				});
 			if (error.value) return false;
-			const newsResponse: TNewsResponse = unref(data.value) as TNewsResponse;
-			if (!newsResponse.errors) {
-				this.updateNewsData(newsResponse.news);
+			const response: TNewsResponse = unref(data.value) as TNewsResponse;
+			if (!response.errors) {
+				this.updateNewsData(response.news);
 			}
-			return newsResponse;
+			return response;
 		},
 		/**
 		 * Обновление данных о регионе в массиве
@@ -386,7 +398,7 @@ export const useData = defineStore('data', {
 		},
 
 		/**
-		 * Сохранение, добавление новости
+		 * Сохранение, добавление компании
 		 */
 		async updateCompany(company: TCompany): Promise<TCompanyResponse | false> {
 			const { data, error } =
@@ -398,14 +410,14 @@ export const useData = defineStore('data', {
 					},
 				});
 			if (error.value) return false;
-			const companyResponse: TCompanyResponse = unref(data.value) as TCompanyResponse;
-			if (!companyResponse.errors) {
-				this.updateCompanyData(companyResponse.company);
+			const response: TCompanyResponse = unref(data.value) as TCompanyResponse;
+			if (!response.errors) {
+				this.updateCompanyData(response.company);
 			}
-			return companyResponse;
+			return response;
 		},
 		/**
-		 * Обновление данных о регионе в массиве
+		 * Обновление данных о компании в массиве
 		 * @param company
 		 */
 		updateCompanyData(company?: TCompany): void {
@@ -427,7 +439,7 @@ export const useData = defineStore('data', {
 			})
 		},
 		/**
-		 * Удаление новости
+		 * Удаление компании
 		 * @param company
 		 */
 		async deleteCompany(company: TCompany): Promise<boolean> {
@@ -451,5 +463,145 @@ export const useData = defineStore('data', {
 			}
 			return true;
 		},
+
+		/**
+		 * Сохранение, добавление Инициативы
+		 */
+		async updateInitiative(item: FormData | TInitiativeWithID): Promise<TInitiativeResponse | false> {
+			const headers: Record<string, string> = {
+				Authorization: `Bearer ${this.accessToken}`,
+			}
+			const { data, error } =
+				await useFetch(`${this.path}/initiative`, {
+					method: 'post',
+					body: item,
+					headers,
+				});
+			if (error.value) return false;
+			const response: TInitiativeResponse = unref(data.value) as TInitiativeResponse;
+			if (!response.errors) {
+				this.updateInitiativeData(response.initiative);
+			}
+			return response;
+		},
+		/**
+		 * Обновление данных о регионе в массиве
+		 * @param initiative
+		 */
+		updateInitiativeData(initiative?: TInitiative): void {
+			if (typeof this.initiatives === 'undefined') {
+				this.initiatives = [];
+			}
+			if (initiative) {
+				const index: number = this.initiatives.findIndex((item: TInitiative): boolean => item.id === initiative.id);
+				if (index >= 0) {
+					this.initiatives[index] = {...initiative};
+				} else {
+					this.initiatives = [{...initiative}, ...this.initiatives];
+				}
+			}
+			this.initiatives = this.initiatives.sort((a: TInitiative, b: TInitiative): number => {
+				if (a.name > b.name) return 1;
+				if (b.name > a.name) return -1;
+				return 0;
+			})
+		},
+		/**
+		 * Удаление инициативы
+		 * @param initiative
+		 */
+		async deleteInitiative(initiative: TInitiative): Promise<boolean> {
+			const { data, error } =
+				await useFetch(`${this.path}/initiative`, {
+					method: 'delete',
+					body: initiative,
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			const deleted: TInitiativeDeleteResponse = unref(data.value) as TInitiativeDeleteResponse;
+			if (deleted.status && this.initiatives) {
+				this.initiatives = this.initiatives.filter((item: TInitiative): boolean => item.id !== initiative.id);
+				alert(`Инициатива «${initiative.name}» удалена`);
+			} else {
+				if (deleted.errors) {
+					alert(deleted.errors);
+				} else {
+					if (!deleted.status) alert('Ошибка удаления инициативы');
+				}
+			}
+			return true;
+		},
+
+		async approveCompany(id: number): Promise<boolean> {
+			const { data, error } =
+				await useFetch(`${this.path}/moderate_company`, {
+					method: 'post',
+					body: {
+						id,
+						approved: true
+					},
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			this.companies = data.value as TCompany[];
+			return true;
+		},
+
+		async declineCompany(id: number, reason: string): Promise<boolean> {
+			const { data, error } =
+				await useFetch(`${this.path}/moderate_company`, {
+					method: 'post',
+					body: {
+						id,
+						declined: true,
+						reason
+					},
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			this.companies = data.value as TCompany[];
+			return true;
+		},
+
+		async approveInitiative(id: number): Promise<boolean> {
+			const { data, error } =
+				await useFetch(`${this.path}/moderate_initiative`, {
+					method: 'post',
+					body: {
+						id,
+						approved: true
+					},
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			this.initiatives = data.value as TInitiative[];
+			return true;
+		},
+
+		async declineInitiative(id: number, reason: string): Promise<boolean> {
+			const { data, error } =
+				await useFetch(`${this.path}/moderate_initiative`, {
+					method: 'post',
+					body: {
+						id,
+						declined: true,
+						reason
+					},
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			this.initiatives = data.value as TInitiative[];
+			return true;
+		}
 	}
 });

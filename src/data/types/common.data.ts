@@ -5,6 +5,7 @@ import { TOwnership } from '~/src/data/types/ownership';
 import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import { TNews } from '~/src/data/types/news';
 import { TCompany } from '~/src/data/types/company';
+import { TInitiative } from '~/src/data/types/initiatives';
 
 export type TAdminMenu = Record<string, string>;
 
@@ -18,4 +19,16 @@ export type TCommonData = {
 	ownership?: TOwnership[],
 	types?: TInitiativeTypes[],
 	companies?: TCompany[]
+	initiatives?: TInitiative[]
+}
+
+export type TClientData = {
+	news?: TNews[],
+	types?: TInitiativeTypes[],
+	regions?: TRegion[],
+	initiatives?: TInitiative[]
+}
+
+export type TClientDataError = {
+	message: string;
 }

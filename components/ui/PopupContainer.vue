@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+const emit = defineEmits(['close']);
 defineExpose({show, hide});
 
 const isPopupVisible = ref(false);
@@ -11,10 +12,15 @@ function show(): void {
 function hide(): void {
 	isPopupVisible.value = false;
 }
+
+function onClose(e: Event): void {
+	if ((e?.target as HTMLElement)?.classList.contains('popup-container')) emit('close');
+}
+//
 </script>
 
 <template>
-	<div class="popup-container" :class="isPopupVisible ? 'show' : ''">
+	<div class="popup-container" :class="isPopupVisible ? 'show' : ''" @click="onClose">
 		<slot />
 	</div>
 </template>

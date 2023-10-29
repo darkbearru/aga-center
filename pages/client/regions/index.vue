@@ -3,9 +3,10 @@
 import Regions from '~/components/layout/admin/Regions.vue';
 
 definePageMeta({
-	middleware: ["auth"],
+	middleware: ["admin"],
 	layout: "client",
 });
+useHead({ title: 'АГА. Настройка регионов' });
 
 </script>
 

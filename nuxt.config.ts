@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     '@nuxt/devtools',
     '@nuxtjs/google-fonts',
     'nuxt-svgo',
-    'nuxt-security',
+    // 'nuxt-security',
     '@pinia/nuxt',
     '@formkit/nuxt',
   ],
@@ -31,14 +31,28 @@ export default defineNuxtConfig({
       },
     },
   },
-  security: {
+/*  security: {
+    nonce: true,
     headers: {
       crossOriginEmbedderPolicy: {
         value: process.env.NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp',
-        route: '/**',
-      }
+        route: '/!**',
+      },
     },
   },
+  routeRules: {
+    '/client/initiative': {
+      security: {
+        requestSizeLimiter: {
+          maxRequestSizeInBytes: 9437184,
+          maxUploadFileRequestInBytes: 2097152,
+        },
+        xssValidator: {
+
+        }
+      }
+    }
+  },*/
   experimental: {
     headNext: true
   },

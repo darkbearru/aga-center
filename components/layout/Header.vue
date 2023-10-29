@@ -19,9 +19,13 @@ const hidePopup = (): void => {
 }
 
 const authUser = useAuth();
-authUser.check().then(() => {
-	loggedUser.value = authUser.user;
-});
+onMounted(async () => {
+	authUser.check().then(() => {
+		loggedUser.value = authUser.user;
+		loginBtn.value.update(!!authUser.user);
+	});
+})
+
 
 </script>
 
@@ -31,7 +35,7 @@ authUser.check().then(() => {
 	>
 		<LogoColor class="md:h-20" href="/"/>
 		<Menu class="md:h-20" />
-		<Login class="md:h-20" @show-popup="showPopup" ref="loginBtn" :loggedUser="loggedUser" />
+		<Login class="md:h-20" @show-popup="showPopup" ref="loginBtn" :loggedUser="!!loggedUser" />
 	</header>
 	<LoginPopup @hide-popup="hidePopup" ref="loginPopup"/>
 

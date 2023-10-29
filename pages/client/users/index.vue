@@ -3,9 +3,11 @@
 import Users from '~/components/layout/admin/Users.vue';
 
 definePageMeta({
-	middleware: ["auth"],
+	middleware: ["admin"],
 	layout: "client",
 });
+
+useHead({ title: 'АГА. Список пользователей' });
 
 </script>
 

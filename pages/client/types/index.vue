@@ -3,9 +3,10 @@
 import InitiativeTypes from '~/components/layout/admin/InitiativeTypes.vue';
 
 definePageMeta({
-	middleware: ["auth"],
+	middleware: ["admin"],
 	layout: "client",
 });
+useHead({ title: 'АГА. Список типов' });
 
 </script>
 

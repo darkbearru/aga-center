@@ -1,4 +1,5 @@
 import { TCompany } from '~/src/data/types/company';
+import { TUsersPayload } from '~/src/users/users.payload';
 
 export type TUser = {
 	id?: number,
@@ -16,9 +17,10 @@ export type TUserResponse = {
 	errors?: {
 		email?: string,
 		fio?: string,
-		other?: string
+		other?: string,
+		confirm_code?: string,
 	}
-	user: TUser,
+	user?: TUser | TUsersPayload,
 }
 
 export type TUserRegistration = {

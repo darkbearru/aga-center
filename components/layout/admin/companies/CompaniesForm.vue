@@ -10,7 +10,10 @@ import Button from '~/components/ui/Button.vue';
 import IconTrash from 'assets/svg/icon-trash.svg';
 
 const props = defineProps({
-	data: Object
+	data: {
+		type: Object,
+		default: undefined
+	}
 });
 const emit = defineEmits(['save', 'delete']);
 defineExpose({setup});
@@ -50,6 +53,7 @@ function setup(item?: TCompany): void {
 }
 
 const submit = () => {
+	console.log('submit');
 	const contactsList = contacts.value.getContacts();
 	if (typeof company === 'undefined') {
 		company = {
@@ -68,8 +72,9 @@ const submit = () => {
 	company.nameShort = inputNameShort.value as string;
 	company.requsites = inputRequisites.value as string;
 	if (userData.ownership) {
+		inputOwnership.value = inputOwnership.value || userData.ownership[0];
 		const idx = userData.ownership.findIndex(item => `${item.nameShort} (${item.nameFull})` === inputOwnership.value);
-		company.ownership = userData.ownership[idx];
+		company.ownership = userData.ownership[idx >= 0 ? idx : 0];
 	}
 	company.contacts = contactsList;
 
@@ -95,7 +100,6 @@ const shortNameModify = () => {
 
 const deleteCompany = () => {
 	if (confirm(`Вы действительно хотите удалить компанию «${inputNameFull.value}»`)) {
-		console.log(company);
 		emit('delete', company);
 	}
 }

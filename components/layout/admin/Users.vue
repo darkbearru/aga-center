@@ -76,8 +76,8 @@ const deleteUser = async (user: TUser): Promise<void> => {
 
 		<UsersList @click="popupOpen" @delete="deleteUser" ref="usersList"/>
 
-		<PopupContainer ref="popup">
-			<Popup class="bg-gray-light/60 w-full min-w-[300px] max-w-[500px] pb-0" :title="titlePopup" @close="popupClose">
+		<PopupContainer ref="popup" @close="popupClose">
+			<Popup class="bg-gray-light/60 w-full min-w-[300px] max-w-[500px] max-h-full pb-0" :title="titlePopup" @close="popupClose">
 				<FormKit
 					id="users_form"
 					type="form"
