@@ -1,7 +1,7 @@
-import { TClientData, TClientDataError } from '~/src/data/types/common.data';
-import { TNews } from '~/src/data/types/news';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import {TInitiativeList } from '~/src/data/types/initiatives';
+import { type TClientData, type TClientDataError } from '~/src/data/types/common.data';
+import { type TNews } from '~/src/data/types/news';
+import { type TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import { type TInitiativeList } from '~/src/data/types/initiatives';
 
 export interface IDataService {
 	data(): Promise<TClientData>;

@@ -4,7 +4,7 @@ import IconEdit from 'assets/svg/icon-edit.svg';
 import IconTrash from 'assets/svg/icon-trash.svg';
 import IconActive from 'assets/svg/icon-checkbox.svg';
 import IconNotActive from 'assets/svg/icon-square.svg';
-import { TNews } from '~/src/data/types/news';
+import type { TNews } from '~/src/data/types/news';
 const props = defineProps({
 	item: Object
 });

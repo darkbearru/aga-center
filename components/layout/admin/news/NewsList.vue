@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useData } from '~/components/stores/useData';
 import NewsListItem from '~/components/layout/admin/news/NewsListItem.vue';
-import { TNews } from '~/src/data/types/news';
+import type { TNews } from '~/src/data/types/news';
 
 const data = useData();
 const newsList = ref(data.news);

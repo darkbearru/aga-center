@@ -1,10 +1,9 @@
 <script setup lang="ts">
 
-import { TInitiative } from '~/src/data/types/initiatives';
+import type { TInitiative } from '~/src/data/types/initiatives';
 import IconNotActive from 'assets/svg/icon-square.svg';
 import IconActive from 'assets/svg/icon-checkbox.svg';
 import IconTrash from 'assets/svg/icon-trash.svg';
-import IconEdit from 'assets/svg/icon-edit.svg';
 
 const props = defineProps({
 	item: Object,

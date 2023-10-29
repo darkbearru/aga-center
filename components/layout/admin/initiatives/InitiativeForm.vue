@@ -2,13 +2,13 @@
 
 import { useData } from '~/components/stores/useData';
 import { useAuth } from '~/components/stores/useAuth';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import { TRegion } from '~/src/data/types/regions';
-import { TFormkitOption, TCompany } from '~/src/data/types/company';
-import { TInitiative, TInitiativeWithID } from '~/src/data/types/initiatives';
-import PhotosList from '~/components/layout/admin/photos/PhotosList.vue';
-import { TPhotos } from '~/src/data/types/photos';
 import { setErrors } from '@formkit/core';
+import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { TRegion } from '~/src/data/types/regions';
+import type { TFormkitOption, TCompany } from '~/src/data/types/company';
+import type { TInitiative, TInitiativeWithID } from '~/src/data/types/initiatives';
+import type { TPhotos } from '~/src/data/types/photos';
+import PhotosList from '~/components/layout/admin/photos/PhotosList.vue';
 
 const userData = useData();
 const auth = useAuth();

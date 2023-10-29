@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
-import { TUsersPayload } from '~/src/users/users.payload';
+import type { TUsersPayload } from '~/src/users/users.payload';
 import { H3Event } from 'h3';
-import { TUserResponse } from '~/src/users/types/users';
+import type { TUserResponse } from '~/src/users/types/users';
 
 export const useAuth = defineStore('user', {
 	state: () => {

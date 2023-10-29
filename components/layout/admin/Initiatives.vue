@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { useData } from '~/components/stores/useData';
-import { TInitiative } from '~/src/data/types/initiatives';
+import type { TInitiative } from '~/src/data/types/initiatives';
 import InitiativeList from '~/components/layout/admin/initiatives/InitiativeList.vue';
 import InitiativeForm from '~/components/layout/admin/initiatives/InitiativeForm.vue';
 import PopupContainer from '~/components/ui/PopupContainer.vue';
 import Popup from '~/components/ui/Popup.vue';
 import Button from '~/components/ui/Button.vue';
 import IconPlus from 'assets/svg/icon-plus.svg';
-import { setErrors } from '@formkit/core';
 
 const userData = useData();
 

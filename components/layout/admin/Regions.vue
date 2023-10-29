@@ -6,7 +6,7 @@ import Popup from '~/components/ui/Popup.vue';
 import PopupContainer from '~/components/ui/PopupContainer.vue';
 import { useData } from '~/components/stores/useData';
 import { setErrors } from '@formkit/core';
-import { TRegion } from '~/src/data/types/regions';
+import type { TRegion } from '~/src/data/types/regions';
 import { slugify } from '~/src/utils/slugify';
 
 const titlePopup = ref('Добавить регион')

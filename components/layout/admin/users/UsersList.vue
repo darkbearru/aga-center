@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useData } from '~/components/stores/useData';
-import { TUser } from '~/src/users/types/users';
+import type { TUser } from '~/src/users/types/users';
 import UsersListItem from '~/components/layout/admin/users/UsersListItem.vue';
 
 const data = useData();

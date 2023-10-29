@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useData } from '~/components/stores/useData';
 import InitiativeListItem from '~/components/layout/admin/initiatives/InitiativeListItem.vue';
-import { TInitiative } from '~/src/data/types/initiatives';
+import type { TInitiative } from '~/src/data/types/initiatives';
 
 const userData = useData();
 const initiatives = ref<TInitiative[]>(userData.initiatives as TInitiative[]);

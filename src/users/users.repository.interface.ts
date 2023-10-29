@@ -1,4 +1,4 @@
-import { TUser, TUserRegistration } from '~/src/users/types/users';
+import { type TUser, type TUserRegistration } from '~/src/users/types/users';
 
 export interface IUsersRepository {
 	saveCode(email: string, code: string): Promise<void>;

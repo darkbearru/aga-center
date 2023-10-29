@@ -1,5 +1,4 @@
-import { TUser, TUserRegistration, TUserResponse } from '~/src/users/types/users';
-import { TUsersPayload } from '~/src/users/users.payload';
+import { type TUser, type TUserRegistration, type TUserResponse } from '~/src/users/types/users';
 
 export interface IUsersService {
 	create(body?: TUserRegistration): Promise<TUserResponse | undefined>;

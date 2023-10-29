@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { TCommonData } from '~/src/data/types/common.data';
+import type { TCommonData } from '~/src/data/types/common.data';
 import News from '~/components/layout/admin/News.vue';
 import Companies from '~/components/layout/admin/Companies.vue';
 

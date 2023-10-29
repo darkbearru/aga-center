@@ -1,34 +1,28 @@
-import { IAdminService } from '~/src/services/admin/admin.service.interface';
-import { INewsRepository } from '~/src/data/news.repository.interface';
-import { Articles, News, Users } from '.prisma/client';
-import { TAdminMenu, TCommonData } from '~/src/data/types/common.data';
-import { IUsersRepository } from '~/src/users/users.repository.interface';
-import { TUser, TUserResponse } from '~/src/users/types/users';
+import type { IAdminService } from '~/src/services/admin/admin.service.interface';
+import type { INewsRepository } from '~/src/data/news.repository.interface';
+import type { TAdminMenu, TCommonData } from '~/src/data/types/common.data';
+import type { IUsersRepository } from '~/src/users/users.repository.interface';
+import type { TUser, TUserResponse } from '~/src/users/types/users';
 import { emailValidate } from '~/src/services/validation/validation';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { IRegionsRepository } from '~/src/data/regions.repositiory.interface';
-import { TRegion, TRegionResponse } from '~/src/data/types/regions';
-import { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
-import { IOwnershipRepository } from '~/src/data/ownership.repository.interface';
-import { IInitiativeTypesRepository } from '~/src/data/initiative.types.repository.inerface';
-import { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
-import { TNews, TNewsResponse } from '~/src/data/types/news';
-import { TCompany, TCompanyResponse, TContacts } from '~/src/data/types/company';
-import { ICompanyRepository } from '~/src/data/company.repository.interface';
-import {
-	TInitiative,
-	TInitiativeDeleteResponse,
-	TInitiativeResponse,
-	TInitiativeWithID
-} from '~/src/data/types/initiatives';
-import { IInitiativeRepository } from '~/src/data/initiative.repository.interface';
-import { TPhotoItem, TPhotos } from '~/src/data/types/photos';
+import type { IRegionsRepository } from '~/src/data/regions.repositiory.interface';
+import type { TRegion, TRegionResponse } from '~/src/data/types/regions';
+import type { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
+import type { IOwnershipRepository } from '~/src/data/ownership.repository.interface';
+import type { IInitiativeTypesRepository } from '~/src/data/initiative.types.repository.inerface';
+import type { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
+import type { TNews, TNewsResponse } from '~/src/data/types/news';
+import type { TCompany, TCompanyResponse, TContacts } from '~/src/data/types/company';
+import type { ICompanyRepository } from '~/src/data/company.repository.interface';
+import type { TInitiative, TInitiativeDeleteResponse, TInitiativeResponse, TInitiativeWithID } from '~/src/data/types/initiatives';
+import type { IInitiativeRepository } from '~/src/data/initiative.repository.interface';
+import type { TPhotoItem, TPhotos } from '~/src/data/types/photos';
+import type { TArticles } from '~/src/data/types/articles';
 import ms from 'ms';
-import * as fs from 'fs';
+// import * as fs from 'fs';
 
 export class AdminService implements IAdminService {
 	constructor(
-		private user: Users,
+		private user: TUser,
 		private newsRepository: INewsRepository,
 		private usersRepository: IUsersRepository,
 		private regionsRepository: IRegionsRepository,
@@ -48,7 +42,7 @@ export class AdminService implements IAdminService {
 		let news: TNews[] | undefined = undefined;
 		let users: TUser[] | undefined = undefined;
 		let companies: TCompany[] | undefined = undefined;
-		let articles: Articles[] | undefined = undefined;
+		let articles: TArticles | undefined = undefined;
 		let initiatives: TInitiative[] | undefined = undefined;
 		if (this.user.isAdmin) {
 			menu['/client'] = 'Новости';
@@ -155,11 +149,11 @@ export class AdminService implements IAdminService {
 
 		try {
 			response.user = await this.usersRepository.save(user);
-		} catch (e) {
+		} catch (e: any) {
 			response.errors = {
 				other: 'Ошибка сохранения данных'
 			};
-			if (e instanceof PrismaClientKnownRequestError) {
+			if (e) {
 				response.errors = { other: e?.message }
 			}
 		}
@@ -397,8 +391,7 @@ export class AdminService implements IAdminService {
 
 			const result = await this.initiativeRepository.save(data, this.user);
 			if (result) {
-				const item = await  this.initiativeRepository.select(Number(data.id));
-				response.initiative = item
+				response.initiative = await this.initiativeRepository.select(Number(data.id));
 			} else {
 				response.errors = {other: 'Ошибка сохранения данных'}
 			}
@@ -437,6 +430,7 @@ export class AdminService implements IAdminService {
 		console.log('Deleted Photos', photos);
 		// Удаляем в базе
 		return ;
+/*
 		await this.initiativeRepository.deletePhotos(photos);
 		// Удаляем на диске
 		const current = `${process.cwd()}/public`
@@ -446,6 +440,7 @@ export class AdminService implements IAdminService {
 				if (err) console.log('Error File delete', err);
 			})
 		});
+*/
 	}
 
 	async companyModeration(id: number, operation: string, reason?: string): Promise<TCompany[] | undefined> {

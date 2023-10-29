@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { TPhotos } from '~/src/data/types/photos';
+import type { TPhotos } from '~/src/data/types/photos';
 import PhotosListItem from '~/components/layout/admin/photos/PhotosListItem.vue';
 
 const props = defineProps({

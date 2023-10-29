@@ -2,7 +2,6 @@
 
 import Popup from '~/components/ui/Popup.vue';
 import PopupContainer from '~/components/ui/PopupContainer.vue';
-import ButtonRow from '~/components/ui/ButtonRow.vue';
 import Button from '~/components/ui/Button.vue';
 
 const popup = ref();

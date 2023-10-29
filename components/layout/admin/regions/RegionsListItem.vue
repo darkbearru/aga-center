@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { TRegion } from '~/src/data/types/regions';
+import type { TRegion } from '~/src/data/types/regions';
 import IconEdit from 'assets/svg/icon-edit.svg';
 import IconTrash from 'assets/svg/icon-trash.svg';
 import IconActive from 'assets/svg/icon-checkbox.svg';

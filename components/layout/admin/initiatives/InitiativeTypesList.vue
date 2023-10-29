@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useData } from '~/components/stores/useData';
 import InitiativeTypesListItem from '~/components/layout/admin/initiatives/InitiativeTypesListItem.vue';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 
 const data = useData();
 const typesList = ref(data.types);

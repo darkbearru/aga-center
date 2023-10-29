@@ -5,7 +5,7 @@ import Popup from '~/components/ui/Popup.vue';
 import PopupContainer from '~/components/ui/PopupContainer.vue';
 import { useData } from '~/components/stores/useData';
 import { setErrors } from '@formkit/core';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import InitiativeTypesList from '~/components/layout/admin/initiatives/InitiativeTypesList.vue';
 
 const titlePopup = ref('Добавление типа инициативы')

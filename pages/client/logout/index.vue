@@ -2,7 +2,7 @@
 
 import { useAuth } from '~/components/stores/useAuth';
 
-const auth = useAuth();;
+const auth = useAuth();
 auth.logout();
 
 </script>

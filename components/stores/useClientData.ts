@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
-import { TNews } from '~/src/data/types/news';
-import { TInitiative } from '~/src/data/types/initiatives';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { TNews } from '~/src/data/types/news';
+import type { TInitiative } from '~/src/data/types/initiatives';
+import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 
 export const useClientData = defineStore('client', {
 	state: () => {

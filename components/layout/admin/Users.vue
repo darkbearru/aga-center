@@ -4,7 +4,7 @@ import Button from '~/components/ui/Button.vue';
 import IconUserPlus from 'assets/svg/icon-user-plus.svg';
 import Popup from '~/components/ui/Popup.vue';
 import PopupContainer from '~/components/ui/PopupContainer.vue';
-import { TUser } from '~/src/users/types/users';
+import type { TUser } from '~/src/users/types/users';
 import { useData } from '~/components/stores/useData';
 import { setErrors } from '@formkit/core';
 

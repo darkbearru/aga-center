@@ -1,5 +1,5 @@
-import { IUsersRepository } from '~/src/users/users.repository.interface';
-import { TUser, TUserRegistration } from '~/src/users/types/users';
+import { type IUsersRepository } from '~/src/users/users.repository.interface';
+import { type TUser, type TUserRegistration } from '~/src/users/types/users';
 import { prismaClient } from '~/src/utils/prismaClient';
 
 

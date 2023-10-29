@@ -1,12 +1,12 @@
-import { IUsersService } from '~/src/users/users.service.interface';
-import { TUser, TUserRegistration, TUserResponse } from '~/src/users/types/users';
-import { TUsersPayload } from '~/src/users/users.payload';
-import { TTokensList } from '~/src/services/jwt/token.types';
+import { type IUsersService } from '~/src/users/users.service.interface';
+import { type TUser, type TUserRegistration, type TUserResponse } from '~/src/users/types/users';
+import { type TUsersPayload } from '~/src/users/users.payload';
+import { type TTokensList } from '~/src/services/jwt/token.types';
 import { H3Event } from 'h3';
-import { TEmailResponse } from '~/src/services/email/email.types';
-import { IUsersRepository } from '~/src/users/users.repository.interface';
-import { ITokenService } from '~/src/services/jwt/token.service.interface';
-import { IEmailService } from '~/src/services/email/email.service.interface';
+import { type TEmailResponse } from '~/src/services/email/email.types';
+import { type IUsersRepository } from '~/src/users/users.repository.interface';
+import { type ITokenService } from '~/src/services/jwt/token.service.interface';
+import { type IEmailService } from '~/src/services/email/email.service.interface';
 
 export class UsersService implements IUsersService {
 	private readonly event?: H3Event;

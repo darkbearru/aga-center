@@ -2,7 +2,7 @@
 
 import IconEdit from 'assets/svg/icon-edit.svg';
 import IconTrash from 'assets/svg/icon-trash.svg';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 const props = defineProps({
 	item: Object
 });
