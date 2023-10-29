@@ -1,4 +1,4 @@
-import { TPhotos } from '~/src/data/types/photos';
+import type { TPhotos } from '~/src/data/types/photos';
 
 export type TNews = {
 	id?: number,

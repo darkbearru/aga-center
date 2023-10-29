@@ -1,8 +1,7 @@
-import { TInitiative, TInitiativeList, TInitiativeResult, TInitiativeWithID } from '~/src/data/types/initiatives';
-import { TUser } from '~/src/users/types/users';
-import { TPhotos } from '~/src/data/types/photos';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import { TClientDataError } from '~/src/data/types/common.data';
+import type { TInitiative, TInitiativeList, TInitiativeWithID } from '~/src/data/types/initiatives';
+import type { TUser } from '~/src/users/types/users';
+import type { TPhotos } from '~/src/data/types/photos';
+import type { TClientDataError } from '~/src/data/types/common.data';
 
 export interface IInitiativeRepository {
 	list(user: TUser): Promise<TInitiative[] | undefined>;

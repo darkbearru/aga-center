@@ -1,11 +1,11 @@
-import { Articles } from '.prisma/client';
-import { TUser } from '~/src/users/types/users';
-import { TRegion } from '~/src/data/types/regions';
-import { TOwnership } from '~/src/data/types/ownership';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import { TNews } from '~/src/data/types/news';
-import { TCompany } from '~/src/data/types/company';
-import { TInitiative } from '~/src/data/types/initiatives';
+import type { TUser } from '~/src/users/types/users';
+import type { TRegion } from '~/src/data/types/regions';
+import type { TOwnership } from '~/src/data/types/ownership';
+import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { TNews } from '~/src/data/types/news';
+import type { TCompany } from '~/src/data/types/company';
+import type { TInitiative } from '~/src/data/types/initiatives';
+import type { TArticles } from '~/src/data/types/articles';
 
 export type TAdminMenu = Record<string, string>;
 
@@ -14,7 +14,7 @@ export type TCommonData = {
 	menu?: TAdminMenu,
 	news?: TNews[],
 	users?: TUser[],
-	articles?: Articles[],
+	articles?: TArticles,
 	regions?: TRegion[],
 	ownership?: TOwnership[],
 	types?: TInitiativeTypes[],

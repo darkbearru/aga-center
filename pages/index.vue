@@ -3,6 +3,11 @@
 import ContentAndHeader from '~/components/layout/ContentAndHeader.vue';
 import LastNews from '~/components/content/LastNews.vue';
 import ReviewsList from '~/components/content/ReviewsList.vue';
+import { useClientData } from '~/components/stores/useClientData';
+
+const clientData = useClientData();
+clientData.all().then(() => {});
+
 </script>
 
 <template>

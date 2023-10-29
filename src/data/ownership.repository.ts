@@ -1,5 +1,5 @@
-import { IOwnershipRepository } from '~/src/data/ownership.repository.interface';
-import { TOwnership } from '~/src/data/types/ownership';
+import type { IOwnershipRepository } from '~/src/data/ownership.repository.interface';
+import type { TOwnership } from '~/src/data/types/ownership';
 import { prismaClient } from '~/src/utils/prismaClient';
 
 

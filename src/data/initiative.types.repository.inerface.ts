@@ -1,4 +1,4 @@
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 
 export interface IInitiativeTypesRepository {
 	list(): Promise<TInitiativeTypes[] | undefined>;

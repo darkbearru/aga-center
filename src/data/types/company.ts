@@ -1,5 +1,5 @@
-import { TOwnership } from '~/src/data/types/ownership';
-import { TUser } from '~/src/users/types/users';
+import type { TOwnership } from '~/src/data/types/ownership';
+import type { TUser } from '~/src/users/types/users';
 
 export enum ContactsType {
 	"phone" = "phone",

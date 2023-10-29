@@ -1,8 +1,8 @@
-import { TCompany, TCompanyItem } from '~/src/data/types/company';
-import { TPhotos } from '~/src/data/types/photos';
-import { TReviewList, TReviewListItem, TReviews } from '~/src/data/types/reviews';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import { TRegion } from '~/src/data/types/regions';
+import type { TCompany, TCompanyItem } from '~/src/data/types/company';
+import type { TPhotos } from '~/src/data/types/photos';
+import type { TReviewList, TReviews } from '~/src/data/types/reviews';
+import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { TRegion } from '~/src/data/types/regions';
 
 export type TInitiative = {
 	id?: number,

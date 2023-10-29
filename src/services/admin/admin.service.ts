@@ -18,11 +18,12 @@ import type { IInitiativeRepository } from '~/src/data/initiative.repository.int
 import type { TPhotoItem, TPhotos } from '~/src/data/types/photos';
 import type { TArticles } from '~/src/data/types/articles';
 import ms from 'ms';
+import type { TUsersPayload } from '~/src/users/users.payload';
 // import * as fs from 'fs';
 
 export class AdminService implements IAdminService {
 	constructor(
-		private user: TUser,
+		private user: TUsersPayload,
 		private newsRepository: INewsRepository,
 		private usersRepository: IUsersRepository,
 		private regionsRepository: IRegionsRepository,
@@ -44,7 +45,11 @@ export class AdminService implements IAdminService {
 		let companies: TCompany[] | undefined = undefined;
 		let articles: TArticles | undefined = undefined;
 		let initiatives: TInitiative[] | undefined = undefined;
-		if (this.user.isAdmin) {
+		console.log('AdminService');
+		console.log(this.user);
+		let isAdmin: boolean = (this.user?.rights && ((this.user?.rights&2) > 0)) || false;
+		let isModerator: boolean = (this.user?.rights && ((this.user?.rights&1) > 0)) || false;
+		if (isAdmin) {
 			menu['/client'] = 'Новости';
 			menu['/client/articles'] = 'Статьи';
 			menu['/client/users'] = 'Пользователи';
@@ -54,12 +59,12 @@ export class AdminService implements IAdminService {
 			news = await this.getNewsList();
 			users = await this.getUsersList();
 		}
-		if (this.user.isAdmin || this.user.isModerator) {
+		if (isAdmin || isModerator) {
 			menu['/client/moderation'] = 'Модерация';
 			companies  = await this.companyRepository.moderationList();
 			initiatives = await this.initiativeRepository.moderationList();
 		}
-		if (!this.user.isAdmin && !this.user.isModerator) {
+		if (!isAdmin && !isModerator) {
 			menu['/client'] = 'Компания / Инициативы';
 			menu['/client/orders'] = 'Заявки';
 			companies = await this.companyRepository.list(this.user);

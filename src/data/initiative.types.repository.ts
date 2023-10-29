@@ -1,5 +1,5 @@
-import { IInitiativeTypesRepository } from '~/src/data/initiative.types.repository.inerface';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { IInitiativeTypesRepository } from '~/src/data/initiative.types.repository.inerface';
+import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import { prismaClient } from '~/src/utils/prismaClient';
 
 export class InitiativeTypesRepository implements IInitiativeTypesRepository {

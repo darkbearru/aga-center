@@ -1,9 +1,9 @@
-import { IInitiativeRepository } from '~/src/data/initiative.repository.interface';
-import { TInitiative, TInitiativeList, TInitiativeResult, TInitiativeWithID } from '~/src/data/types/initiatives';
-import { TUser } from '~/src/users/types/users';
-import { TPhotoItem, TPhotos } from '~/src/data/types/photos';
+import type { IInitiativeRepository } from '~/src/data/initiative.repository.interface';
+import type { TInitiative, TInitiativeList, TInitiativeResult, TInitiativeWithID } from '~/src/data/types/initiatives';
+import type { TUser } from '~/src/users/types/users';
+import type { TPhotoItem, TPhotos } from '~/src/data/types/photos';
 import { OrderStatus } from '~/src/data/types/order';
-import { TClientDataError } from '~/src/data/types/common.data';
+import type { TClientDataError } from '~/src/data/types/common.data';
 import { prismaClient } from '~/src/utils/prismaClient';
 
 // const prisma: PrismaClient = new PrismaClient({ log: ['query'] });

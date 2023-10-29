@@ -1,19 +1,11 @@
 <script lang="ts" setup>
 import Menu from '~/components/layout/admin/Menu.vue';
-import { useAuth } from '~/components/stores/useAuth';
 import { useData } from '~/components/stores/useData';
 
-
-/*
-1. Последняя проверка работы авторизации
-2. Форма редактирования профиля пользователя
-3. Форма редактирования и добавления новостей
-*/
-const authUser = useAuth();
-await authUser.check().then(() => {});
-
 const data = useData();
-await data.get().then(() => {});
+await data.get().then(() => {}).catch(() => {
+	console.log('Data read error');
+});
 </script>
 
 <template>
