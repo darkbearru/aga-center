@@ -45,14 +45,23 @@ export class DataService implements IDataService {
 		return await this.initiativeRepository.listByText(text, direction)
 	}
 
-	async news(page?: number, id?: number): Promise<TNews[] | undefined> {
+	async news(page?: number, id?: number): Promise<TNewsList | undefined> {
 		page = page || 1;
-		return await this.newsRepository.list((page - 1) * this.onPage, this.onPage)
+		const news = await this.newsRepository.list((page - 1) * this.onPage, this.onPage);
+		if (news) {
+			return news.map((item: TNews & TNewsTime) => {
+				const momentDate = moment(item.date, 'YYYY-MM-DD');
+				item.timeShort = momentDate.format('DD/MM');
+				item.timeInfo = momentDate.format('DD-MM-YYYY');
+				return item;
+			});
+		}
+		return undefined;
 	}
 
 
-	async types(direction: number): Promise<TInitiativeTypes[] | undefined> {
-		return Promise.resolve([]);
+	async types(direction: number, regionId?: number): Promise<TInitiativeTypes[] | undefined> {
+		return await this.initiativeTypesRepository.listGroup(direction, regionId || this.currentRegion);
 	}
 
 }

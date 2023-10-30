@@ -288,7 +288,6 @@ const gotoClientArea = async () => {
 		& > div {
 			&:first-child {
 				z-index: 1;
-				//visibility:hidden;
 			}
 			&:last-child {
 				z-index: 2;
