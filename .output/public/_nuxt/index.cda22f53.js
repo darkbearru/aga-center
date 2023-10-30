@@ -1,1 +1,0 @@
-import{u as t}from"./useAuth.ec594533.js";import{f as o}from"./entry.676b6978.js";import"./cookie.5691c368.js";import"./ssr.02200a8e.js";const _=o({__name:"index",setup(e){return t().logout(),(u,n)=>" Logout "}});export{_ as default};

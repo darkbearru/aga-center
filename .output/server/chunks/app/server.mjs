@@ -620,7 +620,7 @@ const _routes = [
     meta: __nuxt_page_meta$6 || {},
     alias: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.alias) || [],
     redirect: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.redirect) || void 0,
-    component: () => import('./_nuxt/index-688277ed.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index-532f3783.mjs').then((m) => m.default || m)
   },
   {
     name: "client-logout",
@@ -628,7 +628,7 @@ const _routes = [
     meta: {},
     alias: [],
     redirect: void 0,
-    component: () => import('./_nuxt/index-1344acba.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index-404e7c2c.mjs').then((m) => m.default || m)
   },
   {
     name: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.name) ?? "client-moderation",
@@ -636,7 +636,7 @@ const _routes = [
     meta: __nuxt_page_meta$5 || {},
     alias: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.alias) || [],
     redirect: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.redirect) || void 0,
-    component: () => import('./_nuxt/index-fb953bb0.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index-ea1cfd8b.mjs').then((m) => m.default || m)
   },
   {
     name: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.name) ?? "client-moderation-initiatives",
@@ -644,7 +644,7 @@ const _routes = [
     meta: __nuxt_page_meta$4 || {},
     alias: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.alias) || [],
     redirect: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.redirect) || void 0,
-    component: () => import('./_nuxt/index-98eb9a3c.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index-3d2039b5.mjs').then((m) => m.default || m)
   },
   {
     name: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.name) ?? "client-ownership",
@@ -652,7 +652,7 @@ const _routes = [
     meta: __nuxt_page_meta$3 || {},
     alias: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.alias) || [],
     redirect: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.redirect) || void 0,
-    component: () => import('./_nuxt/index-e7cd493f.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index-a48c49e2.mjs').then((m) => m.default || m)
   },
   {
     name: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) ?? "client-regions",
@@ -660,7 +660,7 @@ const _routes = [
     meta: __nuxt_page_meta$2 || {},
     alias: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.alias) || [],
     redirect: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.redirect) || void 0,
-    component: () => import('./_nuxt/index-ce25ec27.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index-a9eeb949.mjs').then((m) => m.default || m)
   },
   {
     name: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.name) ?? "client-types",
@@ -668,7 +668,7 @@ const _routes = [
     meta: __nuxt_page_meta$1 || {},
     alias: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.alias) || [],
     redirect: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.redirect) || void 0,
-    component: () => import('./_nuxt/index-406d20ea.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index-27843743.mjs').then((m) => m.default || m)
   },
   {
     name: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) ?? "client-users",
@@ -676,7 +676,7 @@ const _routes = [
     meta: __nuxt_page_meta || {},
     alias: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.alias) || [],
     redirect: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.redirect) || void 0,
-    component: () => import('./_nuxt/index-be4fa331.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index-8352d8ea.mjs').then((m) => m.default || m)
   },
   {
     name: "index",
@@ -684,7 +684,7 @@ const _routes = [
     meta: {},
     alias: [],
     redirect: void 0,
-    component: () => import('./_nuxt/index-057bbfcd.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index-bac3dffa.mjs').then((m) => m.default || m)
   }
 ];
 const routerOptions0 = {
@@ -761,9 +761,9 @@ const globalMiddleware = [
   manifest_45route_45rule
 ];
 const namedMiddleware = {
-  admin: () => import('./_nuxt/admin-a0dfa2ce.mjs'),
-  auth: () => import('./_nuxt/auth-eed512f3.mjs'),
-  moderator: () => import('./_nuxt/moderator-b519cacd.mjs')
+  admin: () => import('./_nuxt/admin-ba6177a0.mjs'),
+  auth: () => import('./_nuxt/auth-f16f99bf.mjs'),
+  moderator: () => import('./_nuxt/moderator-8404af3e.mjs')
 };
 const plugin$1 = /* @__PURE__ */ defineNuxtPlugin({
   name: "nuxt:router",
@@ -1300,6 +1300,8 @@ const LazySvgoIconLogin = defineAsyncComponent(() => import('./_nuxt/icon-login-
 const LazySvgoIconPlus = defineAsyncComponent(() => import('./_nuxt/icon-plus-7cf58b44.mjs').then((r) => r.default));
 const LazySvgoIconRestore = defineAsyncComponent(() => import('./_nuxt/icon-restore-25d99875.mjs').then((r) => r.default));
 const LazySvgoIconSearch = defineAsyncComponent(() => import('./_nuxt/icon-search-6c02bf6d.mjs').then((r) => r.default));
+const LazySvgoIconSquareMinus = defineAsyncComponent(() => import('./_nuxt/icon-square-minus-365bd80b.mjs').then((r) => r.default));
+const LazySvgoIconSquarePlus = defineAsyncComponent(() => import('./_nuxt/icon-square-plus-364e3336.mjs').then((r) => r.default));
 const LazySvgoIconSquare = defineAsyncComponent(() => import('./_nuxt/icon-square-c2373fe7.mjs').then((r) => r.default));
 const LazySvgoIconTrash = defineAsyncComponent(() => import('./_nuxt/icon-trash-be4099c2.mjs').then((r) => r.default));
 const LazySvgoIconUserCheck = defineAsyncComponent(() => import('./_nuxt/icon-user-check-2a55e216.mjs').then((r) => r.default));
@@ -1313,6 +1315,8 @@ const lazyGlobalComponents = [
   ["SvgoIconPlus", LazySvgoIconPlus],
   ["SvgoIconRestore", LazySvgoIconRestore],
   ["SvgoIconSearch", LazySvgoIconSearch],
+  ["SvgoIconSquareMinus", LazySvgoIconSquareMinus],
+  ["SvgoIconSquarePlus", LazySvgoIconSquarePlus],
   ["SvgoIconSquare", LazySvgoIconSquare],
   ["SvgoIconTrash", LazySvgoIconTrash],
   ["SvgoIconUserCheck", LazySvgoIconUserCheck],
@@ -2453,8 +2457,8 @@ const _wrapIf = (component, props, slots) => {
   } };
 };
 const layouts = {
-  client: () => import('./_nuxt/client-adb2f46c.mjs').then((m) => m.default || m),
-  default: () => import('./_nuxt/default-e24f726a.mjs').then((m) => m.default || m)
+  client: () => import('./_nuxt/client-561c1913.mjs').then((m) => m.default || m),
+  default: () => import('./_nuxt/default-ee9a4866.mjs').then((m) => m.default || m)
 };
 const LayoutLoader = /* @__PURE__ */ defineComponent({
   name: "LayoutLoader",
@@ -2736,7 +2740,7 @@ const _sfc_main$1 = {
     const statusMessage = _error.statusMessage ?? (is404 ? "Page Not Found" : "Internal Server Error");
     const description = _error.message || _error.toString();
     const stack = void 0;
-    const _Error404 = /* @__PURE__ */ defineAsyncComponent(() => import('./_nuxt/error-404-1ba29a2b.mjs').then((r) => r.default || r));
+    const _Error404 = /* @__PURE__ */ defineAsyncComponent(() => import('./_nuxt/error-404-36e7c358.mjs').then((r) => r.default || r));
     const _Error = /* @__PURE__ */ defineAsyncComponent(() => import('./_nuxt/error-500-49175b35.mjs').then((r) => r.default || r));
     const ErrorTemplate = is404 ? _Error404 : _Error;
     return (_ctx, _push, _parent, _attrs) => {
@@ -2822,4 +2826,4 @@ let entry;
 }
 const entry$1 = (ctx) => entry(ctx);
 
-export { FormKitLazyProvider as F, _export_sfc as _, nuxtLinkDefaults as a, defineStore as b, createError as c, defineNuxtRouteMiddleware as d, entry$1 as default, asyncDataDefaults as e, formkitComponent as f, useNuxtApp as g, fetchDefaults as h, injectHead as i, useRuntimeConfig as j, defineFormKitConfig as k, useRoute as l, __nuxt_component_0 as m, navigateTo as n, resolveUnrefHeadInput as r, useRouter as u };
+export { FormKitLazyProvider as F, _export_sfc as _, defineNuxtRouteMiddleware as a, nuxtLinkDefaults as b, createError as c, defineStore as d, entry$1 as default, asyncDataDefaults as e, formkitComponent as f, useNuxtApp as g, fetchDefaults as h, injectHead as i, useRuntimeConfig as j, defineFormKitConfig as k, useRoute as l, __nuxt_component_0 as m, navigateTo as n, resolveUnrefHeadInput as r, useRouter as u };

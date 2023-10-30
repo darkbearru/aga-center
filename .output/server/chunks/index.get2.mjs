@@ -1,4 +1,5 @@
 import { d as defineEventHandler } from './nitro/node-server.mjs';
+import { i as initDataService } from './initDataService.mjs';
 import 'node:http';
 import 'node:https';
 import 'fs';
@@ -10,9 +11,13 @@ import 'jsonwebtoken';
 import 'ms';
 import 'nodemailer';
 import 'ipx';
+import './initiative.repository.mjs';
+import 'moment';
 
 const index_get = defineEventHandler(
-  async (event) => {
+  async () => {
+    const dataService = initDataService();
+    return await dataService.data();
   }
 );
 

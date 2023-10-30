@@ -34,7 +34,7 @@ class NewsRepository {
         skip,
         take,
         orderBy: {
-          createdAt: "desc"
+          date: "desc"
         }
       });
     } catch (e) {
@@ -161,7 +161,68 @@ class RegionsRepository {
   }
 }
 
+function numberSuffix(number, word, suffixOne, suffixTwo, suffixFive) {
+  const strNumber = number.toString();
+  const numbers = strNumber.split("");
+  const lastNumber = Number(numbers.slice(-1));
+  const lastNumberTwo = strNumber.length > 1 ? Number(numbers.slice(-2)[0]) : 0;
+  let result = `${strNumber} ${word}`;
+  if (lastNumberTwo === 1)
+    return `${result}${suffixFive}`;
+  switch (lastNumber) {
+    case 1: {
+      result += suffixOne;
+      break;
+    }
+    case 2:
+    case 3:
+    case 4: {
+      result += lastNumberTwo !== 1 ? suffixTwo : suffixFive;
+      break;
+    }
+    default:
+      result += suffixFive;
+  }
+  return result;
+}
+
 class InitiativeTypesRepository {
+  async listGroup(direction = 0, region = 1) {
+    try {
+      const result = await prismaClient.initiativeTypes.findMany({
+        select: {
+          id: true,
+          name: true,
+          Initiative: {
+            select: {
+              id: true
+            }
+          },
+          _count: {
+            select: {
+              Initiative: { where: {
+                direction,
+                regionsId: region,
+                isApproved: true,
+                isDeleted: false
+              } }
+            }
+          }
+        },
+        orderBy: { name: "asc" }
+      });
+      return result.map((item) => {
+        return {
+          id: item.id,
+          name: item.name,
+          count: item._count.Initiative,
+          countStr: numberSuffix(item._count.Initiative, "\u0438\u043D\u0438\u0446\u0438\u0430\u0442\u0438\u0432", "\u0430", "\u044B", "")
+        };
+      }).filter((item) => item.count > 0);
+    } catch (e) {
+      return void 0;
+    }
+  }
   async add(type) {
     return prismaClient.initiativeTypes.create({
       data: {
@@ -273,21 +334,24 @@ const clientInitiativeFields = {
   id: true,
   name: true,
   text: true,
+  direction: true,
   Photos: {
     select: {
       id: true,
       path: true
     }
   },
-  Reviews: {
-    select: {
-      id: true,
-      title: true,
-      review: true,
-      rate: true,
-      createdAt: true
-    }
-  },
+  /*
+  	Reviews: {
+  		select: {
+  			id: true,
+  			title: true,
+  			review: true,
+  			rate: true,
+  			createdAt: true,
+  		}
+  	},
+  */
   Company: {
     select: {
       id: true,

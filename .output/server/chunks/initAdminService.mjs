@@ -18,6 +18,7 @@ class AdminService {
     this.initiativeRepository = initiativeRepository;
   }
   async data() {
+    var _a, _b, _c, _d;
     const menu = {};
     const regions = await this.regionsRepository.list();
     const types = await this.initiativeTypesRepository.list();
@@ -27,7 +28,11 @@ class AdminService {
     let companies = void 0;
     let articles = void 0;
     let initiatives = void 0;
-    if (this.user.isAdmin) {
+    console.log("AdminService");
+    console.log(this.user);
+    let isAdmin = ((_a = this.user) == null ? void 0 : _a.rights) && (((_b = this.user) == null ? void 0 : _b.rights) & 2) > 0 || false;
+    let isModerator = ((_c = this.user) == null ? void 0 : _c.rights) && (((_d = this.user) == null ? void 0 : _d.rights) & 1) > 0 || false;
+    if (isAdmin) {
       menu["/client"] = "\u041D\u043E\u0432\u043E\u0441\u0442\u0438";
       menu["/client/articles"] = "\u0421\u0442\u0430\u0442\u044C\u0438";
       menu["/client/users"] = "\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u0438";
@@ -37,12 +42,12 @@ class AdminService {
       news = await this.getNewsList();
       users = await this.getUsersList();
     }
-    if (this.user.isAdmin || this.user.isModerator) {
+    if (isAdmin || isModerator) {
       menu["/client/moderation"] = "\u041C\u043E\u0434\u0435\u0440\u0430\u0446\u0438\u044F";
       companies = await this.companyRepository.moderationList();
       initiatives = await this.initiativeRepository.moderationList();
     }
-    if (!this.user.isAdmin && !this.user.isModerator) {
+    if (!isAdmin && !isModerator) {
       menu["/client"] = "\u041A\u043E\u043C\u043F\u0430\u043D\u0438\u044F / \u0418\u043D\u0438\u0446\u0438\u0430\u0442\u0438\u0432\u044B";
       menu["/client/orders"] = "\u0417\u0430\u044F\u0432\u043A\u0438";
       companies = await this.companyRepository.list(this.user);

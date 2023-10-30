@@ -1,1 +1,0 @@
-import{v as a,x as n}from"./entry.676b6978.js";import{u as i}from"./ssr.02200a8e.js";const f=a(s=>{var r;const e=i();if(!e)return;let t=!1;if(e.context.user&&((r=e.context.user)==null?void 0:r.rights)&2&&(t=!0),s.path!=="/"&&!t)return n("/")});export{f as default};
