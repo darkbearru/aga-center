@@ -1,0 +1,1 @@
+var m=(a=>(a.phone="phone",a.email="email",a.vk="vk",a.instagram="instagram",a.ok="ok",a))(m||{});const i={phone:"Телефон",email:"Email",vk:"Вконтакте",instagram:"Инстаграмм",ok:"Одноклассники"};export{m as C,i as a};

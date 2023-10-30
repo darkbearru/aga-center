@@ -73,7 +73,9 @@ export type TInitiativeListItem = {
 	id: number,
 	name: string | null,
 	text: string | null,
+	rating?: number | null,
+	url?: string,
 	Photos: TPhotos | null,
-	Reviews: TReviewList | null,
+	Reviews?: TReviewList | null,
 	Company: TCompanyItem | null,
 }

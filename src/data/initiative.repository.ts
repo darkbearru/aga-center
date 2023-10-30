@@ -55,12 +55,14 @@ const clientInitiativeFields = {
 	id: true,
 	name: true,
 	text: true,
+	direction: true,
 	Photos: {
 		select: {
 			id: true,
 			path: true,
 		}
 	},
+/*
 	Reviews: {
 		select: {
 			id: true,
@@ -70,6 +72,7 @@ const clientInitiativeFields = {
 			createdAt: true,
 		}
 	},
+*/
 	Company: {
 		select: {
 			id: true,

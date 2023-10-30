@@ -19,3 +19,10 @@ export type TNewsResponse = {
 	}
 	news: TNews,
 }
+
+export type TNewsTime = {
+	timeInfo?: string,
+	timeShort?: string
+}
+
+export type TNewsList = (TNews & TNewsTime)[];

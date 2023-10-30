@@ -2,7 +2,7 @@ import type { TUser } from '~/src/users/types/users';
 import type { TRegion } from '~/src/data/types/regions';
 import type { TOwnership } from '~/src/data/types/ownership';
 import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import type { TNews } from '~/src/data/types/news';
+import type { TNews, TNewsList } from '~/src/data/types/news';
 import type { TCompany } from '~/src/data/types/company';
 import type { TInitiative } from '~/src/data/types/initiatives';
 import type { TArticles } from '~/src/data/types/articles';
@@ -23,7 +23,7 @@ export type TCommonData = {
 }
 
 export type TClientData = {
-	news?: TNews[],
+	news?: TNewsList,
 	types?: TInitiativeTypes[],
 	regions?: TRegion[],
 	initiatives?: TInitiative[]
