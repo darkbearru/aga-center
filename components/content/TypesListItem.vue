@@ -5,10 +5,11 @@ import IconSquareMinus from 'assets/svg/icon-square-minus.svg';
 import InitiativeItem from '~/components/content/InitiativeItem.vue';
 import { useClientData } from '~/components/stores/useClientData';
 import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import type { TInitiativeList } from '~/src/data/types/initiatives';
+import type { TInitiative, TInitiativeList } from '~/src/data/types/initiatives';
 
-const clientData = useClientData();
 const props = defineProps({ item: Object });
+const emit = defineEmits(['click']);
+const clientData = useClientData();
 const typeItem = ref<TInitiativeTypes>(props.item as TInitiativeTypes);
 
 const initiatives = ref<TInitiativeList>([]);
@@ -24,6 +25,12 @@ const showInitiatives = async (): Promise<void> => {
 	}
 }
 
+const onClick = (id: number): void =>{
+	const initiative = initiatives.value.find(item => item.id === id);
+	if (!initiative) return;
+	emit('click', initiative);
+}
+
 </script>
 
 <template>
@@ -37,7 +44,7 @@ const showInitiatives = async (): Promise<void> => {
 			<div class="inline-block bg-gray-400 text-white text-sm rounded-lg px-2 ml-4">{{ typeItem.countStr }}</div>
 		</div>
 		<div v-if="isShow" class="pl-6 divide-y divide-gray-200 bg-gray-100">
-			<InitiativeItem v-for="item in initiatives" :key="item.id">
+			<InitiativeItem v-for="item in initiatives" :key="item.id" @click="onClick(item.id)">
 				<div class="grow">
 					{{ item.name }}
 				</div>

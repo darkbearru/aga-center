@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
-import type { TNews, TNewsList } from '~/src/data/types/news';
+import type { TNews, TNewsList, TNewsTime } from '~/src/data/types/news';
 import type { TInitiative } from '~/src/data/types/initiatives';
 import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import type { TClientData } from '~/src/data/types/common.data';
 import type { TRegion } from '~/src/data/types/regions';
 import type { TInitiativeList } from '~/src/data/types/initiatives';
+import type { TOrder, TOrderResponse } from '~/src/data/types/order';
 
 export const useClientData = defineStore('client', {
 	state: () => {
@@ -33,7 +34,7 @@ export const useClientData = defineStore('client', {
 		// Получения списка новостей
 		async newsList(page: number = 0): Promise<TNewsList | undefined> {
 			return new Promise(async (resolve, reject) => {
-				await $fetch(`${this.path}/news`, {
+				await $fetch(`${this.path}/news${page? '/page/' + page : ''}`, {
 					method: 'get',
 				}).then((data) => {
 					this.news = data as TNewsList || [];
@@ -45,14 +46,16 @@ export const useClientData = defineStore('client', {
 		},
 
 		// Получение текста новости
-		async newsText(id: number): Promise<TNews | undefined> {
-			const { data, error } =
-				await useFetch(`${this.path}/news`, {
+		async newsText(slug: string): Promise<TNews & TNewsTime | undefined> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/news/slug/${slug}`, {
 					method: 'get',
-					body: { id }
+				}).then((data) => {
+					resolve(data as TNews & TNewsTime);
+				}).catch(() => {
+					reject(undefined);
 				});
-			if (error.value) return undefined;
-			return data.value as TNews;
+			});
 		},
 
 		// Получение списка типов инициатив
@@ -81,20 +84,19 @@ export const useClientData = defineStore('client', {
 					reject();
 				});
 			});
-/*
+		},
 
-			const { data, error } =
-				await useFetch(`${this.path}/initiatives`, {
-					method: 'get',
-					body: {
-						direction: this.direction,
-						type
-					}
+		async makeOrder(order: TOrder): Promise<TOrderResponse> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/order`, {
+					method: 'post',
+					body: order
+				}).then((data) => {
+					resolve(data as TOrderResponse);
+				}).catch(() => {
+					reject();
 				});
-			if (error.value) return undefined;
-			console.log(data.value);
-			return data.value as TInitiative[];
-*/
+			});
 		},
 
 		// Поиск по инициативам

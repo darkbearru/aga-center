@@ -5,9 +5,9 @@
 <template>
 	<nav class="flex grow-1 items-center justify-center order-3 md:order-2 w-full">
 		<ul class="flex justify-center w-full md:w-auto">
-			<li>Новости</li>
-			<li>Отдых</li>
-			<li>Работа</li>
+			<li><NuxtLink href="/news">Новости</NuxtLink></li>
+			<li><NuxtLink href="/relax">Отдых</NuxtLink></li>
+			<li><NuxtLink href="/work">Работа</NuxtLink></li>
 		</ul>
 	</nav>
 </template>
