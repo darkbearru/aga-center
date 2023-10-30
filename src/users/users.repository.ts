@@ -33,7 +33,7 @@ export class UsersRepository implements IUsersRepository {
 				where: {
 					email: body?.email,
 					confirmCode: body?.code,
-					isNew: true,
+					// isNew: true,
 				},
 				data: {
 					fio: body?.fio,

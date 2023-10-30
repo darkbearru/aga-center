@@ -2,7 +2,7 @@ import type { TPhotos } from '~/src/data/types/photos';
 
 export type TNews = {
 	id?: number,
-	active: boolean,
+	active?: boolean,
 	title: string,
 	slug: string,
 	text: string | null,

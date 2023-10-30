@@ -8,6 +8,7 @@ export type TUser = {
 	isAdmin?: boolean,
 	isModerator?: boolean,
 	confirmCode?: string | null,
+	autoLogin?: boolean,
 	companies?: TCompany[],
 	createdAt?: Date,
 	changedAt?: Date,

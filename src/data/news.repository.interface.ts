@@ -7,4 +7,5 @@ export interface INewsRepository {
 	add(news: TNews): Promise<TNews | boolean>;
 	delete(news: TNews): Promise<boolean>;
 	check(news: TNews): Promise<boolean>;
+	text(slug: string): Promise<TNews | undefined>
 }

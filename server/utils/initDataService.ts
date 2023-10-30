@@ -3,6 +3,9 @@ import { RegionsRepository } from '~/src/data/regions.repository';
 import { InitiativeTypesRepository } from '~/src/data/initiative.types.repository';
 import { InitiativeRepository } from '~/src/data/initiative.repository';
 import { DataService } from '~/src/services/data/data.service';
+import { UsersRepository } from '~/src/users/users.repository';
+import { EmailService } from '~/src/services/email/email.service';
+import { OrdersRepository } from '~/src/data/orders.repository';
 
 export type TQueryParams = {
 	category: string;
@@ -15,6 +18,9 @@ export function initDataService(): DataService {
 		new RegionsRepository(),
 		new InitiativeTypesRepository(),
 		new InitiativeRepository(),
+		new UsersRepository(),
+		new OrdersRepository(),
+		new EmailService(),
 	);
 }
 

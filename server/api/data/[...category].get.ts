@@ -11,7 +11,7 @@ export default defineEventHandler(
 
 		switch (data.category) {
 			case 'news': {
-				return dataService.news(data.params?.page, data.params?.id);
+				return dataService.news(data.params?.page, data.params?.slug);
 			}
 			case 'initiative': {
 				return dataService.initiatives(data.params?.type);

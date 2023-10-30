@@ -7,6 +7,7 @@ import { type TEmailResponse } from '~/src/services/email/email.types';
 import { type IUsersRepository } from '~/src/users/users.repository.interface';
 import { type ITokenService } from '~/src/services/jwt/token.service.interface';
 import { type IEmailService } from '~/src/services/email/email.service.interface';
+import { makeConfirmCode } from '~/src/utils/makeConfirmCode';
 
 export class UsersService implements IUsersService {
 	private readonly event?: H3Event;
@@ -42,7 +43,7 @@ export class UsersService implements IUsersService {
 			return response;
 		}
 
-		const code: string = this.makeCode();
+		const code: string = makeConfirmCode();
 		if (!body?.code) {
 			const user: TUser | undefined = await this.usersRepository.createUser(body.email, code);
 			if (!user) {
@@ -86,7 +87,7 @@ export class UsersService implements IUsersService {
 			}
 			return response;
 		}
-		const code = this.makeCode();
+		const code = makeConfirmCode();
 		try {
 			await this.usersRepository.saveCode(email, code);
 			await this.sendEmail(email, code);
@@ -121,10 +122,6 @@ export class UsersService implements IUsersService {
 
 	totalCount(): Promise<number> {
 		return Promise.resolve(0);
-	}
-
-	private makeCode(min: number = 10000000, max: number = 99999999): string {
-		return String(Math.floor(Math.random() * (max - min) + min));
 	}
 
 	private async sendEmail(email: string, code: string): Promise<TUser> {

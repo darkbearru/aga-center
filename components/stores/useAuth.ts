@@ -48,7 +48,6 @@ export const useAuth = defineStore('user', {
 				this.user = data as TUsersPayload;
 			}).catch(error => {
 				if (error && (error.statusCode === 401)) {
-					console.log(error.value);
 					this.clearCookies();
 				}
 			});

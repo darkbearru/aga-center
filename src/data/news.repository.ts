@@ -7,6 +7,27 @@ type TPhotosLink = { create: { path: string, title: string }, where: any }[];
 
 
 export class NewsRepository implements INewsRepository {
+    async text(slug: string): Promise<TNews | undefined> {
+        try {
+			return await prismaClient.news.findFirst({
+				where: { slug, active: true },
+				select: {
+					slug: true,
+					title: true,
+					text: true,
+					date: true,
+					Photos: {
+						select: {
+							id: true,
+							path: true
+						}
+					}
+				}
+			}) || undefined;
+		} catch (e) {
+			return undefined
+		}
+    }
     async check(news: TNews): Promise<boolean> {
 		const idQuery = typeof news.id !== 'undefined' ? { id: { not: news.id } } : {};
 		const res = await prismaClient.news.findFirst({
