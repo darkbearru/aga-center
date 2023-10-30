@@ -6,11 +6,12 @@ import ReviewsList from '~/components/content/ReviewsList.vue';
 import { useClientData } from '~/components/stores/useClientData';
 import TypesList from '~/components/content/TypesList.vue';
 
-console.log('Start');
+/*
 const clientData = useClientData();
 clientData.all().then(() => {
 	console.log('Loaded');
 });
+*/
 
 </script>
 

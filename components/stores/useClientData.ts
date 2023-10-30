@@ -32,14 +32,16 @@ export const useClientData = defineStore('client', {
 		},
 		// Получения списка новостей
 		async newsList(page: number = 0): Promise<TNewsList | undefined> {
-			const { data, error } =
-				await useFetch(`${this.path}/news`, {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/news`, {
 					method: 'get',
-					body: { page }
+				}).then((data) => {
+					this.news = data as TNewsList || [];
+					resolve(this.news);
+				}).catch(() => {
+					reject();
 				});
-			if (error.value) return undefined;
-			this.news = data.value as TNewsList;
-			return this.news;
+			});
 		},
 
 		// Получение текста новости
@@ -55,16 +57,17 @@ export const useClientData = defineStore('client', {
 
 		// Получение списка типов инициатив
 		async typesList(): Promise<TInitiativeTypes[] | undefined> {
-			const { data, error } =
-				await useFetch(`${this.path}/types`, {
+
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/types/`, {
 					method: 'get',
-					body: {
-						direction: this.direction
-					}
+				}).then((data) => {
+					this.types = data as TInitiativeTypes[] || [];
+					resolve(this.types);
+				}).catch(() => {
+					reject();
 				});
-			if (error.value) return undefined;
-			this.types = data.value as TInitiativeTypes[];
-			return this.types;
+			});
 		},
 
 		// Получение списка инициатив

@@ -19,7 +19,6 @@ const showInitiatives = async (): Promise<void> => {
 	isShow.value = !isShow.value;
 	if (!isLoaded.value) {
 		const data = await clientData.initiativesList(props.item as TInitiativeTypes);
-		console.log('Loaded 2', data);
 		isLoaded.value = true;
 		initiatives.value = data as TInitiativeList;
 	}

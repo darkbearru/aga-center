@@ -6,10 +6,11 @@ import type { TNewsList } from '~/src/data/types/news';
 
 const lastNews = ref<TNewsList>([]);
 const clientData = useClientData();
-
-onMounted(() => {
-	lastNews.value = clientData.news;
+clientData.newsList().then((data) => {
+	lastNews.value = data as TNewsList;
 });
+
+onMounted(() => {});
 
 
 </script>

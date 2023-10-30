@@ -6,10 +6,9 @@ import TypesListItem from '~/components/content/TypesListItem.vue';
 const clientData = useClientData();
 const typesList = ref<TInitiativeTypes[]>();
 
-console.log(clientData.types);
-
-onMounted(() => {
-	typesList.value = clientData.types || [];
+clientData.typesList().then((data) => {
+	typesList.value = data as TInitiativeTypes[];
+	console.log(clientData.types);
 });
 
 </script>
