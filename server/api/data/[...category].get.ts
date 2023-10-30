@@ -1,7 +1,7 @@
 import { H3Event } from 'h3';
-import { extractParams, initDataService, TQueryParams } from '~/server/utils/initDataService';
+import { extractParams, initDataService } from '~/server/utils/initDataService';
+import type { TQueryParams } from '~/server/utils/initDataService';
 import { DataService } from '~/src/services/data/data.service';
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 
 
 export default defineEventHandler(

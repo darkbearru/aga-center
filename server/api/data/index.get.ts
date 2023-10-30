@@ -1,6 +1,10 @@
-import { H3Event } from 'h3';
+import { DataService } from '~/src/services/data/data.service';
+import { initDataService } from '~/server/utils/initDataService';
+import type { TClientData } from '~/src/data/types/common.data';
 
 export default defineEventHandler(
-	async (event: H3Event) => {
+	async (): Promise<TClientData> => {
+		const dataService:DataService = initDataService();
+		return await dataService.data();
 	}
 );

@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
 import type { TAdminMenu, TCommonData } from '~/src/data/types/common.data';
 import type { TUser, TUserResponse } from '~/src/users/types/users';
-import type { Articles } from '.prisma/client';
 import type { TRegion, TRegionResponse } from '~/src/data/types/regions';
 import type { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
 import type { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
 import type { TNews, TNewsResponse } from '~/src/data/types/news';
 import type { TCompany, TCompanyResponse } from '~/src/data/types/company';
 import type { TInitiative, TInitiativeDeleteResponse, TInitiativeResponse, TInitiativeWithID } from '~/src/data/types/initiatives';
+import type { TArticles } from '~/src/data/types/articles';
 
 export const useData = defineStore('data', {
 	state: () => {
@@ -21,7 +21,7 @@ export const useData = defineStore('data', {
 		const types: globalThis.Ref<TInitiativeTypes[] | undefined> = ref(undefined);
 		const companies: globalThis.Ref<TCompany[] | undefined> = ref(undefined);
 		const initiatives: globalThis.Ref<TInitiative[] | undefined> = ref(undefined);
-		const articles: globalThis.Ref<Articles[] | undefined> = ref(undefined);
+		const articles: globalThis.Ref<TArticles | undefined> = ref(undefined);
 		const accessToken = useCookie('ac_token');
 		return {
 			path, user, menu, news, users,

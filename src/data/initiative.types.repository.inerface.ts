@@ -1,4 +1,4 @@
-import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 
 export interface IInitiativeTypesRepository {
 	list(): Promise<TInitiativeTypes[] | undefined>;
@@ -6,4 +6,5 @@ export interface IInitiativeTypesRepository {
 	save(type: TInitiativeTypes): Promise<boolean>;
 	delete(type: TInitiativeTypes): Promise<boolean>;
 	check(type: TInitiativeTypes): Promise<boolean>;
+	listGroup(direction: number, region?: number): Promise<TInitiativeTypes[] | undefined>;
 }

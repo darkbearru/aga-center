@@ -1,5 +1,5 @@
-import { TCompany, TContacts } from '~/src/data/types/company';
-import { TUser } from '~/src/users/types/users';
+import type { TCompany, TContacts } from '~/src/data/types/company';
+import type { TUser } from '~/src/users/types/users';
 
 export interface ICompanyRepository {
 	list(user: TUser): Promise<TCompany[] | undefined>;

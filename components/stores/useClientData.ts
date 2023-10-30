@@ -1,33 +1,44 @@
 import { defineStore } from 'pinia';
-import type { TNews } from '~/src/data/types/news';
+import type { TNews, TNewsList } from '~/src/data/types/news';
 import type { TInitiative } from '~/src/data/types/initiatives';
 import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { TClientData } from '~/src/data/types/common.data';
+import type { TRegion } from '~/src/data/types/regions';
+import type { TInitiativeList } from '~/src/data/types/initiatives';
 
 export const useClientData = defineStore('client', {
 	state: () => {
+		const currentRegion: number = 1;
 		const path: string = '/api/data';
-		const news: globalThis.Ref<TNews[]> = ref<TNews[]>([]);
+		const news: globalThis.Ref<TNewsList> = ref<TNewsList>([]);
 		const initiatives: globalThis.Ref<TInitiative[] | undefined> = ref<TInitiative[] | undefined>(undefined);
 		const types: globalThis.Ref<TInitiativeTypes[] | undefined> = ref<TInitiativeTypes[] | undefined>(undefined);
+		const regions: globalThis.Ref<TRegion[] | undefined> = ref<TRegion[] | undefined>(undefined);
 		const direction: globalThis.Ref<number> = ref(0);
-		return { path, news, initiatives, types, direction }
+		return { path, news, initiatives, types, direction, regions, currentRegion }
 	},
 	actions: {
 		// Получение всех данных
 		async all(): Promise<boolean> {
-			await this.newsList();
-			await this.initiativesList();
+			await $fetch(`${this.path}`, {
+				method: 'get',
+			}).then((data) => {
+				this.news = (data as TClientData).news || [];
+				this.initiatives = (data as TClientData).initiatives || [];
+				this.types = (data as TClientData).types || [];
+				this.regions = (data as TClientData).regions || [];
+			});
 			return true;
 		},
 		// Получения списка новостей
-		async newsList(page: number = 0): Promise<TNews[] | undefined> {
+		async newsList(page: number = 0): Promise<TNewsList | undefined> {
 			const { data, error } =
 				await useFetch(`${this.path}/news`, {
 					method: 'get',
 					body: { page }
 				});
 			if (error.value) return undefined;
-			this.news = data.value as TNews[];
+			this.news = data.value as TNewsList;
 			return this.news;
 		},
 
@@ -57,7 +68,18 @@ export const useClientData = defineStore('client', {
 		},
 
 		// Получение списка инициатив
-		async initiativesList(type?: TInitiativeTypes): Promise<TInitiative[] | undefined> {
+		async initiativesList(type?: TInitiativeTypes, direction?: number): Promise<TInitiativeList | undefined> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/initiative/type/${type?.id}/direction/${direction}/region/${this.currentRegion}`, {
+					method: 'get',
+				}).then((data) => {
+					resolve(data as TInitiativeList);
+				}).catch(() => {
+					reject();
+				});
+			});
+/*
+
 			const { data, error } =
 				await useFetch(`${this.path}/initiatives`, {
 					method: 'get',
@@ -67,8 +89,9 @@ export const useClientData = defineStore('client', {
 					}
 				});
 			if (error.value) return undefined;
-			this.initiatives = data.value as TInitiative[];
-			return this.initiatives;
+			console.log(data.value);
+			return data.value as TInitiative[];
+*/
 		},
 
 		// Поиск по инициативам

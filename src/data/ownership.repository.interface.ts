@@ -1,4 +1,4 @@
-import { TOwnership } from '~/src/data/types/ownership';
+import type { TOwnership } from '~/src/data/types/ownership';
 
 export interface IOwnershipRepository {
 	list(): Promise<TOwnership[] | undefined>;

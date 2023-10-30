@@ -1,5 +1,5 @@
-import { TInitiative } from '~/src/data/types/initiatives';
-import { TUser } from '~/src/users/types/users';
+import type { TInitiative } from '~/src/data/types/initiatives';
+import type { TUser } from '~/src/users/types/users';
 
 export enum OrderStatus {
 	request = 1,

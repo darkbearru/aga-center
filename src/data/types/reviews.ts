@@ -1,4 +1,4 @@
-import { TInitiative } from '~/src/data/types/initiatives';
+import type { TInitiative } from '~/src/data/types/initiatives';
 
 export type TReviews = {
 	id?: number,

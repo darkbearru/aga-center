@@ -1,4 +1,4 @@
-import { TNews } from '~/src/data/types/news';
+import type { TNews } from '~/src/data/types/news';
 
 export interface INewsRepository {
 	list(skip: number, take: number): Promise<TNews[] | undefined>;

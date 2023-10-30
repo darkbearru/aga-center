@@ -1,6 +1,6 @@
-import { ICompanyRepository } from '~/src/data/company.repository.interface';
-import { TCompany, TContact, TContacts } from '~/src/data/types/company';
-import { TUser } from '~/src/users/types/users';
+import type { ICompanyRepository } from '~/src/data/company.repository.interface';
+import type { TCompany, TContact, TContacts } from '~/src/data/types/company';
+import type { TUser } from '~/src/users/types/users';
 import { prismaClient } from '~/src/utils/prismaClient';
 
 

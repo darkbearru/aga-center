@@ -1,6 +1,8 @@
 export type TInitiativeTypes = {
 	id?: number,
 	name: string,
+	count?: number,
+	countStr?: string
 }
 
 export type TInitiativeTypesResponse = {

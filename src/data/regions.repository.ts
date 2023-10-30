@@ -1,5 +1,5 @@
-import { IRegionsRepository } from '~/src/data/regions.repositiory.interface';
-import { TRegion } from '~/src/data/types/regions';
+import type { IRegionsRepository } from '~/src/data/regions.repositiory.interface';
+import type { TRegion } from '~/src/data/types/regions';
 import { prismaClient } from '~/src/utils/prismaClient';
 
 

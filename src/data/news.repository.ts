@@ -1,6 +1,6 @@
-import { INewsRepository } from '~/src/data/news.repository.interface';
-import { TPhotoItem, TPhotos } from '~/src/data/types/photos';
-import { TNews } from './types/news';
+import type { INewsRepository } from '~/src/data/news.repository.interface';
+import type { TPhotoItem, TPhotos } from '~/src/data/types/photos';
+import type { TNews } from './types/news';
 import { prismaClient } from '~/src/utils/prismaClient';
 
 type TPhotosLink = { create: { path: string, title: string }, where: any }[];
@@ -43,7 +43,7 @@ export class NewsRepository implements INewsRepository {
 				skip,
 				take,
 				orderBy: {
-					createdAt: 'desc'
+					date: 'desc'
 				}
 			});
 		} catch (e) {

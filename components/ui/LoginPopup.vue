@@ -285,6 +285,15 @@ const gotoClientArea = async () => {
 
 	&.is-registration {
 		transform: rotateY(180deg);
+		& > div {
+			&:first-child {
+				z-index: 1;
+				//visibility:hidden;
+			}
+			&:last-child {
+				z-index: 2;
+			}
+		}
 	}
 
 	& > div {
@@ -293,12 +302,15 @@ const gotoClientArea = async () => {
 
 		&:first-child {
 			backface-visibility: hidden;
+			-webkit-backface-visibility: hidden;
 			z-index: 2;
 			transform: rotateY(0deg);
 		}
 
 		&:last-child {
+			z-index: 1;
 			backface-visibility: hidden;
+			-webkit-backface-visibility: hidden;
 			transform: rotateY(180deg);
 		}
 	}

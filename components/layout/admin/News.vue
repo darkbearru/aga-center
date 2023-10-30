@@ -32,6 +32,7 @@ const popupOpen = (item?: TNews): void => {
 		inputId.value = item?.id || undefined;
 	}
 	popup.value.show();
+	clearErrors('news_form');
 }
 
 const popupClose = (): void => {
@@ -86,7 +87,7 @@ const createSlug = () => {
 		<NewsList @click="popupOpen" @delete="deleteNews" ref="newsList" />
 
 		<PopupContainer ref="popup" @close="popupClose">
-			<Popup class="bg-gray-light/60 w-full min-w-[300px] max-w-[800px] max-h-full pb-0" :title="titlePopup" @close="popupClose">
+			<Popup class="bg-gray-light/60 w-full min-w-[300px] max-w-[800px] max-h-full pb-0 formkit-w-full" :title="titlePopup" @close="popupClose">
 				<FormKit
 					id="news_form"
 					type="form"
@@ -103,7 +104,6 @@ const createSlug = () => {
 						v-model="inputTitle"
 						@keyup="createSlug"
 						validation="required|length:8"
-						validation-visibility="live"
 						:validation-messages="{
 	              news_exists: 'Новость с данным заголовком уже существует',
 	              length: 'Длина заголовка должна быть не менее 8 символов',
@@ -119,7 +119,6 @@ const createSlug = () => {
 						placeholder="name_url_slug"
 						v-model="inputSlug"
 						validation="required|length:3|matches:/[0-9a-z_]/"
-						validation-visibility="live"
 						:validation-messages="{
 	              length: 'Длина Идентификатора должна быть не менее 5 символов',
 	              required: 'Необходимо указать Идентификатор',
@@ -134,7 +133,6 @@ const createSlug = () => {
 						placeholder="Текст новости"
 						v-model="inputText"
 						validation="required|length:15"
-						validation-visibility="live"
 						:validation-messages="{
 	              length: 'Длина текста новости должна быть не менее 15 символов',
 	              required: 'Необходимо указать текст новости'
@@ -145,7 +143,6 @@ const createSlug = () => {
 						label="Дата"
 						v-model="inputDate"
 						validation="required|date_after:2023-10-01"
-						validation-visibility="live"
 						:validation-messages="{
 	              required: 'Необходимо указать дату выхода новости',
 	              date_after: 'Дата должна быть не раньше 01 октября 2023'
