@@ -2,10 +2,25 @@ import type { IInitiativeTypesRepository } from '~/src/data/initiative.types.rep
 import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import { prismaClient } from '~/src/utils/prismaClient';
 import { numberSuffix } from '~/src/utils/numberSuffix';
+import { Prisma } from '.prisma/client';
 
 export class InitiativeTypesRepository implements IInitiativeTypesRepository {
-    async listGroup(direction: number = 0, region: number = 1): Promise<TInitiativeTypes[] | undefined> {
+    async listGroup(direction: number = 0, region: number = 1, fnd?: string): Promise<TInitiativeTypes[] | undefined> {
 		try {
+			const typeWhere: Prisma.InitiativeTypesWhereInput = {}
+			const where: Prisma.InitiativeWhereInput = {
+				direction: Number(direction),
+				regionsId: region,
+				isApproved: true,
+				isDeleted: false,
+			};
+			if (fnd) {
+				// typeWhere.name = { contains: fnd }
+				where.OR = [
+					{ name: { contains: fnd } },
+					{ text: { contains: fnd } },
+				];
+			}
 			const result = await prismaClient.initiativeTypes.findMany({
 				select: {
 					id: true,
@@ -14,18 +29,15 @@ export class InitiativeTypesRepository implements IInitiativeTypesRepository {
 						select: {
 							id: true
 						},
+						where
 					},
 					_count: {
 						select: {
-							Initiative: { where: {
-								direction,
-								regionsId: region,
-								isApproved: true,
-								isDeleted: false
-							}}
+							Initiative: { where }
 						}
 					},
 				},
+				where: typeWhere,
 				orderBy: { name: 'asc' },
 			});
 			return result.map((item) => {
@@ -37,6 +49,7 @@ export class InitiativeTypesRepository implements IInitiativeTypesRepository {
 				}
 			}).filter(item => item.count > 0);
 		} catch (e) {
+			console.log(e);
 			return undefined
 		}
     }

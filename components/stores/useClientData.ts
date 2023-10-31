@@ -16,7 +16,8 @@ export const useClientData = defineStore('client', {
 		const types: globalThis.Ref<TInitiativeTypes[] | undefined> = ref<TInitiativeTypes[] | undefined>(undefined);
 		const regions: globalThis.Ref<TRegion[] | undefined> = ref<TRegion[] | undefined>(undefined);
 		const direction: globalThis.Ref<number> = ref(0);
-		return { path, news, initiatives, types, direction, regions, currentRegion }
+		const searchText: globalThis.Ref<string> = ref('');
+		return { path, news, initiatives, types, direction, regions, currentRegion, searchText }
 	},
 	actions: {
 		// Получение всех данных
@@ -60,9 +61,8 @@ export const useClientData = defineStore('client', {
 
 		// Получение списка типов инициатив
 		async typesList(): Promise<TInitiativeTypes[] | undefined> {
-
 			return new Promise(async (resolve, reject) => {
-				await $fetch(`${this.path}/types/`, {
+				await $fetch(`${this.path}/types/direction/${this.direction}${this.searchText ? '/text/' + encodeURIComponent(this.searchText) : ''}`, {
 					method: 'get',
 				}).then((data) => {
 					this.types = data as TInitiativeTypes[] || [];
@@ -74,9 +74,9 @@ export const useClientData = defineStore('client', {
 		},
 
 		// Получение списка инициатив
-		async initiativesList(type?: TInitiativeTypes, direction?: number): Promise<TInitiativeList | undefined> {
+		async initiativesList(type?: TInitiativeTypes): Promise<TInitiativeList | undefined> {
 			return new Promise(async (resolve, reject) => {
-				await $fetch(`${this.path}/initiative/type/${type?.id}/direction/${direction}/region/${this.currentRegion}`, {
+				await $fetch(`${this.path}/initiative/type/${type?.id}/direction/${this.direction}/region/${this.currentRegion}${this.searchText ? '/text/' + encodeURIComponent(this.searchText) : ''}`, {
 					method: 'get',
 				}).then((data) => {
 					resolve(data as TInitiativeList);

@@ -13,7 +13,7 @@ export interface IInitiativeRepository {
 	deletePhotos(photos: TPhotos): Promise<void>;
 	selectDeleted(time: Date): Promise<TInitiative[] | undefined>;
 	deleteMany(id: number[]): Promise<void>;
-	listByType(typeId: number): Promise<TInitiativeList | TClientDataError>;
+	listByType(typeId: number, direction?: number, regionId?: number, fnd?: string): Promise<TInitiativeList | TClientDataError>;
 	listByText(text: string, direction: number): Promise<TInitiativeList | TClientDataError>;
 	moderationList(): Promise<TInitiative[] | undefined>;
 	moderationApprove(id: number): Promise<boolean>;

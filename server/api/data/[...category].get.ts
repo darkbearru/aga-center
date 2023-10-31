@@ -14,10 +14,15 @@ export default defineEventHandler(
 				return dataService.news(data.params?.page, data.params?.slug);
 			}
 			case 'initiative': {
-				return dataService.initiatives(data.params?.type);
+				return dataService.initiatives(
+					data.params?.type,
+					data.params?.direction,
+					data.params?.region,
+					data.params?.text
+				);
 			}
 			case 'types': {
-				return dataService.types(data.params?.direction);
+				return dataService.types(data.params?.direction, undefined, data.params?.text);
 			}
 			case 'search': {
 				return dataService.search(data.params?.text, data.params?.direction);

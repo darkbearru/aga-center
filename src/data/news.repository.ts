@@ -57,9 +57,17 @@ export class NewsRepository implements INewsRepository {
 		return result;
 	}
 
-	async list(skip: number = 0, take: number = 20): Promise<TNews[] | undefined> {
+	async list(skip: number = 0, take: number = 20, client: boolean = false): Promise<TNews[] | undefined> {
 		try {
 			return await prismaClient.news.findMany({
+				select: {
+					id: true,
+					slug: true,
+					title: true,
+					active: true,
+					text: !client,
+					date: true,
+				},
 				where: { active: true },
 				skip,
 				take,

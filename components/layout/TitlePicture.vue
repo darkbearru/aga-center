@@ -2,7 +2,14 @@
 
 import SearchBlock from '~/components/layout/SearchBlock.vue';
 
+const emit = defineEmits(['direction', 'search']);
 const img = useImage();
+
+const directionChange = (value: number) => {
+	emit('direction', value);
+}
+const searchChange = () => emit('search');
+
 </script>
 
 <template>
@@ -19,7 +26,7 @@ const img = useImage();
 				:placeholder="img(`/images/hills_and_sky.jpg`, {fit: 'contain', format: 'webp', height: 50, blur: 3, quality: 50 })"
 			/>
 			<div class="title-footer"></div>
-			<SearchBlock/>
+			<SearchBlock @direction="directionChange" @search="searchChange" />
 		</div>
 	</div>
 </template>

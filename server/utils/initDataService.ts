@@ -31,7 +31,7 @@ export function extractParams(url: string | undefined): TQueryParams {
 	const params: Record<string, any> = {}
 	urlParts = urlParts.slice(1);
 	for(let i: number = 0, len: number = urlParts.length; i < len; i++) {
-		params[urlParts[i]] = typeof urlParts[i + 1] !== 'undefined' ? urlParts[i + 1] : undefined;
+		params[urlParts[i]] = typeof urlParts[i + 1] !== 'undefined' ? decodeURIComponent(urlParts[i + 1]) : undefined;
 		i++;
 	}
 	return { category, params }

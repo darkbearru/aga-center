@@ -104,6 +104,7 @@ export class TokenService implements ITokenService {
 		setCookie(event, tokenName, tokenValue, {
 			httpOnly,
 			expires,
+			sameSite: true
 		});
 	}
 

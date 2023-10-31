@@ -5,27 +5,23 @@ import NewsItem from '~/components/content/NewsItem.vue';
 import type { TNewsList } from '~/src/data/types/news';
 
 const lastNews = ref<TNewsList>([]);
+
 const clientData = useClientData();
 clientData.newsList(0).then((data) => {
 	lastNews.value = data as TNewsList;
 });
 
-onMounted(() => {});
-
-
 </script>
 
 <template>
-	<div class="space-y-4 mb-4">
-		<NewsItem
-			v-for="item in lastNews"
-			:key="item.id"
-			:link="`/news/${item.slug}`"
-			:time-info="item.timeInfo"
-			:time-short="item.timeShort"
-		>
-			{{ item.title }}
-		</NewsItem>
+	<div>
+		<div class="space-y-4 mb-4">
+			<div v-for="item in lastNews">
+				<NewsItem :key="item.id" :time-info="item.timeInfo" :time-short="item.timeShort"  :link="`/news/${item.slug}`">
+					{{ item.title }}
+				</NewsItem>
+			</div>
+		</div>
 	</div>
 </template>
 

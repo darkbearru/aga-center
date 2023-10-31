@@ -47,8 +47,8 @@ export class DataService implements IDataService {
 		});
 	}
 
-	async initiatives(typeId: number): Promise<TInitiativeList | TClientDataError> {
-		return await this.initiativeRepository.listByType(typeId);
+	async initiatives(typeId: number, direction?: number, regionId?: number, fnd?: string): Promise<TInitiativeList | TClientDataError> {
+		return await this.initiativeRepository.listByType(typeId, direction, regionId, fnd);
 	}
 
 	async search(text: string, direction: number = 0): Promise<TInitiativeList | TClientDataError> {
@@ -77,8 +77,8 @@ export class DataService implements IDataService {
 	}
 
 
-	async types(direction: number, regionId?: number): Promise<TInitiativeTypes[] | undefined> {
-		return await this.initiativeTypesRepository.listGroup(direction, regionId || this.currentRegion);
+	async types(direction: number, regionId?: number, fnd?: string): Promise<TInitiativeTypes[] | undefined> {
+		return await this.initiativeTypesRepository.listGroup(direction, regionId || this.currentRegion, fnd);
 	}
 
 	async makeOrder(order: TOrder): Promise<TOrderResponse> {
