@@ -29,17 +29,19 @@ if (route.params.slug) {
 </script>
 
 <template>
-	<div v-if="newsData" class="grid grid-cols-12 md:gap-8 mt-4 md:mt-0 w-full max-w-screen-xl mx-auto my-0">
-		<ContentAndHeader class="order-2 md:order-1 col-span-12 md:col-span-3" title="Новости проекта">
-			<LastNews />
-		</ContentAndHeader>
-		<div class="order-1 md:order-2 col-span-12 md:col-span-9">
-			<NewsText :data="newsData" />
+	<div>
+		<div v-if="newsData" class="grid grid-cols-12 md:gap-8 mt-4 md:mt-0 w-full max-w-screen-xl mx-auto my-0">
+			<ContentAndHeader class="order-2 md:order-1 col-span-12 md:col-span-3" title="Новости проекта">
+				<LastNews />
+			</ContentAndHeader>
+			<div class="order-1 md:order-2 col-span-12 md:col-span-9">
+				<NewsText :data="newsData" />
+			</div>
 		</div>
-	</div>
-	<div v-else>
-		<div class="mx-auto max-w-2xl">
-			<NewsList :data="newsList" ref="newsListComponent" />
+		<div v-else>
+			<div class="mx-auto max-w-2xl">
+				<NewsList :data="newsList" ref="newsListComponent" />
+			</div>
 		</div>
 	</div>
 </template>

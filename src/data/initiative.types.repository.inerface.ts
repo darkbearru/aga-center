@@ -6,5 +6,5 @@ export interface IInitiativeTypesRepository {
 	save(type: TInitiativeTypes): Promise<boolean>;
 	delete(type: TInitiativeTypes): Promise<boolean>;
 	check(type: TInitiativeTypes): Promise<boolean>;
-	listGroup(direction: number, region?: number): Promise<TInitiativeTypes[] | undefined>;
+	listGroup(direction: number, region: number, fnd?: string): Promise<TInitiativeTypes[] | undefined>;
 }

@@ -2,17 +2,41 @@
 
 import Button from '~/components/ui/Button.vue';
 import IconSearch from 'assets/svg/icon-search.svg';
+import { useClientData } from '~/components/stores/useClientData';
+
+const emit = defineEmits(['direction', 'search']);
+const clientData = useClientData()
+const direction = ref(0);
+const searchText = ref();
+const debounced = refDebounced(searchText, 500);
+
+const toggleDirection = () => {
+	direction.value = 1 - direction.value;
+	emit('direction', direction.value);
+}
+
+const changeText = () => {
+	clientData.searchText = searchText.value;
+	emit('search');
+}
+
+watch(debounced, () => changeText());
+
+onMounted(() => {
+	direction.value = clientData.direction || 0;
+})
+
 </script>
 
 <template>
 	<div class="search-block-container">
 		<div class="search-block">
 			<nav>
-				<a href="" class="selected">Отдых</a>
-				<a href="">Бизнес</a>
+				<a href="" :class="direction === 0 ? 'selected' : ''" @click.prevent="toggleDirection">Отдых</a>
+				<a href="" :class="direction === 1 ? 'selected' : ''" @click.prevent="toggleDirection">Бизнес</a>
 			</nav>
 			<div class="flex sm:gap-x-4 order-1 sm:order-2 w-full">
-				<input type="text" />
+				<input type="text" v-model="searchText" />
 				<Button class="btn-main"><IconSearch filled /><span>Найти</span></Button>
 			</div>
 		</div>
@@ -31,9 +55,6 @@ import IconSearch from 'assets/svg/icon-search.svg';
 				@apply flex items-center justify-center w-6/12 sm:w-auto h-8 sm:h-full px-4 sm:px-8 text-base sm:text-lg font-bold text-main text-center bg-white;
 				&.selected {
 					@apply sm:px-8 bg-main-light text-white;
-				}
-				&:last-child {
-					@apply sm:pr-4;
 				}
 			}
 		}

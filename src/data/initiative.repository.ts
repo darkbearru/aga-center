@@ -5,6 +5,7 @@ import type { TPhotoItem, TPhotos } from '~/src/data/types/photos';
 import { OrderStatus } from '~/src/data/types/order';
 import type { TClientDataError } from '~/src/data/types/common.data';
 import { prismaClient } from '~/src/utils/prismaClient';
+import { Prisma } from '.prisma/client';
 
 // const prisma: PrismaClient = new PrismaClient({ log: ['query'] });
 
@@ -384,16 +385,25 @@ export class InitiativeRepository implements IInitiativeRepository {
 		}
 	}
 
-	async listByType(typeId: number): Promise<TInitiativeList | TClientDataError> {
+	async listByType(typeId: number, direction?: number, regionId?: number, fnd?: string): Promise<TInitiativeList | TClientDataError> {
 		try {
+			const where: Prisma.InitiativeWhereInput = {
+				status: true,
+				direction: Number(direction || 0),
+				regionsId: Number(regionId || 0),
+				isApproved: true,
+				isDeleted: false,
+				initiativeTypesId: Number(typeId),
+			}
+			if (fnd) {
+				where.OR = [
+					{ name: { contains: fnd } },
+					{ text: { contains: fnd } },
+				];
+			}
 			return await prismaClient.initiative.findMany({
 				select: clientInitiativeFields,
-				where: {
-					status: true,
-					isApproved: true,
-					isDeleted: false,
-					initiativeTypesId: Number(typeId)
-				},
+				where: where,
 				orderBy: { createdAt: 'desc' },
 			});
 		} catch (e) {
