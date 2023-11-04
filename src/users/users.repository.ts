@@ -14,6 +14,7 @@ export class UsersRepository implements IUsersRepository {
 			orderBy: [
 				{ isAdmin: 'desc' },
 				{ isModerator: 'desc' },
+				{ isClient: 'asc' },
 				{ fio: 'asc' },
 			]
 		})

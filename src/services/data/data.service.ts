@@ -9,7 +9,7 @@ import type { IInitiativeTypesRepository } from '~/src/data/initiative.types.rep
 import type { IInitiativeRepository } from '~/src/data/initiative.repository.interface';
 import type { IUsersRepository } from '~/src/users/users.repository.interface';
 import type { TOrder, TOrderResponse } from '~/src/data/types/order';
-import type { TUser } from '~/src/users/types/users';
+import type { TUser, TUserRegistration } from '~/src/users/types/users';
 import type { TEmailResponse } from '~/src/services/email/email.types';
 import type { IEmailService } from '~/src/services/email/email.service.interface';
 import type { IOrdersRepository } from '~/src/data/orders.repository.interface';
@@ -97,14 +97,9 @@ export class DataService implements IDataService {
 			result.errors = { email: 'Не указан email' }
 			return result;
 		}
+		let user: TUser | null = null;
 		if (!order?.user.id) {
-/*
-			const user: TUser | null = await this.usersRepository.checkEmail(order?.user.email);
-			if (user) {
-				result.errors = { email: 'Пользователь с указанным email уже существует' }
-				return result;
-			}
-*/
+			user = await this.usersRepository.checkEmail(order?.user.email);
 		}
 		if (!order?.user?.fio?.trim()) {
 			result.errors = { fio: 'Не указан ФИО пользователя' }
@@ -122,11 +117,15 @@ export class DataService implements IDataService {
 			result.order = order;
 			return result;
 		}
-		const logged: TUser | undefined = await this.usersRepository.registration({
+		const registrationData: TUserRegistration = {
 			email: order?.user.email,
 			fio: order?.user.fio,
 			code: order?.user.confirmCode
-		});
+		};
+		if (!user) {
+			registrationData.isClient = true;
+		}
+		const logged: TUser | undefined = await this.usersRepository.registration(registrationData);
 		if (!logged) {
 			result.errors = { confirm: 'Указан неверный код' }
 			return result;

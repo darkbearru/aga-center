@@ -19,6 +19,7 @@ model Users {
     isNew       Boolean   @default(false)
     isAdmin     Boolean   @default(false)
     isModerator Boolean   @default(false)
+    isClient    Boolean   @default(false)
     confirmCode String?   @db.VarChar(32)
     createdAt   DateTime  @default(now())
     changedAt   DateTime  @default(now())

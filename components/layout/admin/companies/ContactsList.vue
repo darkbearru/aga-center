@@ -59,18 +59,17 @@ function getContacts(): TContacts {
 
 function update(contacts?: TContacts): void {
 	contactsList.value = [];
-	if (!contacts) {
-		addItem();
-		return;
-	}
-	contacts.forEach((item: TContact) => {
-		contactsList.value.push({
-			id: item.id,
-			type: item.type,
-			value: item.value,
-			isDeleted: item.isDeleted
+	if (contacts) {
+		contacts.forEach((item: TContact) => {
+			contactsList.value.push({
+				id: item.id,
+				type: item.type,
+				value: item.value,
+				isDeleted: item.isDeleted
+			});
 		});
-	});
+	}
+	addItem();
 }
 
 </script>

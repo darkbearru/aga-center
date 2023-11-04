@@ -7,6 +7,7 @@ export type TUser = {
 	fio?: string | null,
 	isAdmin?: boolean,
 	isModerator?: boolean,
+	isClient?: boolean,
 	confirmCode?: string | null,
 	autoLogin?: boolean,
 	companies?: TCompany[],
@@ -27,5 +28,6 @@ export type TUserResponse = {
 export type TUserRegistration = {
 	email: string,
 	fio?: string,
-	code?: string
+	code?: string,
+	isClient?: boolean
 }
