@@ -424,7 +424,7 @@ export const useData = defineStore('data', {
 				if (index >= 0) {
 					this.companies[index] = {...company};
 				} else {
-					this.companies = [{...company}, ...this.companies];
+					this.companies = [...this.companies, {...company}];
 				}
 			}
 			this.companies = this.companies.sort((a: TCompany, b: TCompany): number => {

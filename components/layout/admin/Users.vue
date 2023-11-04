@@ -65,7 +65,7 @@ const deleteUser = async (user: TUser): Promise<void> => {
 </script>
 
 <template>
-	<div class="w-7/12 min-w-[520px]">
+	<div class="w-full sm:w-7/12 sm:min-w-[520px]">
 		<div class="w-full text-center">
 			<Button class="inline-flex items-center bg-main text-white hover:bg-main-light py-3 px-6 w-auto mx-auto mb-8"
 			        title="Добавление пользователя" @click="popupOpen">

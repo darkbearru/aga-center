@@ -25,6 +25,8 @@ const companyFormStart = ref();
 const refreshCompanies = (): void => {
 	if (userData?.companies?.length) {
 		companiesList.value = [];
+		console.log('refreshCompanies');
+		console.log(userData?.companies);
 		userData?.companies.forEach(item => {
 			companiesList.value.push({
 				label: item.nameShort !== item.nameFull ? `${item.nameShort} (${item.nameFull})` : item.nameFull,
@@ -47,6 +49,7 @@ const popupEdit = (): void => {
 }
 
 const popupOpen = (item?: TCompany): void => {
+	if (item instanceof Event) item = undefined;
 	titlePopup.value = 'Добавить компанию';
 	companyCurrent.value = undefined;
 	if (item?.id) {
