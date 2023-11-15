@@ -24,6 +24,7 @@ if (typeof props.contacts !== 'undefined') {
 const contactsListLength = computed(() => contactsList.value.length - 1);
 const contacts = Object(ContactsTypeNames);
 const contactsOptions = ref<TFormkitContactOption[]>([]);
+const refContacts = ref();
 
 for (const key in contacts) {
 	contactsOptions.value.push({
@@ -59,7 +60,7 @@ function getContacts(): TContacts {
 
 function update(contacts?: TContacts): void {
 	contactsList.value = [];
-	if (contacts) {
+	if (contacts && contacts.length > 0) {
 		contacts.forEach((item: TContact) => {
 			contactsList.value.push({
 				id: item.id,
@@ -68,15 +69,21 @@ function update(contacts?: TContacts): void {
 				isDeleted: item.isDeleted
 			});
 		});
+	} else {
+		addItem();
 	}
-	addItem();
+	if (refContacts?.value) {
+		contactsList.value.forEach((item, index) => {
+			refContacts?.value[index]?.updateItem(item);
+		})
+	}
 }
 
 </script>
 
 <template>
 
-	<div v-for="(item, index) in contactsList" :key="`contacts_${item?.id}`" class="formkit-no-limits">
+	<div v-for="(item, index) in contactsList" :key="index" class="formkit-no-limits">
 		<ContactsListItem
 			v-if="!item.isDeleted"
 			:item="item"
@@ -86,6 +93,7 @@ function update(contacts?: TContacts): void {
 			@add="addItem"
 			@delete="deleteItem"
 			@update="updateItem"
+			ref="refContacts"
 		/>
 	</div>
 

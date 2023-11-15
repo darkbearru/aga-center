@@ -6,8 +6,17 @@ import type { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership'
 import type { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/types/initiatives.types';
 import type { TNews, TNewsResponse } from '~/src/data/types/news';
 import type { TCompany, TCompanyResponse } from '~/src/data/types/company';
-import type { TInitiative, TInitiativeDeleteResponse, TInitiativeResponse, TInitiativeWithID } from '~/src/data/types/initiatives';
-import type { TArticles } from '~/src/data/types/articles';
+import type {
+	TInitiative,
+	TInitiativeDeleteResponse,
+	TInitiativeList,
+	TInitiativeResponse,
+	TInitiativeWithID,
+	TInitiativeWithOrders
+} from '~/src/data/types/initiatives';
+import type { TArticle, TArticleFormData, TArticleResponse, TArticles } from '~/src/data/types/articles';
+import type { TOrder, TOrderMessage } from '~/src/data/types/order';
+import { OrderAuthor, OrderStatus } from '~/src/data/types/order';
 
 export const useData = defineStore('data', {
 	state: () => {
@@ -23,11 +32,12 @@ export const useData = defineStore('data', {
 		const initiatives: globalThis.Ref<TInitiative[] | undefined> = ref(undefined);
 		const articles: globalThis.Ref<TArticles | undefined> = ref(undefined);
 		const accessToken = useCookie('ac_token');
+		const timer = ref();
 		return {
 			path, user, menu, news, users,
 			regions, ownership, types,
 			companies, articles, initiatives,
-			accessToken
+			accessToken, timer
 		}
 	},
 	actions: {
@@ -349,7 +359,7 @@ export const useData = defineStore('data', {
 			return response;
 		},
 		/**
-		 * Обновление данных о регионе в массиве
+		 * Обновление данных о новости в массиве
 		 * @param news
 		 */
 		updateNewsData(news?: TNews): void {
@@ -393,6 +403,64 @@ export const useData = defineStore('data', {
 		},
 
 		/**
+		 * Сохранение, добавление статьи
+		 */
+		async updateArticle(article: FormData | TArticleFormData): Promise<TArticleResponse | false> {
+			const { data, error } =
+				await useFetch(`${this.path}/articles`, {
+					method: 'post',
+					body: article,
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			const response: TArticleResponse = unref(data.value) as TArticleResponse;
+			if (!response.errors) {
+				this.updateArticleData(response.article as TArticle);
+			}
+			return response;
+		},
+		/**
+		 * Обновление данных о статье в массиве
+		 * @param article
+		 */
+		updateArticleData(article?: TArticle): void {
+			if (typeof this.articles === 'undefined') {
+				this.articles = [];
+			}
+			if (article) {
+				const index: number = this.articles.findIndex((item: TArticle): boolean => item.id === article.id);
+				if (index >= 0) {
+					this.articles[index] = {...article};
+				} else {
+					this.articles = [{...article}, ...this.articles];
+				}
+			}
+		},
+		/**
+		 * Удаление статьи
+		 * @param article
+		 */
+		async deleteArticle(article: TArticle): Promise<boolean> {
+			const { data, error } =
+				await useFetch(`${this.path}/articles`, {
+					method: 'delete',
+					body: article,
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) return false;
+			const deleted: boolean = unref(data.value) as boolean;
+			if (deleted && this.articles) {
+				this.articles = this.articles.filter((item: TArticle): boolean => item.id !== article.id);
+				alert(`Статья «${article.title}» удалена`);
+			}
+			return true;
+		},
+
+		/**
 		 * Сохранение, добавление компании
 		 */
 		async updateCompany(company: TCompany): Promise<TCompanyResponse | false> {
@@ -428,6 +496,7 @@ export const useData = defineStore('data', {
 				}
 			}
 			this.companies = this.companies.sort((a: TCompany, b: TCompany): number => {
+				if (!a.nameShort || !b.nameShort) return 0;
 				if (a.nameShort > b.nameShort) return 1;
 				if (b.nameShort > a.nameShort) return -1;
 				return 0;
@@ -597,6 +666,105 @@ export const useData = defineStore('data', {
 			if (error.value) return false;
 			this.initiatives = data.value as TInitiative[];
 			return true;
-		}
+		},
+
+		refreshCompaniesAndInitiatives(callback?: Function): void {
+			this.timer = setTimeout(() => {
+				this.loadCompaniesAndInitiatives(callback).then();
+			}, 180000);
+		},
+
+		async loadCompaniesAndInitiatives(callback?: Function): Promise<void> {
+			clearTimeout(this.timer);
+			const { data, error } =
+				await useFetch(`${this.path}/common`, {
+					method: 'get',
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) {
+				console.log(error.value);
+			}
+			if (data.value) {
+				this.companies = (data.value as TCommonData).companies;
+				this.initiatives = (data.value as TCommonData).initiatives;
+				if (callback) callback();
+			}
+			this.refreshCompaniesAndInitiatives(callback);
+		},
+
+		refreshModeration(callback?: Function): void {
+			this.timer = setTimeout(() => {
+				this.loadModerationList(callback).then();
+			}, 60000);
+		},
+
+		async loadModerationList(callback?: Function): Promise<void> {
+			clearTimeout(this.timer);
+			const { data, error } =
+				await useFetch(`${this.path}/moderation`, {
+					method: 'get',
+					headers: {
+						Authorization: `Bearer ${this.accessToken}`,
+					},
+				});
+			if (error.value) {
+				console.log(error.value);
+			}
+			if (data.value) {
+				this.companies = (data.value as TCommonData).companies;
+				this.initiatives = (data.value as TCommonData).initiatives;
+				if (callback) callback();
+			}
+			this.refreshModeration(callback);
+		},
+
+		async ordersList(): Promise<TInitiativeWithOrders> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/orders`, {
+					method: 'get',
+				}).then((data) => {
+					resolve(data as TInitiativeList);
+				}).catch(() => {
+					reject();
+				});
+			});
+		},
+
+		async getOrder(code: string): Promise<TOrder> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/orders`, {
+					method: 'get',
+					query: { code }
+				}).then((data) => {
+					resolve(data as TOrder);
+				}).catch(() => {
+					reject();
+				});
+			});
+		},
+
+		async orderAddMessage(code: string, status: OrderStatus, message: string, author: OrderAuthor, rating?: number): Promise<TOrder> {
+			console.log('orderAddMessage', message, rating)
+			const msg: TOrderMessage = { author, message }
+			if (rating) msg.rating = rating;
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/orders`, {
+					method: 'post',
+					query: { code },
+					body: {
+						status,
+						code,
+						message: msg
+					}
+				}).then((data) => {
+					resolve(data as TOrder);
+				}).catch(() => {
+					reject();
+				});
+			});
+		},
+
 	}
 });

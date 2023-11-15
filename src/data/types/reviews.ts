@@ -1,17 +1,17 @@
 import type { TInitiative } from '~/src/data/types/initiatives';
+import type { TUser } from '~/src/users/types/users';
 
 export type TReviews = {
 	id?: number,
-	title: string,
 	review: string,
 	rate?: number,
 	initiative?: TInitiative,
+	user?: TUser
 }
 
 export type TReviewListItem = {
 	id: number,
 	createdAt: Date,
-	title: string | null,
 	review: string | null,
 	rate: number | null
 }

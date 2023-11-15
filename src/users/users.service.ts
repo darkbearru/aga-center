@@ -79,7 +79,11 @@ export class UsersService implements IUsersService {
 		const user = await this.usersRepository.checkEmail(email);
 		const response: TUserResponse = {
 			errors: undefined,
-			user: user !== null ? user : undefined
+			user: user !== null ? {
+				id: user.id,
+				fio: user.fio,
+				email: user.email
+			}: undefined
 		}
 		if (user === null) {
 			response.errors = {

@@ -45,6 +45,11 @@ const declineInitiative = async () => {
 	}
 }
 
+userData.refreshModeration(() => {
+	companies.value = userData.companies as TCompany[];
+	initiatives.value = userData.initiatives as TInitiative[];
+});
+
 </script>
 
 <template>
@@ -76,10 +81,11 @@ const declineInitiative = async () => {
 	<ModerationPopup ref="popup" @approve="approveInitiative" @decline="declineInitiative">
 		<div class="mb-4">
 			<div class="text-lg text-gray-700 mb-2" v-html="popupText.split('\n').join('<br />')"></div>
-			<div class="text-gray-500 mb-2">
-				<PhotosList :photos=[] ref="photos" :moderation=false />
+			<PhotosList ref="photos" :moderation="false" />
+			<div v-if="popupReason" class="bg-red-600 text-white text-sm px-4 py-2 rounded line-">
+				<b>Причина прошлого отклонения:</b><br />
+				{{ popupReason }}
 			</div>
-			<div v-if="popupReason" class="bg-red-600 text-white text-sm px-4 rounded">{{ popupReason }}</div>
 		</div>
 	</ModerationPopup>
 

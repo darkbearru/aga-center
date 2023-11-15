@@ -27,6 +27,10 @@ export class UsersRepository implements IUsersRepository {
 		});
     }
 
+	/**
+	 * Сохраняем регистрационные данные и сверяем код
+	 * @param body
+	 */
 	async registration(body?: TUserRegistration): Promise<TUser | undefined> {
 		await this.deleteOldCodes();
 		try {
@@ -106,6 +110,7 @@ export class UsersRepository implements IUsersRepository {
 				fio: user.fio,
 				isAdmin: user.isAdmin,
 				isModerator: user.isModerator,
+				changedAt: new Date()
 			},
 			where: {
 				id: user.id
@@ -165,6 +170,34 @@ export class UsersRepository implements IUsersRepository {
 			}
 		})
 	}
+
+
+	async userOrder(email: string, code: string): Promise<TUser|undefined> {
+		const user: TUser | null = await prismaClient.users.findFirst({
+			where: {
+				email: email
+			}
+		});
+		console.log('user check');
+		if (!user) {
+			console.log('User not found create new');
+			return prismaClient.users.create({
+				data: {
+					email: email,
+					confirmCode: code,
+					isNew: true,
+					isClient: true,
+				}
+			});
+		}
+		await this.saveCode(email, code);
+		user.confirmCode = code;
+		console.log('User found', user);
+		return user;
+
+	}
+
+
 
 
 }

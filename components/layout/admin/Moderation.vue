@@ -41,7 +41,6 @@ const approveCompany = async () => {
 	if (await userData.approveCompany(currentID)) {
 		currentID = 0;
 		companies.value = userData.companies as TCompany[];
-		console.log(companies.value.length);
 	}
 }
 
@@ -53,6 +52,11 @@ const declineCompany = async () => {
 		companies.value = userData.companies as TCompany[];
 	}
 }
+
+userData.refreshModeration(() => {
+	companies.value = userData.companies as TCompany[];
+	initiatives.value = userData.initiatives as TInitiative[];
+});
 
 </script>
 
@@ -86,7 +90,10 @@ const declineCompany = async () => {
 		<div class="mb-4">
 			<div class="text-lg text-gray-700 mb-2" v-html="popupText.split('\n').join('<br />')"></div>
 			<div class="italic text-gray-500 mb-2" v-html="popupContacts.split('\n').join('<br />')"></div>
-			<div v-if="popupReason" class="bg-red-600 text-white text-sm px-4 rounded">{{ popupReason }}</div>
+			<div v-if="popupReason" class="bg-red-600 text-white text-sm px-4 py-2 rounded line-">
+				<b>Причина прошлого отклонения:</b><br />
+				{{ popupReason }}
+			</div>
 		</div>
 	</ModerationPopup>
 

@@ -7,14 +7,17 @@ import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import type { TRegion } from '~/src/data/types/regions';
 import type { TFormkitOption, TCompany } from '~/src/data/types/company';
 import type { TInitiative, TInitiativeWithID } from '~/src/data/types/initiatives';
-import type { TPhotos } from '~/src/data/types/photos';
+import type { TPhotos, TFilesList } from '~/src/data/types/photos';
 import PhotosList from '~/components/layout/admin/photos/PhotosList.vue';
+import photosCheck from '~/src/utils/photosCheck';
 
 const userData = useData();
 const auth = useAuth();
 const props = defineProps({
 	company: Object
 })
+
+let currentCompany: TCompany = props.company as TCompany;
 
 defineExpose({ setup });
 const emit = defineEmits(['save']);
@@ -25,19 +28,15 @@ const inputName = ref('');
 const inputText = ref('');
 const inputPhoto = ref('');
 const inputStatus = ref(false);
-const inputPhotos = ref<TPhotos>([]);
 const directionList = ref<TFormkitOption[]>([]);
 const regionList = ref<TFormkitOption[]>([]);
 const typesList = ref<TFormkitOption[]>([]);
 const currentDirection = ref(0);
 const currentRegion = ref(0);
 const currentType = ref(0);
+const inputPhotos = ref<TPhotos>([]);
 const photosList = ref();
-
-type TFilesList = {
-	name: string,
-	file: File
-}[];
+const currentInitiative = ref<TInitiative>();
 
 type TDirection = {
 	label: string,
@@ -58,10 +57,11 @@ const directions = [
 	},
 ];
 
-setup();
+function setup(company: TCompany, initiative?: TInitiative) {
 
-function setup(initiative?: TInitiative) {
+	currentCompany = company || (userData.companies ? userData.companies[0] : undefined);
 
+	currentInitiative.value = initiative;
 	inputID.value = initiative?.id || 0;
 	inputName.value = initiative?.name || '';
 	inputText.value = initiative?.text || '';
@@ -121,9 +121,13 @@ function setup(initiative?: TInitiative) {
 const onSubmit = (data: Record<string, string | TFilesList>) => {
 	const region = regionList.value.find(item => item.value.toString() === (currentRegion.value || data.region));
 	const types = typesList.value.find(item => item.value.toString() === (currentType.value || data.type));
-	const company = props.company as TCompany;
+	const company = currentCompany;
 
 	let body: FormData | TInitiativeWithID;
+
+	if(typeof data.photos !== 'string'){
+		data.photos = photosCheck(data.photos, currentInitiative.value?.photos?.length);
+	}
 
 	if (data.photos.length) {
 		body = new FormData();
@@ -179,10 +183,28 @@ const onSubmit = (data: Record<string, string | TFilesList>) => {
 
 }
 
+onMounted(() => {
+	setup(props.company as TCompany);
+})
+
 </script>
 
 <template>
 	<div class="max-w-[600px] formkit-w-full" @click.stop="">
+		<div v-if="currentInitiative && !currentInitiative?.isApproved && !currentInitiative.isDeclined" class="mb-4 flex flex-wrap justify-center text-center">
+			<div class="flex items-center text-center w-[140px] h-10 px-2 py-1 rounded bg-yellow-500 text-white text-xs">
+				ожидает модерации
+			</div>
+		</div>
+		<div v-if="currentInitiative && !currentInitiative.isApproved && currentInitiative.isDeclined"
+		     class="relative mt-5 mb-4 p-4 text-center border border-red-600 rounded bg-red-100/50"
+		>
+			<div class="absolute -top-3.5 left-[50%] -translate-x-[50%] flex items-center justify-center w-[140px] h-6 px-2 py-1 rounded bg-red-600 text-white text-xs mb-2">
+				отклонена
+			</div>
+			<div class="w-full grow text-red-700">{{ currentInitiative?.declineReason }}</div>
+		</div>
+
 		<FormKit
 			id="initiative_form"
 			type="form"
@@ -239,12 +261,14 @@ const onSubmit = (data: Record<string, string | TFilesList>) => {
 				v-model="inputText"
 			/>
 			<FormKit
+				v-if="currentInitiative?.photos?.length < 3"
 				type="file"
 				name="photos"
 				label="Фотографии"
 				accept=".jpg,.gif,.png,.jpeg,.webp,.svg"
 				multiple="true"
 				v-model="inputPhoto"
+				help="Допустимо выбрать до трех фотографий, размером не более 3Мб"
 			/>
 			<PhotosList :photos="inputPhotos" ref="photosList"/>
 		</FormKit>

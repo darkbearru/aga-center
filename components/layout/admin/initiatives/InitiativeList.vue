@@ -29,7 +29,7 @@ function onDelete(item: TInitiative, index: number) {
 </script>
 
 <template>
-	<div class="my-4">
+	<div class="my-4 max-w-5xl">
 		<InitiativeListItem v-for="(item, index) in initiatives" :key="`init${item.id}`" :item="item" :index="index" @onClick="onClick" @onDelete="onDelete" />
 	</div>
 </template>

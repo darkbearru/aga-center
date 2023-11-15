@@ -8,6 +8,7 @@ import { useAuth } from '~/components/stores/useAuth';
 import { setErrors } from '@formkit/core';
 import Button from '~/components/ui/Button.vue';
 import IconTrash from 'assets/svg/icon-trash.svg';
+import { slugify } from '~/src/utils/slugify';
 
 const props = defineProps({
 	data: {
@@ -30,22 +31,29 @@ if (userData.ownership) {
 	});
 }
 
+const refCompany = ref<TCompany | undefined>(company);
 const inputID = ref<Number>(company?.id || 0);
 const inputNameShort = ref<String>(company?.nameShort || '');
 const inputNameFull = ref<String>(company?.nameFull || '');
 const inputRequisites = ref<String>(company?.requsites || '');
+const inputSlug = ref<String>(company?.slug || '');
 const inputOwnership = ref<String>(company?.ownership ? `${company.ownership.nameShort} (${company.ownership.nameFull})` : '');
 const contacts = ref();
 
 let isShortName: boolean = false;
+let isSlugChanged: boolean = false;
 
 
 function setup(item?: TCompany): void {
-	if (item) company = item;
+	if (item) {
+		company = item;
+		refCompany.value = item;
+	}
 	inputNameShort.value = item?.nameShort || '';
 	inputNameFull.value = item?.nameFull || '';
 	inputRequisites.value = item?.requsites || '';
 	inputOwnership.value = item?.ownership ? `${item.ownership.nameShort} (${item.ownership.nameFull})` : ''
+	inputSlug.value = item?.slug || slugify(inputNameShort.value as string, 50);
 	inputID.value = item?.id || 0;
 	isShortName = !!item?.nameShort;
 	companyContacts.value = item?.contacts;
@@ -53,12 +61,12 @@ function setup(item?: TCompany): void {
 }
 
 const submit = () => {
-	console.log('submit');
 	const contactsList = contacts.value.getContacts();
 	if (typeof company === 'undefined') {
 		company = {
 			nameFull: '',
 			nameShort: '',
+			slug: '',
 			user: {
 				id: auth.user?.id,
 				email: auth.user?.email || '',
@@ -71,6 +79,7 @@ const submit = () => {
 	company.nameFull = inputNameFull.value as string;
 	company.nameShort = inputNameShort.value as string;
 	company.requsites = inputRequisites.value as string;
+	company.slug = inputSlug.value as string;
 	if (userData.ownership) {
 		inputOwnership.value = inputOwnership.value || userData.ownership[0];
 		const idx = userData.ownership.findIndex(item => `${item.nameShort} (${item.nameFull})` === inputOwnership.value);
@@ -92,10 +101,12 @@ const submit = () => {
 const cloneName = () => {
 	if (isShortName) return;
 	inputNameShort.value = inputNameFull.value.trim();
+	createSlug();
 }
 
 const shortNameModify = () => {
 	isShortName = inputNameFull.value.trim() !== inputNameShort.value.trim();
+	createSlug();
 }
 
 const deleteCompany = () => {
@@ -103,10 +114,39 @@ const deleteCompany = () => {
 		emit('delete', company);
 	}
 }
+
+const createSlug = () => {
+	if (isSlugChanged) return;
+	inputSlug.value = slugify(inputNameShort.value as string, 50);
+}
+
+const slugChange = () => {
+	isSlugChanged = true;
+	if (inputSlug.value.length === 0) isSlugChanged = false;
+}
+
+onMounted(() => {
+	setup();
+})
 </script>
 
 <template>
 	<div class="max-w-[600px] formkit-w-full">
+
+		<div v-if="refCompany && !refCompany?.isApproved && !refCompany.isDeclined" class="mb-4 flex flex-wrap justify-center text-center">
+			<div class="flex items-center text-center w-[140px] h-10 px-2 py-1 rounded bg-yellow-500 text-white text-xs">
+				ожидает модерации
+			</div>
+		</div>
+		<div v-if="refCompany && !refCompany.isApproved && refCompany.isDeclined"
+		     class="relative mt-5 mb-4 p-4 text-center border border-red-600 rounded bg-red-100/50"
+		>
+			<div class="absolute -top-3.5 left-[50%] -translate-x-[50%] flex items-center justify-center w-[140px] h-6 px-2 py-1 rounded bg-red-600 text-white text-xs mb-2">
+				отклонена
+			</div>
+			<div class="w-full grow text-red-700">{{ refCompany.declineReason }}</div>
+		</div>
+
 		<FormKit
 			id="companies_form"
 			type="form"
@@ -144,6 +184,7 @@ const deleteCompany = () => {
 				label="«Публичное» название"
 				placeholder="«Публичное» название компании"
 				v-model="inputNameShort"
+				@change="createSlug"
 				@keyup="shortNameModify"
 				validation="required|length:3|contains_alpha_spaces"
 				:validation-messages="{
@@ -154,12 +195,32 @@ const deleteCompany = () => {
 	        }"
 			/>
 			<FormKit
+				type="text"
+				name="slug"
+				id="slug"
+				label="Идентификатор"
+				placeholder="name_url_slug"
+				@keyup="slugChange"
+				v-model="inputSlug"
+				validation="required|length:3|matches:/[0-9a-z_]/"
+				:validation-messages="{
+					  slug_exists: 'Указанный идентификатор уже занят',
+            length: 'Длина Идентификатора должна быть не менее 5 символов',
+            required: 'Необходимо указать Идентификатор',
+            matches: 'В написании Идентификатора допустимо использование символов английского алфавита и нижнего подчеркивания'
+          }"
+			/>
+			<FormKit
 				type="textarea"
-				name="requisite"
-				id="requisite"
+				name="requsites"
+				id="requsites"
 				label="Реквизиты"
 				placeholder="Банковские реквизиты"
 				v-model="inputRequisites"
+				validation="required"
+				:validation-messages="{
+            required: 'Необходимо указать реквизиты компании',
+          }"
 			/>
 
 			<ContactsList :contacts="companyContacts" ref="contacts"/>

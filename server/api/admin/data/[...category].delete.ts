@@ -9,6 +9,7 @@ import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import { TNews } from '~/src/data/types/news';
 import { TCompany } from '~/src/data/types/company';
 import { TInitiative } from '~/src/data/types/initiatives';
+import { TArticle } from '~/src/data/types/articles';
 
 export default defineEventHandler(
 	async (event: H3Event) => {
@@ -37,6 +38,10 @@ export default defineEventHandler(
 			case 'news' : {
 				const news: TNews = await readBody(event);
 				return await adminService.newsDelete(news);
+			}
+			case 'articles' : {
+				const article: TArticle = await readBody(event);
+				return await adminService.articlesDelete(article);
 			}
 			case 'company' : {
 				const company: TCompany = await readBody(event);

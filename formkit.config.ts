@@ -5,9 +5,7 @@ import { genesisIcons } from '@formkit/icons'
 import formkitTailwindTheme from './formkit.tailwind.theme'
 import { createProPlugin, rating, toggle, mask } from '@formkit/pro'
 
-const proPlugin = createProPlugin('fk-b803cdf1b1', {
-	rating, toggle, mask
-})
+const proPlugin = createProPlugin('fk-b803cdf1b1', { mask })
 
 export default defineFormKitConfig({
 	locales: { ru },

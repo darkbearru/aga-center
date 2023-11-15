@@ -18,11 +18,21 @@ const props = defineProps({
 	indexLast: Boolean,
 });
 
+
+defineExpose({ updateItem });
 const emit = defineEmits(['add', 'delete', 'update']);
-const item = props.item as TContact;
+let item = props.item as TContact;
 const type = ref<ContactsType>(item.type);
 const typeIndex = ref(ContactsType[item.type]);
-const itemValue = ref(item.value);
+const itemValue = reactive({
+	phone: '',
+	email: '',
+	instagram: '',
+	vk: '',
+	ok: ''
+});
+updateItem(item);
+
 (props.options as TFormkitContactOption[])?.forEach((item) => {
 	if (type.value === item.value) {
 		item.attr.default = true;
@@ -31,8 +41,10 @@ const itemValue = ref(item.value);
 
 function checkType() {
 	const result = getContactsIndex(type.value);
-	if (result) typeIndex.value = result as ContactsType;
-	itemValue.value = '';
+	if (result) {
+		typeIndex.value = result as ContactsType;
+		itemValue[result as ContactsType] = '';
+	}
 	update();
 }
 
@@ -49,7 +61,7 @@ function deleteItem(): void {
 }
 
 function update(): void {
-	let val = unref(itemValue);
+	let val = unref(itemValue[typeIndex.value]);
 	if (!val) return;
 	const item = {
 		type: type.value,
@@ -57,6 +69,14 @@ function update(): void {
 	}
 	emit('update', item, props.index);
 }
+
+function updateItem(contactsItem: TContact):void {
+	item = contactsItem;
+	type.value = item.type;
+	typeIndex.value = item.type;
+	itemValue[item.type] = item.value;
+}
+
 </script>
 
 <template>
@@ -65,11 +85,11 @@ function update(): void {
 			<FormKit type="select" :options="options" v-model="type" :default="type" @change="checkType"/>
 		</div>
 		<div class="grow">
-			<FormKit v-if="typeIndex === 'phone'" type="mask" name="phone" mask="+7 (###) ###-##-##" v-model="itemValue" autocomplete="off" @keyup="update"/>
-			<FormKit v-if="typeIndex === 'email'" type="email" name="email" placeholder="your@email.ru" v-model="itemValue" autocomplete="off" @keyup="update" />
-			<FormKit v-if="typeIndex === 'vk'" type="mask" name="vk" mask="vk.com/##########" v-model="itemValue" autocomplete="off" @keyup="update" />
-			<FormKit v-if="typeIndex === 'instagram'" type="mask" name="instagram" mask="instagram.com/##########" v-model="itemValue" autocomplete="off" @keyup="update" />
-			<FormKit v-if="typeIndex === 'ok'" type="mask" name="ok" mask="ok.ru/##########" v-model="itemValue" autocomplete="off" @keyup="update" />
+			<FormKit v-if="typeIndex === 'phone'" type="mask" name="phone" mask="+7 (###) ###-##-##" v-model="itemValue.phone" autocomplete="off" @keyup="update"/>
+			<FormKit v-if="typeIndex === 'email'" type="email" name="email" placeholder="your@email.ru" v-model="itemValue.email" autocomplete="off" @keyup="update" />
+			<FormKit v-if="typeIndex === 'vk'" type="mask" name="vk" mask="[vk.com]/*******" v-model="itemValue.vk" autocomplete="off" @keyup="update" />
+			<FormKit v-if="typeIndex === 'instagram'" type="mask" name="instagram" mask="[instagram.com]/*******" v-model="itemValue.instagram" autocomplete="off" @keyup="update" />
+			<FormKit v-if="typeIndex === 'ok'" type="mask" name="ok" mask="[ok.ru]/*******" v-model="itemValue.ok" autocomplete="off" @keyup="update" />
 		</div>
 		<div class="flex items-stretch">
 			<Button v-if="indexLast" class="inline-flex items-center bg-second text-white hover:bg-main-light py-2 px-6" @click.prevent="addItem">

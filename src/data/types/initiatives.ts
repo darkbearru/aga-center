@@ -3,7 +3,13 @@ import type { TPhotos } from '~/src/data/types/photos';
 import type { TReviewList, TReviews } from '~/src/data/types/reviews';
 import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import type { TRegion } from '~/src/data/types/regions';
+import type { TOrders } from '~/src/data/types/order';
 
+
+export type TShortInitiative = {
+	id: number,
+	name: string,
+}
 export type TInitiative = {
 	id?: number,
 	status: boolean,
@@ -78,4 +84,13 @@ export type TInitiativeListItem = {
 	Photos: TPhotos | null,
 	Reviews?: TReviewList | null,
 	Company: TCompanyItem | null,
+}
+
+export type TInitiativeWithOrders = TInitiativeWithOrder[];
+
+export type TInitiativeWithOrder = {
+	id: number,
+	name: string | null,
+	orders?: TOrders;
+	Order?: TOrders | null;
 }

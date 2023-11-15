@@ -51,7 +51,6 @@ const registrationClick = (): void => {
 }
 
 const login = async (): Promise<void> => {
-
 	if (!loginForm.mode) {
 		loginForm.loading = true;
 		const result = await authUser.login(loginForm.email);
@@ -109,9 +108,8 @@ const gotoClientArea = async () => {
 </script>
 
 <template>
-	<div class="login-popup-container " :class="(loginForm.show ? 'show ' : '')">
-		<div class="login-popup" :class="loginForm.classList">
-			<Popup title="Авторизация" class="w-full bg-gray-200/60 pb-6 shadow-md" @close="hide">
+	<div class="login-popup" :class="(loginForm.show ? 'show ' : '')">
+			<Popup v-if="!loginForm.isReg" title="Авторизация" class="w-full bg-gray-200/60 pb-6 shadow-md" @close="hide">
 				<FormKit
 					id="login_form"
 					type="form"
@@ -174,8 +172,7 @@ const gotoClientArea = async () => {
 				</FormKit>
 				<LoadingBg v-show="loginForm.loading"/>
 			</Popup>
-
-			<Popup title="Регистрация" class="w-full bg-gray-200/60 pb-6 shadow-md" @close="hide">
+			<Popup v-if="loginForm.isReg"  title="Регистрация" class="w-full bg-gray-200/60 pb-6 shadow-md" @close="hide">
 				<FormKit
 					id="registration_form"
 					type="form"
@@ -263,55 +260,13 @@ const gotoClientArea = async () => {
 				<LoadingBg v-show="loginForm.loading"/>
 			</Popup>
 		</div>
-	</div>
 </template>
 
 <style scoped lang="postcss">
 .login-popup {
-	transform-style: preserve-3d;
-	position: relative;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-	transition: all 0.6s cubic-bezier(0.785, 0.135, 0.15, 0.86);
-	transform: rotateY(0);
-
-	&-container {
-		@apply fixed z-50 right-4 top-8 w-full min-w-[300px] max-w-[440px] invisible scale-110 opacity-0 transition-all duration-300;
-		perspective: 3000px;
-
-		&.show {
-			@apply visible opacity-100 scale-100;
-		}
-	}
-
-	&.is-registration {
-		transform: rotateY(180deg);
-		& > div {
-			&:first-child {
-				z-index: 1;
-			}
-			&:last-child {
-				z-index: 2;
-			}
-		}
-	}
-
-	& > div {
-		overflow: hidden;
-		position: absolute;
-
-		&:first-child {
-			backface-visibility: hidden;
-			-webkit-backface-visibility: hidden;
-			z-index: 2;
-			transform: rotateY(0deg);
-		}
-
-		&:last-child {
-			z-index: 1;
-			backface-visibility: hidden;
-			-webkit-backface-visibility: hidden;
-			transform: rotateY(180deg);
-		}
+	@apply fixed z-50 right-4 top-8 w-full min-w-[300px] max-w-[440px] invisible scale-110 opacity-0 transition-all duration-300;
+	&.show {
+		@apply visible opacity-100 scale-100;
 	}
 }
 </style>

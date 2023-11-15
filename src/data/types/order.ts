@@ -1,20 +1,32 @@
-import type { TInitiative } from '~/src/data/types/initiatives';
+import type { TInitiative, TShortInitiative } from '~/src/data/types/initiatives';
 import type { TUser } from '~/src/users/types/users';
+import { Prisma } from '.prisma/client';
 
 export enum OrderStatus {
 	request = 1,
-	active = 2,
-	complete = 3,
-	deleted = 4
+	canceled = 2,
+	active = 3,
+	tryComplete = 5,
+	cancelComplete = 6,
+	complete = 7,
+	deleted = 8
 }
 
 export type TOrder = {
 	id?: number,
 	status: OrderStatus,
-	messages?: TOrderMessages,
-	initiative?: TInitiative | number,
+	messages?: TOrderMessages | Prisma.JsonValue,
+	code?: string,
+	initiative?: TShortInitiative | TInitiative | number,
 	user?: TUser
 	message?: string,
+	author?: OrderAuthor,
+	createdAt?: Date,
+	changedAt?: Date,
+	statusText?: string,
+	statusColor?: string,
+	created?: string,
+	changed?: string,
 }
 export type TOrders = TOrder[];
 
@@ -35,7 +47,8 @@ export enum OrderAuthor {
 }
 export type TOrderMessage = {
 	author: OrderAuthor,
-	message: string
+	message: string,
+	rating?: number,
 }
 
 export type TOrderMessages = TOrderMessage[];

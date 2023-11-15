@@ -4,6 +4,37 @@ import type { TUser } from '~/src/users/types/users';
 import { prismaClient } from '~/src/utils/prismaClient';
 
 
+const companySelect = {
+	id: true,
+	nameFull: true,
+	nameShort: true,
+	requsites: true,
+	slug: true,
+	isDeclined: true,
+	declineReason: true,
+	contacts: {
+		select: {
+			id: true,
+			type: true,
+			value: true
+		}
+	},
+	typeOwnership: {
+		select: {
+			id: true,
+			nameShort: true,
+			nameFull: true,
+		}
+	},
+	Users: {
+		select: {
+			id: true,
+			fio: true,
+			email: true
+		}
+	}
+};
+
 export class CompanyRepository implements ICompanyRepository {
 
 	async add(company: TCompany): Promise<TCompany | undefined> {
@@ -14,6 +45,7 @@ export class CompanyRepository implements ICompanyRepository {
 					nameFull: company.nameFull,
 					nameShort: company.nameShort,
 					requsites: company.requsites || '',
+					slug: company.slug,
 					isApproved: false,
 					isDeclined: false,
 					declineReason: '',
@@ -52,40 +84,14 @@ export class CompanyRepository implements ICompanyRepository {
 	async select(id: number): Promise<TCompany> {
 		const result = await prismaClient.company.findFirst({
 			where: { id },
-			select: {
-				nameFull: true,
-				nameShort: true,
-				requsites: true,
-				isDeclined: true,
-				declineReason: true,
-				contacts: {
-					select: {
-						id: true,
-						type: true,
-						value: true
-					}
-				},
-				typeOwnership: {
-					select: {
-						id: true,
-						nameShort: true,
-						nameFull: true,
-					}
-				},
-				Users: {
-					select: {
-						id: true,
-						fio: true,
-						email: true
-					}
-				}
-			}
+			select: companySelect
 		});
 		return {
 			id,
 			nameShort: result?.nameShort || '',
 			nameFull: result?.nameFull || '',
 			requsites: result?.requsites || '',
+			slug: result?.slug || '',
 			contacts: result?.contacts as TContacts,
 			isApproved: false,
 			isDeclined: result?.isDeclined || false,
@@ -103,17 +109,31 @@ export class CompanyRepository implements ICompanyRepository {
 		}
 	}
 
-	async check(company: TCompany): Promise<boolean> {
+	async check(company: TCompany): Promise<TCompany | boolean> {
 		const idQuery = typeof company.id !== 'undefined' ? { id: { not: company.id } } : {};
-		const res = await prismaClient.company.findFirst({
+		const result = await prismaClient.company.findFirst({
 			where: {
 				AND: [
-					{ nameFull: company.nameFull },
+					{
+						OR: [
+							{ nameFull: company.nameFull },
+							{ nameShort: company.nameShort },
+							{ slug: company.slug },
+						],
+					},
 					idQuery,
 				]
 			}
 		});
-		return !res;
+		if (result) {
+			return {
+				id: result?.id || 0,
+				nameShort: result?.nameShort || '',
+				nameFull: result?.nameFull || '',
+				slug: result?.slug || '',
+			}
+		}
+		return false;
 	}
 
 	async delete(company: TCompany): Promise<boolean> {
@@ -133,35 +153,7 @@ export class CompanyRepository implements ICompanyRepository {
 
 	async list(user: TUser): Promise<TCompany[] | undefined> {
 		const result = await prismaClient.company.findMany({
-			select: {
-				id: true,
-				nameFull: true,
-				nameShort: true,
-				requsites: true,
-				isDeclined: true,
-				declineReason: true,
-				contacts: {
-					select: {
-						id: true,
-						type: true,
-						value: true
-					}
-				},
-				typeOwnership: {
-					select: {
-						id: true,
-						nameShort: true,
-						nameFull: true,
-					}
-				},
-				Users: {
-					select: {
-						id: true,
-						fio: true,
-						email: true
-					}
-				}
-			},
+			select: companySelect,
 			where: {
 				Users: {
 					id: user.id
@@ -186,19 +178,21 @@ export class CompanyRepository implements ICompanyRepository {
 		return undefined;
 	}
 
-	async save(company: TCompany): Promise<boolean> {
+	async save(company: TCompany): Promise<TCompany | undefined> {
 		try {
 			const contacts = this.contactsConnectOrCreate(company?.contacts);
-			await prismaClient.company.update({
+			const result = await prismaClient.company.update({
 				where: {
 					id: company?.id
 				},
+				select: companySelect,
 				data: {
 					nameFull: company.nameFull,
 					nameShort: company.nameShort,
 					requsites: company.requsites || '',
 					isApproved: false,
 					isDeclined: false,
+					changedAt: new Date(),
 					contacts: {
 						connectOrCreate: contacts,
 					},
@@ -210,10 +204,30 @@ export class CompanyRepository implements ICompanyRepository {
 					}
 				}
 			});
-			return true;
+			return {
+				id: company?.id,
+				nameShort: result?.nameShort || '',
+				nameFull: result?.nameFull || '',
+				requsites: result?.requsites || '',
+				slug: result?.slug || '',
+				contacts: result?.contacts as TContacts,
+				isApproved: false,
+				isDeclined: result?.isDeclined || false,
+				declineReason: result?.declineReason || '',
+				ownership: {
+					id: result?.typeOwnership?.id || 0,
+					nameShort: result?.typeOwnership?.nameShort || '',
+					nameFull: result?.typeOwnership?.nameFull || '',
+				},
+				user: {
+					id: result?.Users?.id || 0,
+					fio: result?.Users?.fio || '',
+					email: result?.Users?.email || ''
+				}
+			};
 		} catch (e) {
 			console.log(e);
-			return false;
+			return undefined;
 		}
 	}
 
@@ -315,6 +329,32 @@ export class CompanyRepository implements ICompanyRepository {
 			return false;
 		}
 
-	};
+	}
+
+	async calcRating(id: number): Promise<void>{
+		try {
+			const result = await prismaClient.initiative.aggregate({
+				_avg: {
+					rating: true
+				},
+				_count: {
+					rating: true
+				},
+				where: {
+					Company: {
+						id: id,
+					},
+					isApproved: true
+
+				},
+			});
+			await prismaClient.company.update({
+				data: { rating: result?._avg?.rating || 0 }, where: { id }
+			})
+		} catch (e) {
+
+		}
+
+	}
 
 }
