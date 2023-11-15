@@ -1,4 +1,4 @@
-import type { TInitiative, TInitiativeList, TInitiativeWithID } from '~/src/data/types/initiatives';
+import type { TInitiative, TInitiativeList, TInitiativeWithID, TShortInitiative } from '~/src/data/types/initiatives';
 import type { TUser } from '~/src/users/types/users';
 import type { TPhotos } from '~/src/data/types/photos';
 import type { TClientDataError } from '~/src/data/types/common.data';
@@ -10,7 +10,6 @@ export interface IInitiativeRepository {
 	delete(item: TInitiative, user: TUser): Promise<boolean | number>;
 	check(item: TInitiativeWithID): Promise<TInitiative | undefined>;
 	select(id: number): Promise<TInitiative>;
-	deletePhotos(photos: TPhotos): Promise<void>;
 	selectDeleted(time: Date): Promise<TInitiative[] | undefined>;
 	deleteMany(id: number[]): Promise<void>;
 	listByType(typeId: number, direction?: number, regionId?: number, fnd?: string): Promise<TInitiativeList | TClientDataError>;
@@ -18,4 +17,6 @@ export interface IInitiativeRepository {
 	moderationList(): Promise<TInitiative[] | undefined>;
 	moderationApprove(id: number): Promise<boolean>;
 	moderationDecline(id: number, reason: string): Promise<boolean>;
+	get(id: number): Promise<TShortInitiative | undefined>;
+	calcRating(id: number): Promise<void>;
 }

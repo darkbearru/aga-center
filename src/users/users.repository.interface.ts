@@ -11,4 +11,5 @@ export interface IUsersRepository {
 	save(user: TUser): Promise<TUser>;
 	delete(id: number): Promise<TUser>;
 	checkEmail(email: string, id?: number): Promise<TUser | null>;
+	userOrder(email: string, code: string): Promise<TUser | undefined>;
 }

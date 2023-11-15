@@ -20,8 +20,8 @@ watch(menuToggle, (value) => {
 </script>
 
 <template>
-  <div class="sm:flex bg-white h-full">
-	  <aside class="relative h-[4.5rem] sm:h-auto z-[100] sm:z-auto bg-main transition-{height} ease-in-out duration-300 overflow-hidden">
+  <div class="sm:flex bg-white items-stretch">
+	  <aside class="relative h-[4.5rem] sm:h-auto z-[100] sm:z-auto bg-main transition-{height} ease-in-out duration-300">
 		  <img class="absolute top-1.5 left-2 w-24 h-16 transition-{left} ease-in-out duration-300 sm:hidden" src="/images/logo-white.svg" alt="АГА. Тур-центр. Логотип"/>
 		  <input type="checkbox" class="menu-check-box sm:hidden" v-model="menuToggle">
 		  <a href="#" class="menu-burger sm:hidden">
@@ -29,14 +29,14 @@ watch(menuToggle, (value) => {
 			  <span class="line"></span>
 			  <span class="line"></span>
 		  </a>
-		  <div class="absolute sm:static sm:block w-full sm:w-[200px] md:w-[320px] -left-[640px] sm:left-auto transition-{left} ease-in-out duration-300 p-8 bg-main sm:h-screen">
+		  <div class="absolute sm:sticky sm:block sm:top-0 w-full sm:w-[200px] md:w-[320px] -left-[640px] sm:left-auto transition-{left} ease-in-out duration-300 p-8 bg-main sm:h-screen">
 			  <div class=""><img src="/images/logo-white.svg" alt="АГА. Тур-центр. Логотип"/></div>
 			  <div v-if="data.menu">
 				  <Menu :menu="data.menu" />
 			  </div>
 		  </div>
 	  </aside>
-	  <main class="sm:grow p-2 sm:p-8">
+	  <main class="sm:grow p-2 sm:p-6">
 		  <NuxtPage :data="data"/>
 	  </main>
   </div>

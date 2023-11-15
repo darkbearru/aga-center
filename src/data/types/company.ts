@@ -32,7 +32,8 @@ export const ContactsTypeNames: TContactsTypeName = {
 export type TCompany = {
 	id?: number,
 	nameFull: string,
-	nameShort: string,
+	nameShort: string | null,
+	slug: string,
 	requsites?: string,
 	isApproved?: boolean,
 	isDeclined?: boolean,
@@ -46,6 +47,7 @@ export type TCompanyItem = {
 	id?: number,
 	nameFull: string,
 	nameShort: string | null,
+	slug: string,
 	typeOwnership?: TOwnership | null,
 }
 
@@ -55,6 +57,7 @@ export type TCompanyResponse = {
 		nameShort?: string,
 		requsites?: string
 		contacts?: string
+		slug?: string,
 		other?: string
 	},
 	company: TCompany
@@ -63,6 +66,7 @@ export type TCompanyResponse = {
 export type TFormkitOption = {
 	label: string,
 	value: number,
+	status?: number,
 	attr?: {
 		default?: boolean,
 		disabled?: boolean

@@ -2,7 +2,7 @@
 import Ownership from '~/components/layout/admin/Ownership.vue';
 
 definePageMeta({
-	middleware: ["admin"],
+	middleware: ["moderator"],
 	layout: "client",
 });
 useHead({ title: 'АГА. Формы собственностей' });

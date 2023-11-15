@@ -1,7 +1,7 @@
 import type { IDataService } from '~/src/services/data/data.service.interface';
 import type { TClientData, TClientDataError } from '~/src/data/types/common.data';
 import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import type { TInitiativeList } from '~/src/data/types/initiatives';
+import type { TInitiativeList, TShortInitiative } from '~/src/data/types/initiatives';
 import type { TNews, TNewsList, TNewsTime } from '~/src/data/types/news';
 import type { INewsRepository } from '~/src/data/news.repository.interface';
 import type { IRegionsRepository } from '~/src/data/regions.repositiory.interface';
@@ -15,6 +15,7 @@ import type { IEmailService } from '~/src/services/email/email.service.interface
 import type { IOrdersRepository } from '~/src/data/orders.repository.interface';
 import { makeConfirmCode } from '~/src/utils/makeConfirmCode';
 import moment from 'moment';
+import { sha256 } from 'ohash';
 
 export class DataService implements IDataService {
 	private onPage: number = 20;
@@ -87,7 +88,6 @@ export class DataService implements IDataService {
 			errors: undefined,
 			order: undefined,
 		}
-		const code = makeConfirmCode();
 
 		if (!order?.user) {
 			result.errors = { other: 'Необходимо указать ваш Email и данные ФИО, необходимо для регистрации в системе и дальнейшего взаимодействия с исполнителем' }
@@ -98,18 +98,19 @@ export class DataService implements IDataService {
 			return result;
 		}
 		let user: TUser | null = null;
-		if (!order?.user.id) {
-			user = await this.usersRepository.checkEmail(order?.user.email);
-		}
 		if (!order?.user?.fio?.trim()) {
 			result.errors = { fio: 'Не указан ФИО пользователя' }
 			return result;
 		}
-
+		// Если не указан код, то генерим его и проверяем пользователя в базе и если нет, то создаём
 		if (!order?.user?.confirmCode) {
-			await this.usersRepository.saveCode(order?.user.email, code);
+			const code = makeConfirmCode();
+			await this.usersRepository.userOrder(order?.user.email, code);
 			try {
-				await this.sendEmail(order?.user.email, code);
+				const send = await this.sendEmail(order?.user.email, code);
+				if (!send) {
+					result.errors = { other: 'Ошибка отправки Email, проверьте правильность написания или попробуйте повторить позже' }
+				}
 			}catch (e) {
 				result.errors = { other: 'Ошибка отправки Email, проверьте правильность написания или попробуйте повторить позже' }
 				return result;
@@ -122,39 +123,86 @@ export class DataService implements IDataService {
 			fio: order?.user.fio,
 			code: order?.user.confirmCode
 		};
-		if (!user) {
-			registrationData.isClient = true;
-		}
 		const logged: TUser | undefined = await this.usersRepository.registration(registrationData);
 		if (!logged) {
 			result.errors = { confirm: 'Указан неверный код' }
 			return result;
 		}
 		// Код принят формируем заявку
-		const created = await this.ordersRepository.create(order);
-		if (!created) {
-			result.errors = { other: 'Ошибка создания заявки' }
+		return this.completeCreateOrder(order, logged);
+	}
+
+	private async completeCreateOrder(order: TOrder, logged: TUser): Promise<TOrderResponse> {
+		const result: TOrderResponse = {
+			errors: undefined,
+			order: undefined,
+		}
+		let hashCode: string;
+		order.user = logged;
+		let created: TOrder | undefined = undefined;
+		try {
+			created = await this.ordersRepository.create(order);
+			if (!created) {
+				result.errors = { other: 'Ошибка создания заявки' }
+			}else {
+				hashCode = sha256(`i:${created.id}:${typeof order.initiative === 'number' ? order.initiative : order.initiative?.id},u:${logged.email}`)
+				await this.ordersRepository.saveCode(created.id || 0, hashCode);
+				order.code = hashCode;
+				created.code = hashCode;
+				if (typeof order.initiative === 'number') {
+					order.initiative = await this.initiativeRepository.get(order.initiative);
+				}
+				if (!await this.sendOrderLink(order?.user.email, order, created?.id || 0)) {
+					result.errors = { other: 'Ошибка отправки ссылки на заказ на email' }
+				}
+			}
+		} catch (e) {
+			result.errors = { other: 'Ошибка создания заявки и отправки ссылки на заказ на email' }
 		}
 		result.order = created;
+		// Так же формируем код доступа к заказу
 		console.log('makeOrder. Last', result);
 		return result;
 	}
 
-	private async sendEmail(email: string, code: string): Promise<TUser> {
-
+	private async sendEmail(email: string, code: string): Promise<boolean> {
 		const result: TEmailResponse = await this.emailService.send({
 			to: email,
 			from: process.env.MAIL_FROM || '',
 			subject: 'Код подтверждения',
 			text: `Код подтверждения: ${code}`,
 			html: `<html lang="ru"><head></head><body><h1>Код подтверждения: ${code}</h1></body></html>`
-		})
-		if (!result.error) return { email }
-
-		throw createError({
-			statusCode: 500,
-			message: result.error?.message,
 		});
+		console.log('sendEmail', result);
+		if (!result.error) return true;
+		return false;
 	}
 
+	/**
+	 * Отправка ссылки на заказ
+	 * @param email
+	 * @param order
+	 * @param orderNum
+	 * @private
+	 */
+	private async sendOrderLink(email: string, order: TOrder, orderNum: number): Promise<boolean> {
+
+		const initiative = order.initiative as TShortInitiative;
+		const result: TEmailResponse = await this.emailService.send({
+			to: email,
+			from: process.env.MAIL_FROM || '',
+			subject: `Заказ №${orderNum} на «${initiative.name}»`,
+			text: `Вами была сформирована заявка №${orderNum} на «${initiative.name}», для дальнейшего взаимодействия с исполнителем перейдите по ссылке: http://localhost:3000/orders/${order.code}`,
+			html: `<html lang="ru">
+				<head></head>
+				<body>
+				<h1>Заявка №${orderNum}</h1>
+				<h2>Вами была сформирована на услугу «${initiative.name}»</h2>
+				<h3>Для дальнейшего взаимодействия с исполнителем <a href="http://localhost:3000/orders/${order.code}">перейдите по ссылке</a> </h3>
+				</body></html>`
+		})
+		if (!result.error) return true
+
+		return false;
+	}
 }

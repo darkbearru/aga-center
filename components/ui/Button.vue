@@ -1,4 +1,4 @@
-<script setup lang="ts">
+MessageButton<script setup lang="ts">
 
 defineProps({
 	to: String

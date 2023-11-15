@@ -46,6 +46,8 @@ model Company {
     isApproved      Boolean        @default(false)
     isDeclined      Boolean        @default(false)
     declineReason   String?        @db.VarChar(255)
+    slug            String         @unique @db.VarChar(50)
+    rating          Int            @default(0)
     Users           Users?         @relation(fields: [usersId], references: [id])
     usersId         Int?
     typeOwnership   TypeOwnership? @relation(fields: [typeOwnershipId], references: [id])
@@ -81,12 +83,13 @@ model Initiative {
     id                Int              @id @default(autoincrement())
     status            Boolean          @default(false)
     direction         Int              @default(0)
-    name              String?          @db.VarChar(255)
-    text              String?          @db.Text
+    name              String           @db.VarChar(255)
+    text              String           @db.Text
     isApproved        Boolean          @default(false)
     isDeleted         Boolean          @default(false)
     isDeclined        Boolean          @default(false)
     declineReason     String?          @db.VarChar(255)
+    rating            Int              @default(0)
     Company           Company?         @relation(fields: [companyId], references: [id])
     companyId         Int?
     Photos            Photos[]
@@ -109,11 +112,14 @@ model InitiativeTypes {
 model Order {
     id           Int         @id @default(autoincrement())
     status       Int         @default(0)
+    code         String      @db.VarChar(120)
     messages     Json?
     Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
     initiativeId Int?
     Users        Users?      @relation(fields: [usersId], references: [id])
     usersId      Int?
+    createdAt    DateTime    @default(now())
+    changedAt    DateTime    @default(now())
 }
 
 model Photos {
@@ -130,13 +136,11 @@ model Photos {
 
 model Reviews {
     id           Int         @id @default(autoincrement())
-    Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
-    initiativeId Int?
-    title        String?
     review       String?     @db.Text
     rate         Int?        @default(0)
     createdAt    DateTime    @default(now())
-    changedAt    DateTime    @default(now())
+    Initiative   Initiative? @relation(fields: [initiativeId], references: [id])
+    initiativeId Int?
     Users        Users?      @relation(fields: [usersId], references: [id])
     usersId      Int?
     Company      Company?    @relation(fields: [companyId], references: [id])

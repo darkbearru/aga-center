@@ -25,16 +25,28 @@ function onDelete(): void {
 </script>
 
 <template>
-	<div class="flex items-center px-4 py-3 bg-dark-light/10 odd:bg-white hover:bg-dark-light/20 cursor-pointer round" @click.prevent.stop="onClick">
-		<div class="w-1/12">
-			<IconActive v-if="props.item?.status" class="w-5 h-5 mr-1" filled />
-			<IconNotActive v-else class="w-хъ h-5 mr-1" filled />
+	<div class="flex items-center gap-2 px-3 py-3 bg-dark-light/10 odd:bg-white hover:bg-dark-light/20 cursor-pointer round" @click.prevent.stop="onClick">
+		<div class="w-[20px]">
+			<IconActive v-if="props.item?.status" class="w-5 h-5" filled />
+			<IconNotActive v-else class="w-хъ h-5" filled />
 		</div>
-		<div class="w-6/12">{{ props.item.name }}</div>
+		<div class="w-6/12 grow">
+			{{ props.item.name }}
+			<div v-if="!props.item?.isApproved && !props.item?.isDeclined"
+			     class="inline-flex items-center text-center px-2 py-1 rounded bg-yellow-500 text-white text-xs ml-2"
+			>
+				Ожидает&nbsp;модерации
+			</div>
+			<div v-if="!props.item?.isApproved && props.item?.isDeclined"
+			     class="inline-flex items-center text-center px-2 py-1 rounded bg-red-600 text-white text-xs ml-2"
+			>
+				Отклонена
+			</div>
+		</div>
 		<div class="w-2/12">{{ directions[props.item.direction] }}</div>
 		<div class="w-2/12">{{ props.item.region.name }}</div>
-		<div class="flex w-1/12 justify-end">
-			<a href="" class="block w-5 h-5 mx-1 text-dark-main hover:text-main" @click.prevent.stop="onDelete"><IconTrash filled /></a>
+		<div class="flex w-[20px] justify-end">
+			<a href="" class="block w-5 h-5 text-dark-main hover:text-main" @click.prevent.stop="onDelete"><IconTrash filled /></a>
 		</div>
 	</div>
 </template>

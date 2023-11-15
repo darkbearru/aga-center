@@ -1,5 +1,11 @@
 import type { IInitiativeRepository } from '~/src/data/initiative.repository.interface';
-import type { TInitiative, TInitiativeList, TInitiativeResult, TInitiativeWithID } from '~/src/data/types/initiatives';
+import type {
+	TInitiative,
+	TInitiativeList,
+	TInitiativeResult,
+	TInitiativeWithID,
+	TShortInitiative
+} from '~/src/data/types/initiatives';
 import type { TUser } from '~/src/users/types/users';
 import type { TPhotoItem, TPhotos } from '~/src/data/types/photos';
 import { OrderStatus } from '~/src/data/types/order';
@@ -35,6 +41,7 @@ const selectFields = {
 	Company: {
 		select: {
 			id: true,
+			slug: true,
 			nameShort: true,
 			nameFull: true,
 		}
@@ -79,6 +86,7 @@ const clientInitiativeFields = {
 			id: true,
 			nameShort: true,
 			nameFull: true,
+			slug: true,
 			typeOwnership: true
 		}
 	}
@@ -226,7 +234,8 @@ export class InitiativeRepository implements IInitiativeRepository {
 			company: {
 				id: item.Company?.id || 0,
 				nameShort: item.Company?.nameShort || '',
-				nameFull: item.Company?.nameFull || ''
+				nameFull: item.Company?.nameFull || '',
+				slug: item.Company?.slug || '',
 			},
 			photos: item.Photos || [],
 			ordersCount: item._count?.Order || 0
@@ -236,15 +245,15 @@ export class InitiativeRepository implements IInitiativeRepository {
 	async save(item: TInitiativeWithID, user: TUser): Promise<boolean> {
 		try {
 			const photos = this.photosConnectOrCreate(item?.photos);
-			await prismaClient.initiative.update({
+			const result = await prismaClient.initiative.update({
 				data: {
 					status: item.status === 'true',
 					direction: Number(item.direction),
 					isApproved: false,
 					isDeclined: false,
-					declineReason: '',
 					name: item.name,
 					text: item.text,
+					changedAt: new Date(),
 					initiativeTypesId: Number(item.type),
 					companyId: Number(item.company),
 					regionsId: Number(item.region),
@@ -267,55 +276,13 @@ export class InitiativeRepository implements IInitiativeRepository {
 		}
 	}
 
-	async deletePhotos(photos: TPhotos): Promise<void> {
-		if (!photos.length) return;
-
-		const idList: number[] = [];
-		let where;
-		if (photos.length > 1) {
-			photos.forEach((item: TPhotoItem) => {
-				if (item.id) idList.push(item.id);
-			});
-			if (idList.length === 0) return;
-			const OR = idList.map(id => { return { id } });
-			where = { OR };
-			console.log('deletePhotos', OR);
-		} else {
-			where = { id: photos[0].id }
-		}
-		console.log('deletePhotos', where);
-
-		try {
-			await prismaClient.photos.deleteMany({ where });
-		} catch (e) {
-			console.log(e);
-		}
-	}
-
 	async selectDeleted(time: Date): Promise<TInitiative[] | undefined> {
-		console.log({
-			where: {
-				isDeleted: true,
-				changedAt: {
-					gte: time
-				}
-			},
-			select: {
-				id: true,
-				Photos: {
-					select: {
-						id: true,
-						path: true,
-					}
-				},
-			}
-		});
 		try {
 			const result = await prismaClient.initiative.findMany({
 				where: {
 					isDeleted: true,
 					changedAt: {
-						gte: time
+						lte: time
 					}
 				},
 				select: {
@@ -335,23 +302,12 @@ export class InitiativeRepository implements IInitiativeRepository {
 	}
 
 	async deleteMany(idList: number[]): Promise<void> {
-		let where;
-		if (idList.length > 1) {
-			const OR = idList.map(id => { return { id } });
-			where = { OR };
-			console.log('deleteMany 1', OR);
-		} else {
-			where = { id: idList[0] }
-		}
-		console.log('deleteMany 2');
-		console.log({ where });
-		return ;
-/*
 		try {
-			await prismaClient.initiative.deleteMany({ where });
+			await prismaClient.initiative.deleteMany({
+				where: { id: { in: idList }}
+			});
 		} catch (e) {
 		}
-*/
 	}
 
 	async listByText(text: string, direction: number = 0): Promise<TInitiativeList | TClientDataError> {
@@ -455,6 +411,42 @@ export class InitiativeRepository implements IInitiativeRepository {
 			return true;
 		} catch (e) {
 			return false;
+		}
+	}
+
+	async get(id: number): Promise<TShortInitiative | undefined> {
+		try {
+			const result = await prismaClient.initiative.findFirst({
+				select: {
+					id: true,
+					name: true
+				},
+				where: { id }
+			});
+			return result as TShortInitiative;
+		} catch (e) {
+			return undefined
+		}
+	}
+
+	async calcRating(id: number): Promise<void>{
+		try {
+			const result = await prismaClient.reviews.groupBy({
+				by: [ 'usersId' ],
+				_avg: {
+					rate: true
+				},
+				where: {
+					initiativeId: id
+				},
+			});
+			const sumRating = result.reduce((acc, current) => acc + (current._avg.rate || 0), 0)
+			const averageRating = sumRating / result.length;
+			await prismaClient.initiative.update({
+				data: { rating: averageRating }, where: { id }
+			})
+		} catch (e) {
+
 		}
 	}
 

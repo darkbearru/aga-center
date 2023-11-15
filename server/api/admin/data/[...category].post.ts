@@ -13,6 +13,7 @@ import formidable from 'formidable';
 import { IncomingMessage } from 'http';
 import * as fs from 'fs';
 import { TPhotos } from '~/src/data/types/photos';
+import { TArticle, TArticleFormData } from '~/src/data/types/articles';
 
 export default defineEventHandler(
 	async (event: H3Event) => {
@@ -44,11 +45,20 @@ export default defineEventHandler(
 				const company: TCompany = await readBody(event);
 				return await adminService.companySave(company);
 			}
+			case 'articles' : {
+				const headers = getRequestHeaders(event);
+				let item: TArticleFormData;
+				if (headers['content-type']?.includes('multipart/form-data')) {
+					item = await parseMultipartNodeRequest<TArticleFormData>(event.node.req);
+				} else {
+					item = await readBody(event);
+				}
+				return await adminService.articlesSave(item);
+			}
 			case 'initiative' : {
 				const headers = getRequestHeaders(event);
 				let item: TInitiativeWithID;
 				if (headers['content-type']?.includes('multipart/form-data')) {
-					// const item: TInitiative = await readBody(event);
 					item = await parseMultipartNodeRequest<TInitiativeWithID>(event.node.req);
 				} else {
 					item = await readBody(event);
@@ -57,9 +67,8 @@ export default defineEventHandler(
 			}
 			case 'moderate_company' : {
 				const data = await readBody(event);
-				console.log(data);
 				if (!data?.id) return;
-				return await adminService.companyModeration(
+				return await adminService.moderationCompany(
 					data.id,
 					data.approved ? 'approved' : 'declined',
 					data?.reason
@@ -68,11 +77,15 @@ export default defineEventHandler(
 			case 'moderate_initiative' : {
 				const data = await readBody(event);
 				if (!data?.id) return;
-				return await adminService.initiativeModeration(
+				return await adminService.moderationInitiative(
 					data.id,
 					data.approved ? 'approved' : 'declined',
 					data?.reason
 				);
+			}
+			case 'orders' : {
+				const data = await readBody(event);
+				return await adminService.orderAddMessage(data.code, data.status, data.message);
 			}
 		}
 		return '';
@@ -86,8 +99,9 @@ function parseMultipartNodeRequest<T>(req: IncomingMessage): Promise<T> {
 			multiples: true,
 			uploadDir: './public/upload',
 			keepExtensions: true,
-			minFileSize: 30 * 1024,
-			maxFileSize: 3 * 1024 * 1024,
+			minFileSize: 10 * 1024,
+			maxFileSize: 3145728, //3 * 1024 * 1024,
+			maxTotalFileSize: 9437184, //3 * 3145728
 			filter(file) {
 				const originalFilename = file.originalFilename ?? '';
 				// Enforce file ends with allowed extension

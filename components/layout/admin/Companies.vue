@@ -20,13 +20,12 @@ const companyCurrentID = ref(userData.companies ? userData.companies[0]?.id : 0)
 const companyCurrent = ref(userData.companies ? userData.companies[0] : undefined);
 const companyForm = ref();
 const companyFormStart = ref();
+const initiativesList = ref();
 
 
 const refreshCompanies = (): void => {
 	if (userData?.companies?.length) {
 		companiesList.value = [];
-		console.log('refreshCompanies');
-		console.log(userData?.companies);
 		userData?.companies.forEach(item => {
 			companiesList.value.push({
 				label: item.nameShort !== item.nameFull ? `${item.nameShort} (${item.nameFull})` : item.nameFull,
@@ -36,6 +35,11 @@ const refreshCompanies = (): void => {
 		companies.value = userData?.companies as TCompany[];
 	} else {
 		companyFormStart.value?.setup();
+	}
+	if (companyCurrentID.value && userData?.companies) {
+		companyCurrent.value = userData?.companies.find(item => item.id === companyCurrentID.value);
+	} else {
+		companyCurrent.value = userData.companies ? userData?.companies[0] : undefined;
 	}
 }
 
@@ -74,8 +78,25 @@ const deleteCompany = async (company: TCompany): Promise<void> => {
 	});
 }
 
+// Включаем обновление контента раз в минуту
+userData.refreshCompaniesAndInitiatives(() => {
+	refreshCompanies();
+	initiativesList?.value?.updateInitiatives();
+});
+
+watch(companyCurrentID, (id) => {
+	if (!userData?.companies) return;
+	companyCurrent.value = userData?.companies.find(item => item?.id === id);
+})
+
+
+
 onMounted(() => {
 	refreshCompanies();
+	if(typeof companyCurrent.value === 'undefined') {
+		companyCurrent.value  = companyCurrent.value || (userData.companies ? userData.companies[0] : undefined);
+		initiativesList?.value?.setupCompany(companyCurrent.value);
+	}
 })
 </script>
 
@@ -83,7 +104,7 @@ onMounted(() => {
 
 	<CompaniesForm ref="companyFormStart" v-if="!companies.length" @save="refreshCompanies" />
 	<div v-else>
-		<div class="formkit-no-limits flex gap-2 items-end max-w-[600px]">
+		<div class="formkit-no-limits flex gap-2 items-end max-w-[740px]">
 			<div class="grow">
 				<FormKit
 					type="select"
@@ -91,7 +112,14 @@ onMounted(() => {
 					v-model="companyCurrentID"
 					:label="companies.length === 1 ? 'Компания' : 'Компании'"
 					:options="companiesList"
-				/>
+				>
+				</FormKit>
+			</div>
+			<div v-if="!companyCurrent.isApproved && !companyCurrent.isDeclined" class="flex items-center text-center w-[90px] h-10 px-2 py-1 rounded bg-yellow-500 text-white text-xs">
+				ожидает модерации
+			</div>
+			<div v-if="!companyCurrent.isApproved && companyCurrent.isDeclined" class="flex items-center justify-center w-[90px] h-10  px-2 py-1 rounded bg-red-600 text-white text-xs">
+				отклонена
 			</div>
 			<Button class="inline-flex items-center bg-main text-white hover:bg-main-light py-2 px-6" title="Редактировать" @click="popupEdit">
 				<IconEdit filled class="w-6 h-6" />
@@ -101,7 +129,7 @@ onMounted(() => {
 			</Button>
 		</div>
 
-		<Initiatives :company="companyCurrent" />
+		<Initiatives :company="companyCurrent" ref="initiativesList" />
 
 		<PopupContainer ref="popup" @onClose="popupClose">
 			<Popup class="bg-gray-light/60 w-full max-h-full min-w-[300px] max-w-[600px] pb-0" :title="titlePopup" @close="popupClose">

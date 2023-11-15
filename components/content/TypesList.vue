@@ -47,7 +47,9 @@ await loadTypesList();
 async function loadTypesList(): Promise<void> {
 	clientData.typesList().then((data) => {
 		typesList.value = data as TInitiativeTypes[];
-		if (typesList.value?.length === 1) typesListItem?.value[0]?.openInitiativeList();
+		if (typesList.value?.length === 1) {
+			if (typeof typesListItem?.value !== 'undefined') typesListItem?.value[0]?.openInitiativeList();
+		}
 	});
 }
 
@@ -82,6 +84,7 @@ const popupClose = () => {
 const orderCheck = () => submitForm('order_form');
 
 const order = async () => {
+	clearErrors('order_form', true);
 	loginForm.loading = true;
 	if (!currentInitiativeId) return;
 	const order: TOrder = {
@@ -122,6 +125,7 @@ async function searchChange(): Promise<void> {
 }
 
 const openGroup = (value?: number) => {
+	if (!typesListItem.value) return;
 	typesListItem.value?.forEach((item: { toggleOpen: (arg0: number | undefined) => any; }) => item?.toggleOpen(value));
 };
 
@@ -201,7 +205,7 @@ const openGroup = (value?: number) => {
 									v-model="loginForm.fio"
 									validation="required|length:5|contains_alpha_spaces"
 									validation-visibility="submit"
-									:disabled="!!auth.user"
+									:disabled="!!auth.user || loginForm.mode"
 									:validation-messages="{
 					              length: 'Длина ФИО должна быть не менее 5 символов',
 					              required: 'Необходимо указать ФИО',
@@ -216,6 +220,7 @@ const openGroup = (value?: number) => {
 							type="textarea"
 							label="Сообщение"
 							placeholder="Сообщение исполнителю"
+							:disabled="loginForm.mode"
 							v-model="loginForm.message"
 						/>
 						<FormKit
@@ -229,6 +234,7 @@ const openGroup = (value?: number) => {
 							v-model="loginForm.code"
 							validation="required|length:8|contains_numeric"
 							validation-visibility="submit"
+							help="Введите код подтверждения, отправленный на указанный вами email"
 							:validation-messages="{
 				              code_not_exists: 'Введён неверный код',
 				              length: 'Длина кода должна быть 8 символов',

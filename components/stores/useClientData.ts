@@ -5,7 +5,7 @@ import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import type { TClientData } from '~/src/data/types/common.data';
 import type { TRegion } from '~/src/data/types/regions';
 import type { TInitiativeList } from '~/src/data/types/initiatives';
-import type { TOrder, TOrderResponse } from '~/src/data/types/order';
+import type { TOrder, TOrderResponse, TOrders } from '~/src/data/types/order';
 
 export const useClientData = defineStore('client', {
 	state: () => {
@@ -17,7 +17,8 @@ export const useClientData = defineStore('client', {
 		const regions: globalThis.Ref<TRegion[] | undefined> = ref<TRegion[] | undefined>(undefined);
 		const direction: globalThis.Ref<number> = ref(0);
 		const searchText: globalThis.Ref<string> = ref('');
-		return { path, news, initiatives, types, direction, regions, currentRegion, searchText }
+		const orders: globalThis.Ref<TOrders | undefined> = ref<TOrders | undefined>(undefined);
+		return { path, news, initiatives, types, direction, regions, currentRegion, searchText, orders }
 	},
 	actions: {
 		// Получение всех данных
@@ -111,5 +112,6 @@ export const useClientData = defineStore('client', {
 			if (error.value) return undefined;
 			return undefined;
 		}
+
 	}
 });

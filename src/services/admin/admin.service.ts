@@ -3,7 +3,6 @@ import type { INewsRepository } from '~/src/data/news.repository.interface';
 import type { TAdminMenu, TCommonData } from '~/src/data/types/common.data';
 import type { IUsersRepository } from '~/src/users/users.repository.interface';
 import type { TUser, TUserResponse } from '~/src/users/types/users';
-import { emailValidate } from '~/src/services/validation/validation';
 import type { IRegionsRepository } from '~/src/data/regions.repositiory.interface';
 import type { TRegion, TRegionResponse } from '~/src/data/types/regions';
 import type { TOwnership, TOwnershipResponse } from '~/src/data/types/ownership';
@@ -13,24 +12,42 @@ import type { TInitiativeTypes, TInitiativeTypesResponse } from '~/src/data/type
 import type { TNews, TNewsResponse } from '~/src/data/types/news';
 import type { TCompany, TCompanyResponse, TContacts } from '~/src/data/types/company';
 import type { ICompanyRepository } from '~/src/data/company.repository.interface';
-import type { TInitiative, TInitiativeDeleteResponse, TInitiativeResponse, TInitiativeWithID } from '~/src/data/types/initiatives';
+import type {
+	TInitiative,
+	TInitiativeDeleteResponse,
+	TInitiativeResponse,
+	TInitiativeWithID,
+	TInitiativeWithOrders
+} from '~/src/data/types/initiatives';
 import type { IInitiativeRepository } from '~/src/data/initiative.repository.interface';
 import type { TPhotoItem, TPhotos } from '~/src/data/types/photos';
-import type { TArticles } from '~/src/data/types/articles';
-import ms from 'ms';
+import type { TArticle, TArticleFormData, TArticleResponse, TArticles } from '~/src/data/types/articles';
 import type { TUsersPayload } from '~/src/users/users.payload';
-// import * as fs from 'fs';
+import type { IArticlesRepository } from '~/src/data/articles.repository.interface';
+import type { IPhotosRepository } from '~/src/data/photos.repository.interface';
+import type { IOrdersRepository } from '~/src/data/orders.repository.interface';
+import type { TOrder, TOrderMessage } from '~/src/data/types/order';
+import { OrderStatus } from '~/src/data/types/order';
+import { emailValidate } from '~/src/services/validation/validation';
+import ms from 'ms';
+import * as fs from 'fs';
+import moment from 'moment/moment';
+import type { IReviewsRepository } from '~/src/data/reviews.repository.interface';
 
 export class AdminService implements IAdminService {
 	constructor(
 		private user: TUsersPayload,
 		private newsRepository: INewsRepository,
+		private articlesRepository: IArticlesRepository,
 		private usersRepository: IUsersRepository,
 		private regionsRepository: IRegionsRepository,
 		private ownershipRepository: IOwnershipRepository,
 		private initiativeTypesRepository: IInitiativeTypesRepository,
 		private companyRepository: ICompanyRepository,
 		private initiativeRepository: IInitiativeRepository,
+		private photosRepository: IPhotosRepository,
+		private ordersRepository: IOrdersRepository,
+		private reviewsRepository: IReviewsRepository,
 	) {
 	}
 
@@ -45,22 +62,21 @@ export class AdminService implements IAdminService {
 		let companies: TCompany[] | undefined = undefined;
 		let articles: TArticles | undefined = undefined;
 		let initiatives: TInitiative[] | undefined = undefined;
-		console.log('AdminService');
-		console.log(this.user);
 		let isAdmin: boolean = (this.user?.rights && ((this.user?.rights&2) > 0)) || false;
 		let isModerator: boolean = (this.user?.rights && ((this.user?.rights&1) > 0)) || false;
 		if (isAdmin) {
-			menu['/client'] = 'Новости';
-			menu['/client/articles'] = 'Статьи';
 			menu['/client/users'] = 'Пользователи';
 			menu['/client/regions'] = 'Регионы';
-			menu['/client/ownership'] = 'Типы собственности';
-			menu['/client/types'] = 'Типы инициатив';
-			news = await this.getNewsList();
 			users = await this.getUsersList();
 		}
 		if (isAdmin || isModerator) {
+			menu['/client'] = 'Новости';
+			menu['/client/articles'] = 'Статьи';
+			menu['/client/ownership'] = 'Типы собственности';
+			menu['/client/types'] = 'Типы инициатив';
 			menu['/client/moderation'] = 'Модерация';
+			news = await this.getNewsList();
+			articles = await this.getArticlesList();
 			companies  = await this.companyRepository.moderationList();
 			initiatives = await this.initiativeRepository.moderationList();
 		}
@@ -76,8 +92,8 @@ export class AdminService implements IAdminService {
 			user: this.user,
 			menu,
 			news,
-			users,
 			articles,
+			users,
 			regions,
 			ownership,
 			types,
@@ -129,6 +145,72 @@ export class AdminService implements IAdminService {
 		return await this.newsRepository.delete(news);
 	}
 
+	private async getNewsList(page: number = 0): Promise<TNews[] | undefined> {
+		const onPage: number = Number(process.env?.NEWS_ON_PAGE) || 20;
+		const newsCount: number = await this.newsRepository.count();
+		const skip: number = Math.floor(newsCount / onPage) + (newsCount > onPage ? newsCount % onPage : 0);
+
+		return await this.newsRepository.list(skip, onPage);
+	}
+
+	async articlesSave(article: TArticleFormData): Promise<TArticleResponse> {
+		const check: boolean = await this.articlesRepository.check(article);
+		const response: TArticleResponse = {
+			errors: undefined,
+			article
+		}
+		if (!check) {
+			response.errors = {
+				title: `Статья с заголовком «${article.title}» уже существует`
+			}
+		}
+
+		if (!article.title.trim()) {
+			response.errors = {...response.errors, title: 'Не указан заголовок новости'}
+		}
+		if (!article.slug.trim()) {
+			response.errors = {...response.errors, slug: 'Не указан идентификатор новости'}
+		}
+		if (!article?.text?.trim()) {
+			response.errors = {...response.errors, text: 'Не указан текст новости'}
+		}
+		if(response.errors) return response;
+
+		if (!article.id) {
+			const result = await this.articlesRepository.add(article);
+			if (typeof result !== 'boolean') {
+				response.article = result;
+			} else {
+				response.errors = {other: 'Ошибка добавления данных'}
+			}
+		} else {
+			const deletedPhotos: TPhotos | undefined = article.photos?.filter(item => item.isDeleted);
+			article.photos = article.photos?.filter(item => !item.isDeleted);
+
+			if (deletedPhotos) await this.deletePhotos(deletedPhotos);
+
+			if (await this.articlesRepository.save(article)) {
+				response.article = article
+			} else {
+				response.errors = {other: 'Ошибка сохранения данных'}
+			}
+		}
+		return response;
+	}
+
+	async articlesDelete(article: TArticle): Promise<boolean> {
+		return await this.articlesRepository.delete(article);
+	}
+
+	private async getArticlesList(page: number = 0): Promise<TArticles | undefined> {
+		const onPage: number = Number(process.env?.NEWS_ON_PAGE) || 20;
+		const articlesCount: number = await this.articlesRepository.count();
+		const skip: number = Math.floor(articlesCount / onPage) + (articlesCount > onPage ? articlesCount % onPage : 0);
+
+		return await this.articlesRepository.list(skip, onPage);
+	}
+
+
 	async userSave(user: TUser): Promise<TUserResponse> {
 		const response: TUserResponse = {
 			errors: undefined,
@@ -168,14 +250,6 @@ export class AdminService implements IAdminService {
 	async userDelete(user: TUser): Promise<TUser | null> {
 		if (user?.id) return await this.usersRepository.delete(user?.id);
 		return null;
-	}
-
-	private async getNewsList(page: number = 0): Promise<TNews[] | undefined> {
-		const onPage: number = Number(process.env?.NEWS_ON_PAGE) || 20;
-		const newsCount: number = await this.newsRepository.count();
-		const skip: number = Math.floor(newsCount / onPage) + (newsCount > onPage ? newsCount % onPage : 0);
-
-		return await this.newsRepository.list(skip, onPage);
 	}
 
 	private async getUsersList(page: number = 0): Promise<TUser[] | undefined> {
@@ -290,14 +364,30 @@ export class AdminService implements IAdminService {
 	}
 
 	async companySave(company: TCompany): Promise<TCompanyResponse> {
-		const check: boolean = await this.companyRepository.check(company);
+		const check: boolean | TCompany = await this.companyRepository.check(company);
 		const response: TCompanyResponse = {
 			errors: undefined,
 			company
 		}
-		if (!check) {
-			response.errors = {
-				nameFull: `Компания «${company.nameFull}» уже существует`
+		if (check && typeof check === 'object') {
+			if ((check as TCompany)?.nameShort === company?.nameShort) {
+				response.errors = {
+					...response.errors,
+					nameShort: `Компания c кратким названием «${company.nameShort}» уже существует`
+				}
+			}
+			if ((check as TCompany)?.slug === company?.slug) {
+				response.errors = {
+					...response.errors,
+					slug: `Компания c идентификатором «${company.slug}» уже существует`
+				}
+
+			}
+			if ((check as TCompany)?.nameFull === company?.nameFull) {
+				response.errors = {
+					...response.errors,
+					nameFull: `Компания «${company.nameFull}» уже существует`
+				}
 			}
 		}
 		if (!company.nameFull?.trim()) {
@@ -305,6 +395,9 @@ export class AdminService implements IAdminService {
 		}
 		if (!company.nameShort?.trim()) {
 			response.errors = {...response.errors, nameShort: 'Не указано краткое наименование компании'}
+		}
+		if (!company.slug?.trim()) {
+			response.errors = {...response.errors, slug: 'Не указан идентификатор для формирования ссылки на страницу компании'}
 		}
 		if (!company.requsites?.trim()) {
 			response.errors = {...response.errors, requsites: 'Не указаны реквизиты компании'}
@@ -336,13 +429,22 @@ export class AdminService implements IAdminService {
 				await this.companyRepository.deleteContacts(deletedContacts);
 			}
 
-			if (await this.companyRepository.save(company)) {
-				response.company = company
+			const res = await this.companyRepository.save(company);
+			if (res) {
+				response.company = res
 			} else {
 				response.errors = {other: 'Ошибка сохранения данных'}
 			}
 		}
 		return response;
+	}
+
+	async companyList(): Promise<TCompany[] | undefined> {
+		return await this.companyRepository.list(this.user);
+	}
+
+	async initiativeList(): Promise<TInitiative[] | undefined> {
+		return await this.initiativeRepository.list(this.user);
 	}
 
 	async initiativeDelete(item: TInitiative): Promise<TInitiativeDeleteResponse> {
@@ -411,44 +513,25 @@ export class AdminService implements IAdminService {
 	async initiativeRemoveOld(): Promise<void> {
 		const exp: Date = new Date();
 		const deletedPhotos: TPhotos = [];
-		console.log(process?.env?.DELETED_RECORDS_STORE_TIME || '90 days');
-		console.log(ms('-' + (process?.env?.DELETED_RECORDS_STORE_TIME || '90 days')));
 		exp.setTime(Date.now() + ms('-' + (process?.env?.DELETED_RECORDS_STORE_TIME || '90 days')));
+		console.log('initiativeRemoveOld', exp);
 		const records: TInitiative[] | undefined = await this.initiativeRepository.selectDeleted(exp);
 		console.log('Records', records);
 		if (typeof records === 'undefined') return;
 		if (records?.length === 0) return;
 
-		console.log('initiativeRemoveOld');
-		console.log(records);
 		records.forEach((record: TInitiative) => {
 			if (record.photos) record.photos?.forEach((photo: TPhotoItem) => {
 				deletedPhotos.push(photo);
 			});
 		});
-		// console.log('Deleted ID', records.map(item => item.id || 0));
+		console.log('Deleted ID', records.map(item => item.id || 0));
 		await this.initiativeRepository.deleteMany(records.map(item => item.id || 0));
 		await this.deletePhotos(deletedPhotos);
 	}
 
-	async deletePhotos(photos: TPhotos): Promise<void> {
-		console.log('Deleted Photos', photos);
-		// Удаляем в базе
-		return ;
-/*
-		await this.initiativeRepository.deletePhotos(photos);
-		// Удаляем на диске
-		const current = `${process.cwd()}/public`
-		photos.forEach(file => {
-			console.log(`Delete file ${file.path}`);
-			fs.unlink(`${current}${file.path}`, err => {
-				if (err) console.log('Error File delete', err);
-			})
-		});
-*/
-	}
 
-	async companyModeration(id: number, operation: string, reason?: string): Promise<TCompany[] | undefined> {
+	async moderationCompany(id: number, operation: string, reason?: string): Promise<TCompany[] | undefined> {
 		console.log(operation, reason);
 		if (operation === 'approved') {
 			await this.companyRepository.moderationApprove(id);
@@ -458,7 +541,7 @@ export class AdminService implements IAdminService {
 		return await this.companyRepository.moderationList();
 	}
 
-	async initiativeModeration(id: number, operation: string, reason?: string): Promise<TInitiative[] | undefined> {
+	async moderationInitiative(id: number, operation: string, reason?: string): Promise<TInitiative[] | undefined> {
 		if (operation === 'approved') {
 			await this.initiativeRepository.moderationApprove(id);
 		} else {
@@ -466,4 +549,90 @@ export class AdminService implements IAdminService {
 		}
 		return await this.initiativeRepository.moderationList();
 	}
+
+	async moderationList(): Promise<TCommonData> {
+		const companies: TCompany[] | undefined  = await this.companyRepository.moderationList();
+		const initiatives: TInitiative[] | undefined = await this.initiativeRepository.moderationList();
+		return {
+			companies,
+			initiatives
+		}
+	}
+
+	async companyAndInitiativesList(): Promise<TCommonData> {
+		const companies: TCompany[] | undefined = await this.companyRepository.list(this.user);
+		const initiatives: TInitiative[] | undefined = await this.initiativeRepository.list(this.user);
+		return {
+			companies,
+			initiatives
+		}
+	}
+
+
+	async deletePhotos(photos: TPhotos): Promise<void> {
+		console.log('Deleted Photos', photos);
+		// Удаляем в базе
+		await this.photosRepository.deletePhotos(photos);
+		// Удаляем на диске
+		const current = `${process.cwd()}/public`
+		photos.forEach(file => {
+			console.log(`Delete file ${file.path}`);
+			fs.unlink(`${current}${file.path}`, err => {
+				if (err) console.log('Error File delete', err);
+			})
+		});
+	}
+
+
+	async ordersList(): Promise<TInitiativeWithOrders | null> {
+		let list: TInitiativeWithOrders | null = await this.ordersRepository.list(this.user);
+		moment.locale('ru');
+		if (list) {
+			list = list?.map(item => {
+				item.orders = item.Order?.map(order => this.updateOrderData(order));
+				delete item.Order;
+				return item;
+			})
+
+		}
+		return list;
+	}
+
+	async orderByCode(code: string): Promise<TOrder | null> {
+		let order: TOrder | null = await this.ordersRepository.get(code);
+		moment.locale('ru');
+		if (order) order = this.updateOrderData(order);
+		return order;
+	}
+
+	async orderAddMessage(code: string, status: OrderStatus, message: TOrderMessage): Promise<TOrder | null> {
+		let order: TOrder | null = null;
+		try {
+			order = await this.ordersRepository.addMessage(code, status, message);
+			if (status === OrderStatus.complete && order) {
+				// Если завершение работы, то последнее сообщение это ещё и отзыв
+				await this.reviewsRepository.add({
+					review: message.message,
+					rate:  message.rating,
+					initiative: order.initiative as TInitiative,
+					user: order.user
+				});
+				// Получаем полные данные по заказу, чтобы потом сделать все расчёты
+				await this.initiativeRepository.calcRating((order.initiative as TInitiative).id || 0);
+				await this.companyRepository.calcRating((order.initiative as TInitiative).company.id || 0);
+			}
+		} catch (e) {
+		}
+		if (!order) return null;
+		return this.updateOrderData(order);
+	}
+
+	private updateOrderData(order: TOrder ): TOrder {
+		const changedDate = moment(order.changedAt, 'YYYY-MM-DD HH:II:SS');
+		order.changed = changedDate.format('LLLL');
+		const createdDate = moment(order.createdAt, 'YYYY-MM-DD HH:II:SS');
+		order.created = createdDate.format('LLLL');
+		return order;
+	}
+
 }
