@@ -5,6 +5,7 @@ import type { TInitiativeList } from '~/src/data/types/initiatives';
 import type { TOrder, TOrderResponse } from '~/src/data/types/order';
 import type { TCompany } from '~/src/data/types/company';
 import type { TCompanyWithInitiatives } from '~/src/data/types/company';
+import type { TReviewList } from '~/src/data/types/reviews';
 
 export interface IDataService {
 	data(): Promise<TClientData>;
@@ -15,4 +16,5 @@ export interface IDataService {
 	makeOrder(order: TOrder): Promise<TOrderResponse>;
 	companies(slug?: string): Promise<TCompany[] | TCompanyWithInitiatives | TClientDataError>;
 	initiativesPromo(): Promise<TInitiativeList | TClientDataError>;
+	reviews(): Promise<TReviewList | TClientDataError>
 }

@@ -10,9 +10,11 @@ export type TReviews = {
 }
 
 export type TReviewListItem = {
-	id: number,
+	id?: number,
 	createdAt: Date,
 	review: string | null,
-	rate: number | null
+	rate: number | null,
+	Initiative: { name: string } | null,
+	Users: TUser | null,
 }
 export type TReviewList = TReviewListItem[];

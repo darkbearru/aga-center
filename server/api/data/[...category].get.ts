@@ -27,6 +27,9 @@ export default defineEventHandler(
 			case 'promo': {
 				return dataService.initiativesPromo();
 			}
+			case 'reviews': {
+				return dataService.reviews();
+			}
 			case 'types': {
 				return dataService.types(data.params?.direction, undefined, data.params?.text);
 			}

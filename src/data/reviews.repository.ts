@@ -16,7 +16,33 @@ export class ReviewsRepository implements IReviewsRepository {
 	}
 
 	async list(): Promise<TReviewList | null> {
-		return Promise.resolve(null);
+		return prismaClient.reviews.findMany({
+			select: {
+				review: true,
+				rate: true,
+				createdAt: true,
+				Users: {
+					select: {
+						email: true,
+						fio: true
+					}
+				},
+				Initiative: {
+					select: {
+						name: true,
+					}
+				}
+			},
+			where: {
+				Users: {
+					isClient: true
+				}
+			},
+			orderBy: {
+				createdAt: 'desc',
+			},
+			take: 12
+		});
 	}
 
 	async listByCompany(companyId: number): Promise<TReviewList | null> {
