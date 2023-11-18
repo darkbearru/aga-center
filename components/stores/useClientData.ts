@@ -135,10 +135,11 @@ export const useClientData = defineStore('client', {
 					method: 'post',
 					body: {
 						direction: this.direction,
+						text,
 					}
 				});
 			if (error.value) return undefined;
-			return undefined;
+			return data.value as TInitiative[];
 		},
 
 		// Получение списка инициатив
