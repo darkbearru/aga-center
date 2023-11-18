@@ -1,20 +1,22 @@
 <script setup lang="ts">
 
-import { useClientData } from '~/components/stores/useClientData';
 import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
+import type { TInitiativeListItem } from '~/src/data/types/initiatives';
+import type { TOrder, TOrderResponse } from '~/src/data/types/order';
+import { OrderStatus } from '~/src/data/types/order';
+import { useClientData } from '~/components/stores/useClientData';
+import { useAuth } from '~/components/stores/useAuth';
+import { setErrors } from '@formkit/core';
 import TypesListItem from '~/components/content/TypesListItem.vue';
 import PopupContainer from '~/components/ui/PopupContainer.vue';
 import Popup from '~/components/ui/Popup.vue';
-import type { TInitiativeListItem } from '~/src/data/types/initiatives';
 import PhotosList from '~/components/layout/admin/photos/PhotosList.vue';
 import Button from '~/components/ui/Button.vue';
-import { useAuth } from '~/components/stores/useAuth';
 import LoadingBg from '~/components/ui/LoadingBg.vue';
-import type { TOrder, TOrderResponse } from '~/src/data/types/order';
-import { OrderStatus } from '~/src/data/types/order';
-import { setErrors } from '@formkit/core';
+import RatingStars from '~/components/ui/RatingStars.vue';
 
-defineExpose({ directionChange, searchChange });
+
+defineExpose({ directionChange, searchChange, popupOpen });
 
 const clientData = useClientData();
 const auth = useAuth();
@@ -23,6 +25,8 @@ const initiativeData = reactive({
 	title: '',
 	text: '',
 	company: '',
+	company_info: '',
+	company_slug: '',
 	rating: 0,
 	order: false,
 });
@@ -54,13 +58,15 @@ async function loadTypesList(): Promise<void> {
 }
 
 
-const popupOpen = (initiative: TInitiativeListItem) => {
+function popupOpen(initiative: TInitiativeListItem): void {
 	if (!initiative) return;
 	popup?.value?.show();
 	currentInitiativeId = initiative.id;
 	initiativeData.title = initiative.name || '';
 	initiativeData.text = (initiative.text || '').split('\n').join('<br />');
 	initiativeData.company = initiative.Company?.nameShort || '';
+	initiativeData.company_info = `${initiative.Company?.typeOwnership?.nameShort} «${initiative.Company?.nameFull || ''}»`;
+	initiativeData.company_slug = initiative.Company?.slug || '';
 	initiativeData.rating = initiative.rating || 0;
 	initiativeData.order = false;
 	loginForm.mode = false;
@@ -155,9 +161,14 @@ const openGroup = (value?: number) => {
 			<Popup class="relative bg-gray-200/80 w-full max-h-full min-w-[300px] max-w-[600px] pb-0"
 			       :title="	initiativeData.title" @close="popupClose">
 				<div v-if="!initiativeData.order">
-					<div class="flex italic text-sm text-dark-light mb-4 gap-3">
-						<h4 class="grow">{{ initiativeData.company }}</h4>
-						<div>{{ initiativeData.rating }}</div>
+					<div class="flex flex-wrap sm:flex-nowrap italic text-sm mb-4 gap-3">
+						<h4 class="grow text-main">
+							<a class="hover:underline decoration-main/80 underline-offset-4 decoration-2" :href="`/companies/${initiativeData.company_slug}`">{{ initiativeData.company }}</a>
+							<span class="pl-2 text-xs text-gray-500">{{ initiativeData.company_info }}</span>
+						</h4>
+						<div class="flex w-[6.25rem] text-main">
+							<RatingStars :rating="initiativeData.rating" />
+						</div>
 					</div>
 					<div class="text-lg text-dark-main">
 						<div v-html="initiativeData.text"></div>

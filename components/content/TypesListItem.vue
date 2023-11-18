@@ -1,11 +1,12 @@
 <script setup lang="ts">
-
 import IconSquarePlus from 'assets/svg/icon-square-plus.svg';
 import IconSquareMinus from 'assets/svg/icon-square-minus.svg';
-import InitiativeItem from '~/components/content/InitiativeItem.vue';
+import InitiativeItem from '~/components/content/initiatives/InitiativeItem.vue';
 import { useClientData } from '~/components/stores/useClientData';
 import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import type { TInitiative, TInitiativeList } from '~/src/data/types/initiatives';
+import type { TInitiativeList } from '~/src/data/types/initiatives';
+import RatingStars from '~/components/ui/RatingStars.vue';
+
 
 const props = defineProps({
 	item: Object,
@@ -18,6 +19,7 @@ const typeItem = ref<TInitiativeTypes>(props.item as TInitiativeTypes);
 const initiatives = ref<TInitiativeList>([]);
 const isShow = ref(false);
 const isLoaded = ref(false);
+
 
 async function showInitiatives(): Promise<void> {
 	isShow.value = !isShow.value;
@@ -54,7 +56,7 @@ const onClick = (id: number): void =>{
 			<IconSquarePlus v-if="!isShow" class="w-5 h-5 mr-2 text-gray-400" filled />
 			<IconSquareMinus v-else class="w-5 h-5 mr-2 text-gray-400" filled />
 			<div class="grow">
-				<div class="relative truncate">{{ typeItem.name }}</div>
+				<div class="relative truncate text-lg">{{ typeItem.name }}</div>
 			</div>
 			<div class="inline-block bg-gray-400 text-white text-sm rounded-lg px-2 ml-4">{{ typeItem.countStr }}</div>
 		</div>
@@ -63,11 +65,11 @@ const onClick = (id: number): void =>{
 				<div class="grow">
 					{{ item.name }}
 				</div>
+				<div class="flex gap-0 w-20 text-gray-400">
+					<RatingStars :rating="item?.rating || 0" class-name="w-4 h-4" />
+				</div>
 				<div>
 					{{ item?.Company?.nameShort }}
-				</div>
-				<div class="">
-					{{ item?.rating }}
 				</div>
 			</InitiativeItem>
 		</div>

@@ -13,9 +13,11 @@ import type { TUser, TUserRegistration } from '~/src/users/types/users';
 import type { TEmailResponse } from '~/src/services/email/email.types';
 import type { IEmailService } from '~/src/services/email/email.service.interface';
 import type { IOrdersRepository } from '~/src/data/orders.repository.interface';
+import type { TCompany, TCompanyWithInitiatives } from '~/src/data/types/company';
+import type { ICompanyRepository } from '~/src/data/company.repository.interface';
 import { makeConfirmCode } from '~/src/utils/makeConfirmCode';
-import moment from 'moment';
 import { sha256 } from 'ohash';
+import moment from 'moment/moment.js';
 
 export class DataService implements IDataService {
 	private onPage: number = 20;
@@ -25,6 +27,7 @@ export class DataService implements IDataService {
 		private regionsRepository: IRegionsRepository,
 		private initiativeTypesRepository: IInitiativeTypesRepository,
 		private initiativeRepository: IInitiativeRepository,
+		private companyRepository: ICompanyRepository,
 		private usersRepository: IUsersRepository,
 		private ordersRepository: IOrdersRepository,
 		private emailService: IEmailService,
@@ -97,7 +100,6 @@ export class DataService implements IDataService {
 			result.errors = { email: 'Не указан email' }
 			return result;
 		}
-		let user: TUser | null = null;
 		if (!order?.user?.fio?.trim()) {
 			result.errors = { fio: 'Не указан ФИО пользователя' }
 			return result;
@@ -174,8 +176,8 @@ export class DataService implements IDataService {
 			html: `<html lang="ru"><head></head><body><h1>Код подтверждения: ${code}</h1></body></html>`
 		});
 		console.log('sendEmail', result);
-		if (!result.error) return true;
-		return false;
+		return !result.error;
+
 	}
 
 	/**
@@ -201,8 +203,29 @@ export class DataService implements IDataService {
 				<h3>Для дальнейшего взаимодействия с исполнителем <a href="http://localhost:3000/orders/${order.code}">перейдите по ссылке</a> </h3>
 				</body></html>`
 		})
-		if (!result.error) return true
-
-		return false;
+		return !result.error;
 	}
+
+	async companies(slug?: string): Promise<TCompany[] | TCompanyWithInitiatives | TClientDataError> {
+		const error = { message: 'Ошибка получения списка компаний' };
+		try {
+			let result;
+			if (slug) {
+				const company = await this.companyRepository.getBySlug(slug);
+				const initiatives = await this.initiativeRepository.listByCompany(company?.id || 0);
+				if (!company) return error;
+				return { company, initiatives }
+			} else {
+				result = await this.companyRepository.listAll();
+			}
+			return result || error;
+		}catch (e) {
+			return error;
+		}
+	}
+
+	async initiativesPromo(): Promise<TInitiativeList | TClientDataError> {
+		return await this.initiativeRepository.listPromo();
+	}
+
 }

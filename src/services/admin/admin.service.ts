@@ -31,7 +31,7 @@ import { OrderStatus } from '~/src/data/types/order';
 import { emailValidate } from '~/src/services/validation/validation';
 import ms from 'ms';
 import * as fs from 'fs';
-import moment from 'moment/moment';
+import moment from 'moment/moment.js';
 import type { IReviewsRepository } from '~/src/data/reviews.repository.interface';
 
 export class AdminService implements IAdminService {

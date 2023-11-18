@@ -14,6 +14,8 @@ export interface IInitiativeRepository {
 	deleteMany(id: number[]): Promise<void>;
 	listByType(typeId: number, direction?: number, regionId?: number, fnd?: string): Promise<TInitiativeList | TClientDataError>;
 	listByText(text: string, direction: number): Promise<TInitiativeList | TClientDataError>;
+	listByCompany(company: number): Promise<TInitiativeList | undefined>;
+	listPromo(): Promise<TInitiativeList | TClientDataError>;
 	moderationList(): Promise<TInitiative[] | undefined>;
 	moderationApprove(id: number): Promise<boolean>;
 	moderationDecline(id: number, reason: string): Promise<boolean>;

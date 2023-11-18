@@ -1,12 +1,9 @@
 <script setup lang="ts">
-
-useHead({ title: 'АГА. Работа' });
-
+	await navigateTo('/');
 </script>
 
 <template>
-	<div>
-	</div>
+
 </template>
 
 <style scoped>

@@ -54,12 +54,12 @@ export default defineNuxtConfig({
     }
   },*/
   experimental: {
-    headNext: true
+    headNext: true,
   },
   devtools: {
-    enabled: false,
+    enabled: true,
     timeline: {
-      enabled: false,
+      enabled: true,
     },
   },
   image: {
@@ -71,7 +71,7 @@ export default defineNuxtConfig({
     autoImport: true
   },
   sourcemap: {
-    "server": false,
-    "client": false
+    "server": true,
+    "client": true
   },
 })

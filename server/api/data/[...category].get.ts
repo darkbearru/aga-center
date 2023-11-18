@@ -21,6 +21,12 @@ export default defineEventHandler(
 					data.params?.text
 				);
 			}
+			case 'companies': {
+				return dataService.companies(data.params?.slug);
+			}
+			case 'promo': {
+				return dataService.initiativesPromo();
+			}
 			case 'types': {
 				return dataService.types(data.params?.direction, undefined, data.params?.text);
 			}
