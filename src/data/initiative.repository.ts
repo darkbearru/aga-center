@@ -64,6 +64,7 @@ const clientInitiativeFields = {
 	name: true,
 	text: true,
 	direction: true,
+	rating: true,
 	Photos: {
 		select: {
 			id: true,
@@ -369,6 +370,46 @@ export class InitiativeRepository implements IInitiativeRepository {
 			});
 		}
 	}
+	async listByCompany(company: number): Promise<TInitiativeList | undefined> {
+		try {
+			return await prismaClient.initiative.findMany({
+				select: clientInitiativeFields,
+				where: {
+					companyId: company,
+					isApproved: true,
+					isDeleted: false,
+				},
+				orderBy: { createdAt: 'desc' },
+			});
+
+		} catch (e) {
+			return undefined
+		}
+	}
+
+	async listPromo(): Promise<TInitiativeList | TClientDataError> {
+		try {
+			// Для начала отключаем все промо где дата меньше текущей
+			await prismaClient.initiative.updateMany({
+				data: { promo: null },
+				where: { promo: { lte: new Date() }}
+			});
+			return await prismaClient.initiative.findMany({
+				select: clientInitiativeFields,
+				where: {
+					promo: { gt: new Date()},
+					isApproved: true,
+					isDeleted: false,
+				},
+				orderBy: { createdAt: 'desc' },
+			});
+		} catch (e) {
+			return {
+				message: 'Ошибка получения списка промо инициатив'
+			}
+		}
+	}
+
 
 	async moderationList(): Promise<TInitiative[] | undefined> {
 		const result = await prismaClient.initiative.findMany({

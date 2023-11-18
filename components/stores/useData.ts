@@ -746,7 +746,6 @@ export const useData = defineStore('data', {
 		},
 
 		async orderAddMessage(code: string, status: OrderStatus, message: string, author: OrderAuthor, rating?: number): Promise<TOrder> {
-			console.log('orderAddMessage', message, rating)
 			const msg: TOrderMessage = { author, message }
 			if (rating) msg.rating = rating;
 			return new Promise(async (resolve, reject) => {

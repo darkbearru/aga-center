@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-useHead({ title: 'АГА. Тур-центр' });
+useHead({ title: 'АГА. Бизнес' });
 
 </script>
 

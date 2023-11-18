@@ -1,5 +1,6 @@
 import type { TOwnership } from '~/src/data/types/ownership';
 import type { TUser } from '~/src/users/types/users';
+import type { TInitiativeList } from '~/src/data/types/initiatives';
 
 export enum ContactsType {
 	"phone" = "phone",
@@ -34,6 +35,7 @@ export type TCompany = {
 	nameFull: string,
 	nameShort: string | null,
 	slug: string,
+	rating?: number,
 	requsites?: string,
 	isApproved?: boolean,
 	isDeclined?: boolean,
@@ -41,6 +43,11 @@ export type TCompany = {
 	contacts?: TContacts,
 	ownership?: TOwnership,
 	user?: TUser,
+}
+
+export type TCompanyWithInitiatives = {
+	company: TCompany,
+	initiatives?: TInitiativeList
 }
 
 export type TCompanyItem = {

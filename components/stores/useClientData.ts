@@ -2,10 +2,11 @@ import { defineStore } from 'pinia';
 import type { TNews, TNewsList, TNewsTime } from '~/src/data/types/news';
 import type { TInitiative } from '~/src/data/types/initiatives';
 import type { TInitiativeTypes } from '~/src/data/types/initiatives.types';
-import type { TClientData } from '~/src/data/types/common.data';
+import type { TClientData, TClientDataError } from '~/src/data/types/common.data';
 import type { TRegion } from '~/src/data/types/regions';
 import type { TInitiativeList } from '~/src/data/types/initiatives';
 import type { TOrder, TOrderResponse, TOrders } from '~/src/data/types/order';
+import type { TCompany, TCompanyWithInitiatives } from '~/src/data/types/company';
 
 export const useClientData = defineStore('client', {
 	state: () => {
@@ -87,6 +88,32 @@ export const useClientData = defineStore('client', {
 			});
 		},
 
+		// Получение списка инициатив
+		async companiesList(): Promise<TCompany[] | undefined> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/companies`, {
+					method: 'get',
+				}).then((data) => {
+					resolve(data as TCompany[]);
+				}).catch(() => {
+					reject();
+				});
+			});
+		},
+
+		// Получение списка инициатив
+		async companyFullInfo(slug: string): Promise<TCompanyWithInitiatives> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/companies/slug/${slug}`, {
+					method: 'get',
+				}).then((data) => {
+					resolve(data as TCompanyWithInitiatives);
+				}).catch(() => {
+					reject();
+				});
+			});
+		},
+
 		async makeOrder(order: TOrder): Promise<TOrderResponse> {
 			return new Promise(async (resolve, reject) => {
 				await $fetch(`${this.path}/order`, {
@@ -111,7 +138,21 @@ export const useClientData = defineStore('client', {
 				});
 			if (error.value) return undefined;
 			return undefined;
-		}
+		},
+
+		// Получение списка инициатив
+		async initiativePromo(): Promise<TInitiativeList> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/promo`, {
+					method: 'get',
+				}).then((data) => {
+					if ((data as TClientDataError).message) reject((data as TClientDataError).message);
+					resolve(data as TInitiativeList);
+				}).catch(() => {
+					reject();
+				});
+			});
+		},
 
 	}
 });

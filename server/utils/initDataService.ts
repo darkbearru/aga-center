@@ -6,6 +6,7 @@ import { DataService } from '~/src/services/data/data.service';
 import { UsersRepository } from '~/src/users/users.repository';
 import { EmailService } from '~/src/services/email/email.service';
 import { OrdersRepository } from '~/src/data/orders.repository';
+import { CompanyRepository } from '~/src/data/company.repository';
 
 export type TQueryParams = {
 	category: string;
@@ -18,6 +19,7 @@ export function initDataService(): DataService {
 		new RegionsRepository(),
 		new InitiativeTypesRepository(),
 		new InitiativeRepository(),
+		new CompanyRepository(),
 		new UsersRepository(),
 		new OrdersRepository(),
 		new EmailService(),

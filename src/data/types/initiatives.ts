@@ -20,7 +20,7 @@ export type TInitiative = {
 	isDeclined?: boolean,
 	declineReason?: string,
 	company: TCompany,
-	region: TRegion
+	region: TRegion,
 	type: TInitiativeTypes,
 	photos?: TPhotos,
 	reviews?: TReviews,

@@ -96,6 +96,7 @@ model Initiative {
     Reviews           Reviews[]
     InitiativeTypes   InitiativeTypes? @relation(fields: [initiativeTypesId], references: [id])
     initiativeTypesId Int?
+    promo             DateTime?
     createdAt         DateTime         @default(now())
     changedAt         DateTime         @default(now())
     Regions           Regions?         @relation(fields: [regionsId], references: [id])

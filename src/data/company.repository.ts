@@ -10,6 +10,8 @@ const companySelect = {
 	nameShort: true,
 	requsites: true,
 	slug: true,
+	rating: true,
+	isApproved: true,
 	isDeclined: true,
 	declineReason: true,
 	contacts: {
@@ -164,6 +166,8 @@ export class CompanyRepository implements ICompanyRepository {
 			return result.map((company) => {
 				return {
 					id: company.id,
+					slug: company.slug,
+					rating: company.rating,
 					nameFull: company.nameFull,
 					nameShort: company.nameShort,
 					requsites: company.requsites,
@@ -176,6 +180,60 @@ export class CompanyRepository implements ICompanyRepository {
 			}) as TCompany[];
 		}
 		return undefined;
+	}
+
+	async listAll(): Promise<TCompany[] | undefined> {
+		const result = await prismaClient.company.findMany({
+			select: companySelect,
+			where: {
+				isApproved: true,
+				isDeclined: false
+			},
+			orderBy: [
+				{ nameShort: 'asc' },
+				{ nameFull: 'asc' }
+			]
+		});
+		if (result) {
+			return result.map((company) => {
+				return {
+					id: company.id,
+					slug: company.slug,
+					rating: company.rating,
+					nameFull: company.nameFull,
+					nameShort: company.nameShort,
+					requsites: company.requsites,
+					contacts: company.contacts,
+					ownership: company.typeOwnership,
+					user: company.Users
+				}
+			}) as TCompany[];
+		}
+		return undefined;
+	}
+
+	async getBySlug(slug: string): Promise<TCompany | undefined> {
+		const company = await prismaClient.company.findFirst({
+			select: companySelect,
+			where: {
+				slug,
+				isApproved: true,
+				isDeclined: false
+			}
+		});
+		if (company) {
+			return {
+				id: company.id,
+				slug: company.slug,
+				rating: company.rating,
+				nameFull: company.nameFull,
+				nameShort: company.nameShort,
+				requsites: company.requsites,
+				contacts: company.contacts as TContacts,
+				ownership: company.typeOwnership || undefined,
+			}
+		}
+		return undefined
 	}
 
 	async save(company: TCompany): Promise<TCompany | undefined> {
