@@ -7,6 +7,7 @@ import { UsersRepository } from '~/src/users/users.repository';
 import { EmailService } from '~/src/services/email/email.service';
 import { OrdersRepository } from '~/src/data/orders.repository';
 import { CompanyRepository } from '~/src/data/company.repository';
+import { ReviewsRepository } from '~/src/data/reviews.repository';
 
 export type TQueryParams = {
 	category: string;
@@ -22,6 +23,7 @@ export function initDataService(): DataService {
 		new CompanyRepository(),
 		new UsersRepository(),
 		new OrdersRepository(),
+		new ReviewsRepository(),
 		new EmailService(),
 	);
 }

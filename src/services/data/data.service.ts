@@ -18,6 +18,8 @@ import type { ICompanyRepository } from '~/src/data/company.repository.interface
 import { makeConfirmCode } from '~/src/utils/makeConfirmCode';
 import { sha256 } from 'ohash';
 import moment from 'moment/moment.js';
+import type { TReviewList } from '~/src/data/types/reviews';
+import type { IReviewsRepository } from '~/src/data/reviews.repository.interface';
 
 export class DataService implements IDataService {
 	private onPage: number = 20;
@@ -30,6 +32,7 @@ export class DataService implements IDataService {
 		private companyRepository: ICompanyRepository,
 		private usersRepository: IUsersRepository,
 		private ordersRepository: IOrdersRepository,
+		private reviewsRepository: IReviewsRepository,
 		private emailService: IEmailService,
 	) {
 	}
@@ -226,6 +229,20 @@ export class DataService implements IDataService {
 
 	async initiativesPromo(): Promise<TInitiativeList | TClientDataError> {
 		return await this.initiativeRepository.listPromo();
+	}
+
+	async reviews(): Promise<TReviewList | TClientDataError> {
+		try {
+			const reviews = await this.reviewsRepository.list();
+			if (reviews) return reviews;
+		} catch (e: any) {
+			return {
+				message: e?.message || 'Ошибка получения списка отзывов'
+			}
+		}
+		return {
+			message: 'Ошибка получения списка отзывов'
+		}
 	}
 
 }

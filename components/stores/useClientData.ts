@@ -7,6 +7,7 @@ import type { TRegion } from '~/src/data/types/regions';
 import type { TInitiativeList } from '~/src/data/types/initiatives';
 import type { TOrder, TOrderResponse, TOrders } from '~/src/data/types/order';
 import type { TCompany, TCompanyWithInitiatives } from '~/src/data/types/company';
+import type { TReviewList } from '~/src/data/types/reviews';
 
 export const useClientData = defineStore('client', {
 	state: () => {
@@ -134,14 +135,15 @@ export const useClientData = defineStore('client', {
 					method: 'post',
 					body: {
 						direction: this.direction,
+						text,
 					}
 				});
 			if (error.value) return undefined;
-			return undefined;
+			return data.value as TInitiative[];
 		},
 
 		// Получение списка инициатив
-		async initiativePromo(): Promise<TInitiativeList> {
+		async initiativePromo(): Promise<TInitiativeList | string> {
 			return new Promise(async (resolve, reject) => {
 				await $fetch(`${this.path}/promo`, {
 					method: 'get',
@@ -153,6 +155,20 @@ export const useClientData = defineStore('client', {
 				});
 			});
 		},
+
+		// Получение списка отзывов
+		async reviewsList(): Promise<TReviewList | string> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/reviews`, {
+					method: 'get',
+				}).then((data) => {
+					if ((data as TClientDataError).message) reject((data as TClientDataError).message);
+					resolve(data as TReviewList);
+				}).catch(() => {
+					reject();
+				});
+			});
+		}
 
 	}
 });
