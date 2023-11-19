@@ -3,7 +3,6 @@
 import type { TInitiative } from '~/src/data/types/initiatives';
 import IconNotActive from 'assets/svg/icon-square.svg';
 import IconActive from 'assets/svg/icon-checkbox.svg';
-import IconTrash from 'assets/svg/icon-trash.svg';
 
 const props = defineProps({
 	item: Object,
@@ -27,27 +26,15 @@ function onDelete(): void {
 <template>
 	<div class="flex items-center gap-2 px-3 py-3 bg-dark-light/10 odd:bg-white hover:bg-dark-light/20 cursor-pointer round" @click.prevent.stop="onClick">
 		<div class="w-[20px]">
-			<IconActive v-if="props.item?.status" class="w-5 h-5" filled />
-			<IconNotActive v-else class="w-хъ h-5" filled />
+			<IconActive v-if="props.item?.promoStr" class="w-5 h-5" filled />
+			<IconNotActive v-else class="w-5 h-5" filled />
 		</div>
-		<div class="w-6/12 grow">
+		<div class="w-8/12 grow">
 			{{ props.item.name }}
-			<div v-if="!props.item?.isApproved && !props.item?.isDeclined"
-			     class="inline-flex items-center text-center px-2 py-1 rounded bg-yellow-500 text-white text-xs ml-2"
-			>
-				Ожидает&nbsp;модерации
-			</div>
-			<div v-if="!props.item?.isApproved && props.item?.isDeclined"
-			     class="inline-flex items-center text-center px-2 py-1 rounded bg-red-600 text-white text-xs ml-2"
-			>
-				Отклонена
-			</div>
+			<p v-if="props.item?.promoStr" class="text-main text-sm">в промо-блоке до {{ props.item.promoStr }}</p>
 		</div>
 		<div class="w-2/12">{{ directions[props.item.direction] }}</div>
-		<div class="w-2/12">{{ props.item.region.name }}</div>
-		<div class="flex w-[20px] justify-end">
-			<a href="" class="block w-5 h-5 text-dark-main hover:text-main" @click.prevent.stop="onDelete"><IconTrash filled /></a>
-		</div>
+		<div class="w-2/12 text-right">{{ props.item.region.name }}</div>
 	</div>
 </template>
 

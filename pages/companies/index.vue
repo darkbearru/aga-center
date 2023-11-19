@@ -3,7 +3,6 @@
 import { useClientData } from '~/components/stores/useClientData';
 import type { TCompany } from '~/src/data/types/company';
 import ContentAndHeader from '~/components/layout/ContentAndHeader.vue';
-import TypesList from '~/components/content/TypesList.vue';
 import CompanyListItem from '~/components/content/companies/CompanyListItem.vue';
 useHead({ title: 'АГА. Список компаний' });
 

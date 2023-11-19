@@ -64,6 +64,7 @@ export class AdminService implements IAdminService {
 		let initiatives: TInitiative[] | undefined = undefined;
 		let isAdmin: boolean = (this.user?.rights && ((this.user?.rights&2) > 0)) || false;
 		let isModerator: boolean = (this.user?.rights && ((this.user?.rights&1) > 0)) || false;
+		let promo: TInitiative[] | undefined = undefined;
 		if (isAdmin) {
 			menu['/client/users'] = 'Пользователи';
 			menu['/client/regions'] = 'Регионы';
@@ -75,10 +76,12 @@ export class AdminService implements IAdminService {
 			menu['/client/ownership'] = 'Типы собственности';
 			menu['/client/types'] = 'Типы инициатив';
 			menu['/client/moderation'] = 'Модерация';
+			menu['/client/promo'] = 'Промо-блок';
 			news = await this.getNewsList();
 			articles = await this.getArticlesList();
 			companies  = await this.companyRepository.moderationList();
 			initiatives = await this.initiativeRepository.moderationList();
+			promo = await this.getAllInitiatives();
 		}
 		if (!isAdmin && !isModerator) {
 			menu['/client'] = 'Компания / Инициативы';
@@ -98,7 +101,8 @@ export class AdminService implements IAdminService {
 			ownership,
 			types,
 			companies,
-			initiatives
+			initiatives,
+			promo
 		}
 	}
 
@@ -633,6 +637,26 @@ export class AdminService implements IAdminService {
 		const createdDate = moment(order.createdAt, 'YYYY-MM-DD HH:II:SS');
 		order.created = createdDate.format('LLLL');
 		return order;
+	}
+
+	async setPromo(id: number, isActivate: boolean = false): Promise<string> {
+		const result = await this.initiativeRepository.setPromo(id, isActivate);
+		if (!result) return '';
+		moment.locale('ru');
+		const momentDate = moment(result, 'YYYY-MM-DD HH:II:SS');
+		return  momentDate.format('LLLL');
+	}
+
+	async getAllInitiatives(): Promise<TInitiative[] | undefined> {
+		moment.locale('ru');
+		const data = await this.initiativeRepository.listAll();
+		data?.map((item: TInitiative) => {
+			if (item.promo) {
+				const momentDate = moment(item.promo, 'YYYY-MM-DD HH:II:SS');
+				item.promoStr = momentDate.format('LLLL');
+			}
+		});
+		return data;
 	}
 
 }

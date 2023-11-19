@@ -1,6 +1,5 @@
 import type { TInitiative, TInitiativeList, TInitiativeWithID, TShortInitiative } from '~/src/data/types/initiatives';
 import type { TUser } from '~/src/users/types/users';
-import type { TPhotos } from '~/src/data/types/photos';
 import type { TClientDataError } from '~/src/data/types/common.data';
 
 export interface IInitiativeRepository {
@@ -16,9 +15,11 @@ export interface IInitiativeRepository {
 	listByText(text: string, direction: number): Promise<TInitiativeList | TClientDataError>;
 	listByCompany(company: number): Promise<TInitiativeList | undefined>;
 	listPromo(): Promise<TInitiativeList | TClientDataError>;
+	listAll(): Promise<TInitiative[] | undefined>;
 	moderationList(): Promise<TInitiative[] | undefined>;
 	moderationApprove(id: number): Promise<boolean>;
 	moderationDecline(id: number, reason: string): Promise<boolean>;
 	get(id: number): Promise<TShortInitiative | undefined>;
 	calcRating(id: number): Promise<void>;
+	setPromo(id: number, isActivate?: boolean): Promise<Date | null>;
 }

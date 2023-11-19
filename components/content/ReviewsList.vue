@@ -9,7 +9,6 @@ const reviews = ref<TReviewList>();
 clientData.reviewsList()
 	.then(data => {
 		if (typeof data !== 'string') update(data);
-		console.log('Отзывы', data);
 	})
 	.catch();
 

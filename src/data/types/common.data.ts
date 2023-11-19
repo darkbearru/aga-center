@@ -18,8 +18,9 @@ export type TCommonData = {
 	regions?: TRegion[],
 	ownership?: TOwnership[],
 	types?: TInitiativeTypes[],
-	companies?: TCompany[]
-	initiatives?: TInitiative[]
+	companies?: TCompany[],
+	initiatives?: TInitiative[],
+	promo?: TInitiative[],
 }
 
 export type TClientData = {
