@@ -9,6 +9,7 @@ async function main() {
 			fio: 'Абраменко Алексей',
 			isAdmin: true,
 			isModerator: true,
+			isClient: false,
 			confirmCode: '',
 		},
 	});
