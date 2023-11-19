@@ -41,4 +41,5 @@ export interface IAdminService {
 	companyAndInitiativesList(): Promise<TCommonData>
 	ordersList(): Promise<TInitiativeWithOrders | null>
 	orderByCode(code: string): Promise<TOrder | null>
+	setPromo(id: number): Promise<string>;
 }

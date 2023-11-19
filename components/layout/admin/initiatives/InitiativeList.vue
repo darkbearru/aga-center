@@ -9,8 +9,8 @@ const initiatives = ref<TInitiative[]>(userData.initiatives as TInitiative[]);
 defineExpose({ refresh, update });
 const emit = defineEmits(['onClick', 'onDelete']);
 
-function refresh() {
-	initiatives.value = userData.initiatives  as TInitiative[];
+function refresh(items?: TInitiative[]): void {
+	initiatives.value = (items || userData.initiatives)  as TInitiative[];
 }
 
 function update(item: TInitiative, index: number) {

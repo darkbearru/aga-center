@@ -26,6 +26,8 @@ export type TInitiative = {
 	reviews?: TReviews,
 	ordersCount?: number,
 	ordersActive?: number,
+	promo?: Date,
+	promoStr?: string,
 }
 
 export type TInitiativeResult = {
@@ -37,6 +39,7 @@ export type TInitiativeResult = {
 	isApproved: boolean,
 	isDeclined?: boolean,
 	declineReason?: string,
+	promo?: Date,
 	Company: TCompany,
 	Regions: TRegion
 	InitiativeTypes: TInitiativeTypes,

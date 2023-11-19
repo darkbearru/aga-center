@@ -1,4 +1,4 @@
-import { H3Event, NodeEventContext } from 'h3';
+import { H3Event } from 'h3';
 import { AdminService } from '~/src/services/admin/admin.service';
 import { TUser } from '~/src/users/types/users';
 import { checkRoute } from '~/server/utils/checkRoute';
@@ -8,12 +8,11 @@ import { TOwnership } from '~/src/data/types/ownership';
 import { TInitiativeTypes } from '~/src/data/types/initiatives.types';
 import { TNews } from '~/src/data/types/news';
 import { TCompany } from '~/src/data/types/company';
-import { TInitiative, TInitiativeWithID } from '~/src/data/types/initiatives';
+import { TInitiativeWithID } from '~/src/data/types/initiatives';
 import formidable from 'formidable';
 import { IncomingMessage } from 'http';
-import * as fs from 'fs';
 import { TPhotos } from '~/src/data/types/photos';
-import { TArticle, TArticleFormData } from '~/src/data/types/articles';
+import { TArticleFormData } from '~/src/data/types/articles';
 
 export default defineEventHandler(
 	async (event: H3Event) => {
@@ -87,6 +86,11 @@ export default defineEventHandler(
 				const data = await readBody(event);
 				return await adminService.orderAddMessage(data.code, data.status, data.message);
 			}
+			case 'promo' : {
+				const data: {id: number, isActivate?: boolean} = await readBody(event);
+				if (!data.id) return '';
+				return await adminService.setPromo(data.id, data.isActivate || false);
+			}
 		}
 		return '';
 	}
@@ -106,10 +110,8 @@ function parseMultipartNodeRequest<T>(req: IncomingMessage): Promise<T> {
 				const originalFilename = file.originalFilename ?? '';
 				// Enforce file ends with allowed extension
 				const allowedExtensions = /\.(jpe?g|png|gif|webp|svg)$/i;
-				if (!allowedExtensions.test(originalFilename)) {
-					return false;
-				}
-				return true;
+				return allowedExtensions.test(originalFilename);
+
 			}
 		})
 		form.parse(req, (error, fields, files) => {
@@ -131,7 +133,7 @@ function parseMultipartNodeRequest<T>(req: IncomingMessage): Promise<T> {
 				if ((key === 'photosList')) {
 					let photosList: TPhotos = [];
 					try {
-						photosList = typeof value === 'string' ? JSON.parse(value) : [];
+						photosList = JSON.parse(value) || [];
 					} catch (e) {
 					}
 					photos = [...photos, ...photosList];

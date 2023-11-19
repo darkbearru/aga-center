@@ -31,13 +31,14 @@ export const useData = defineStore('data', {
 		const companies: globalThis.Ref<TCompany[] | undefined> = ref(undefined);
 		const initiatives: globalThis.Ref<TInitiative[] | undefined> = ref(undefined);
 		const articles: globalThis.Ref<TArticles | undefined> = ref(undefined);
+		const promo: globalThis.Ref<TInitiative[]> = ref([]);
 		const accessToken = useCookie('ac_token');
 		const timer = ref();
 		return {
 			path, user, menu, news, users,
 			regions, ownership, types,
 			companies, articles, initiatives,
-			accessToken, timer
+			accessToken, timer, promo
 		}
 	},
 	actions: {
@@ -61,6 +62,7 @@ export const useData = defineStore('data', {
 			this.articles = list.articles;
 			this.companies = list.companies;
 			this.initiatives = list.initiatives;
+			this.promo = list.promo || [];
 			return true;
 		},
 		/**
@@ -761,6 +763,20 @@ export const useData = defineStore('data', {
 					resolve(data as TOrder);
 				}).catch(() => {
 					reject();
+				});
+			});
+		},
+
+		async setPromo(id: number, isActivate: boolean = false): Promise<string> {
+			const body = { id, isActivate }
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/promo`, {
+					method: 'post',
+					body
+				}).then((data) => {
+					resolve(data as string);
+				}).catch(() => {
+					reject('');
 				});
 			});
 		},

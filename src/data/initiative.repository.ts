@@ -7,13 +7,12 @@ import type {
 	TShortInitiative
 } from '~/src/data/types/initiatives';
 import type { TUser } from '~/src/users/types/users';
-import type { TPhotoItem, TPhotos } from '~/src/data/types/photos';
-import { OrderStatus } from '~/src/data/types/order';
+import type { TPhotos } from '~/src/data/types/photos';
 import type { TClientDataError } from '~/src/data/types/common.data';
+import { OrderStatus } from '~/src/data/types/order';
 import { prismaClient } from '~/src/utils/prismaClient';
 import { Prisma } from '.prisma/client';
-
-// const prisma: PrismaClient = new PrismaClient({ log: ['query'] });
+import ms from 'ms';
 
 const selectFields = {
 	id: true,
@@ -24,6 +23,7 @@ const selectFields = {
 	isApproved: true,
 	isDeclined: true,
 	declineReason: true,
+	promo: true,
 	InitiativeTypes: {
 		select: {
 			id: true,
@@ -212,6 +212,21 @@ export class InitiativeRepository implements IInitiativeRepository {
 		}
 	}
 
+	async listAll(): Promise<TInitiative[] | undefined> {
+		try {
+			const result = await prismaClient.initiative.findMany({
+				where: {
+					isApproved: true,
+					isDeleted: false,
+				},
+				select: selectFields,
+			});
+			return result.map(item => this.formatResult(item as TInitiativeResult));
+		} catch (e) {
+			return []
+		}
+	}
+
 	formatResult(item: TInitiativeResult): TInitiative {
 		return {
 			id: item?.id || 0,
@@ -222,6 +237,7 @@ export class InitiativeRepository implements IInitiativeRepository {
 			declineReason: item.declineReason || '',
 			name: item.name || '',
 			text: item.text || '',
+			promo: item.promo || undefined,
 			type: {
 				id: item.InitiativeTypes?.id || 0,
 				name: item.InitiativeTypes?.name || '',
@@ -246,7 +262,7 @@ export class InitiativeRepository implements IInitiativeRepository {
 	async save(item: TInitiativeWithID, user: TUser): Promise<boolean> {
 		try {
 			const photos = this.photosConnectOrCreate(item?.photos);
-			const result = await prismaClient.initiative.update({
+			await prismaClient.initiative.update({
 				data: {
 					status: item.status === 'true',
 					direction: Number(item.direction),
@@ -389,15 +405,17 @@ export class InitiativeRepository implements IInitiativeRepository {
 
 	async listPromo(): Promise<TInitiativeList | TClientDataError> {
 		try {
-			// Для начала отключаем все промо где дата меньше текущей
+			const current: Date = new Date();
+			// Для начала отключаем все промо, где дата меньше текущей
 			await prismaClient.initiative.updateMany({
 				data: { promo: null },
-				where: { promo: { lte: new Date() }}
+				where: { promo: { lte: current }}
 			});
+			//  А потом, получаем список где дата промо больше текущей
 			return await prismaClient.initiative.findMany({
 				select: clientInitiativeFields,
 				where: {
-					promo: { gt: new Date()},
+					promo: { gt: current },
 					isApproved: true,
 					isDeleted: false,
 				},
@@ -409,7 +427,6 @@ export class InitiativeRepository implements IInitiativeRepository {
 			}
 		}
 	}
-
 
 	async moderationList(): Promise<TInitiative[] | undefined> {
 		const result = await prismaClient.initiative.findMany({
@@ -474,12 +491,8 @@ export class InitiativeRepository implements IInitiativeRepository {
 		try {
 			const result = await prismaClient.reviews.groupBy({
 				by: [ 'usersId' ],
-				_avg: {
-					rate: true
-				},
-				where: {
-					initiativeId: id
-				},
+				_avg: { rate: true },
+				where: { initiativeId: id },
 			});
 			const sumRating = result.reduce((acc, current) => acc + (current._avg.rate || 0), 0)
 			const averageRating = sumRating / result.length;
@@ -491,5 +504,23 @@ export class InitiativeRepository implements IInitiativeRepository {
 		}
 	}
 
+	async setPromo(id: number, isActivate: boolean = false): Promise<Date | null> {
+		let promo: Date | null;
+		try {
+			if (isActivate) {
+				promo = new Date();
+				promo.setTime(Date.now() + ms('14d'));
+			} else {
+				promo = null
+			}
+			await prismaClient.initiative.update({
+				data: { promo },
+				where: { id },
+			})
+		} catch (e) {
+			promo = null
+		}
+		return promo;
+	}
 
 }
