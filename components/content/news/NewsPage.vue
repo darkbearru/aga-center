@@ -18,6 +18,7 @@ const newsListComponent = ref();
 if (route.params.slug) {
 	clientData.newsText(route.params.slug as string).then((data) => {
 		newsData.value = data as TNews;
+		useHead({ title: (data as TNews).title });
 	})
 } else {
 	clientData.newsList(page).then( data => {

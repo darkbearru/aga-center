@@ -13,6 +13,9 @@ export default defineEventHandler(
 			case 'news': {
 				return dataService.news(data.params?.page, data.params?.slug);
 			}
+			case 'article': {
+				return dataService.article(data.params?.slug);
+			}
 			case 'initiative': {
 				return dataService.initiatives(
 					data.params?.type,

@@ -1,15 +1,16 @@
 <script setup lang="ts">
+
+import type { TArticle, TArticleFormData } from '~/src/data/types/articles';
+import type { TPhotos } from '~/src/data/types/photos';
+import { useData } from '~/components/stores/useData';
+import { setErrors } from '@formkit/core';
+import { slugify } from '~/src/utils/slugify';
 import ArticlesList from '~/components/layout/admin/articles/ArticlesList.vue';
 import Button from '~/components/ui/Button.vue';
 import IconUserPlus from 'assets/svg/icon-user-plus.svg';
 import Popup from '~/components/ui/Popup.vue';
 import PopupContainer from '~/components/ui/PopupContainer.vue';
-import { useData } from '~/components/stores/useData';
-import { setErrors } from '@formkit/core';
-import { slugify } from '~/src/utils/slugify';
-import type { TArticle, TArticleFormData } from '~/src/data/types/articles';
 import PhotosList from '~/components/layout/admin/photos/PhotosList.vue';
-import { TPhotos } from '~/src/data/types/photos';
 
 const titlePopup = ref('Добавить статью')
 const popup = ref();
@@ -23,6 +24,7 @@ const articlesList = ref();
 const inputPhotos = ref<TPhotos>([]);
 const photosList = ref();
 const inputPhoto = ref('');
+const currentArticle = ref<TArticle>();
 
 
 type TFilesList = {
@@ -33,6 +35,7 @@ type TFilesList = {
 
 const popupOpen = (item?: TArticle): void => {
 	titlePopup.value = 'Добавить статью';
+	currentArticle.value = item;
 	if (item?.id) {
 		titlePopup.value = 'Изменение статью';
 		inputTitle.value = item?.title || '';
@@ -40,6 +43,8 @@ const popupOpen = (item?: TArticle): void => {
 		inputText.value = item?.text || '';
 		inputActive.value = item?.active || false;
 		inputId.value = item?.id || undefined;
+		photosList.value?.update(item?.photos || []);
+		inputPhotos.value = item?.photos || [];
 	}
 	popup.value.show();
 	clearErrors('articles_form');
@@ -88,10 +93,11 @@ const popupSubmit = async (data: Record<string, string | TFilesList>): Promise<v
 			}
 		}
 		body.append('id', inputId.value?.toString() || '0');
+		body.append('photosList', inputPhotos.value.length ? JSON.stringify(inputPhotos.value) : '');
 	} else {
 		body = {
 			id: inputId.value?.toString() || '0',
-			title: data.name.toString(),
+			title: data.title.toString(),
 			text: data.text.toString(),
 			slug: data.slug.toString(),
 			active: data.active.toString(),
@@ -143,8 +149,8 @@ const createSlug = () => {
 				>
 					<FormKit
 					type="text"
-					name="name"
-					id="name"
+					name="title"
+					id="title"
 					label="Заголовок"
 					placeholder="Заголовок статьи"
 					v-model="inputTitle"
@@ -154,7 +160,7 @@ const createSlug = () => {
 	              news_exists: 'Статья с данным заголовком уже существует',
 	              length: 'Длина заголовка должна быть не менее 8 символов',
 	              required: 'Необходимо указать заголовок статьи',
-	              name: 'Заголовок должен состоять из букв и пробелов'
+	              title: 'Заголовок должен состоять из букв и пробелов'
 	            }"
 					/>
 					<FormKit
@@ -184,7 +190,7 @@ const createSlug = () => {
 	              required: 'Необходимо указать текст статьи'
             }"
 					/>
-					<FormKit type="checkbox" name="isActive" id="isActive" label="Отображение статьи на сайте"
+					<FormKit type="checkbox" name="active" id="active" label="Отображение статьи на сайте"
 					         v-model="inputActive"/>
 					<FormKit
 					type="file"

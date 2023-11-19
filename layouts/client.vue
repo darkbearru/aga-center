@@ -22,7 +22,7 @@ watch(menuToggle, (value) => {
 <template>
   <div class="sm:flex bg-white items-stretch">
 	  <aside class="relative h-[4.5rem] sm:h-auto z-[100] sm:z-auto bg-main transition-{height} ease-in-out duration-300">
-		  <a href="/"><img class="absolute top-1.5 left-2 w-24 h-16 transition-{left} ease-in-out duration-300 sm:hidden" src="/images/logo-white.svg" alt="АГА. Тур-центр. Логотип"/></a>
+		  <a href="/" class="cursor-pointer"><img class="absolute top-1.5 left-2 w-24 h-16 transition-{left} ease-in-out duration-300 sm:hidden" src="/images/logo-white.svg" alt="АГА. Тур-центр. Логотип"/></a>
 		  <input type="checkbox" class="menu-check-box sm:hidden" v-model="menuToggle">
 		  <a href="#" class="menu-burger sm:hidden">
 			  <span class="line"></span>
@@ -30,7 +30,7 @@ watch(menuToggle, (value) => {
 			  <span class="line"></span>
 		  </a>
 		  <div class="absolute sm:sticky sm:block sm:top-0 w-full sm:w-[200px] md:w-[320px] -left-[640px] sm:left-auto transition-{left} ease-in-out duration-300 p-8 bg-main sm:h-screen">
-			  <div class=""><img src="/images/logo-white.svg" alt="АГА. Тур-центр. Логотип"/></div>
+			  <div class=""><a href="/" class="cursor-pointer"><img src="/images/logo-white.svg" alt="АГА. Тур-центр. Логотип"/></a></div>
 			  <div v-if="data.menu">
 				  <Menu :menu="data.menu" />
 			  </div>
@@ -55,6 +55,9 @@ watch(menuToggle, (value) => {
 	}
 	.menu-check-box {
 		@apply absolute z-[110] opacity-0 right-4 top-4 w-12 h-10 border-none ring-0 cursor-pointer;
+		&:hover + .menu-burger {
+			@apply opacity-100;
+		}
 		&:checked + .menu-burger {
 			.line:nth-child(1) {
 				@apply translate-y-3 rotate-45
@@ -71,7 +74,7 @@ watch(menuToggle, (value) => {
 		}
 	}
 	.menu-burger {
-		@apply block absolute z-[105] right-4 top-4 w-12 h-10;
+		@apply block absolute z-[105] right-4 top-4 w-12 h-10 opacity-50;
 		.line {
 			@apply block bg-white w-full h-1 my-2 mx-auto transition-all duration-300;
 		}

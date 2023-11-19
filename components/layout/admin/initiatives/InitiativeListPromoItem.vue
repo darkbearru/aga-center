@@ -24,8 +24,8 @@ function onDelete(): void {
 </script>
 
 <template>
-	<div class="flex items-center gap-2 px-3 py-3 bg-dark-light/10 odd:bg-white hover:bg-dark-light/20 cursor-pointer round" @click.prevent.stop="onClick">
-		<div class="w-[20px]">
+	<div class="flex items-start gap-2 px-3 py-3 bg-dark-light/10 odd:bg-white hover:bg-dark-light/20 cursor-pointer round" @click.prevent.stop="onClick">
+		<div class="w-[20px] pt-0.5">
 			<IconActive v-if="props.item?.promoStr" class="w-5 h-5" filled />
 			<IconNotActive v-else class="w-5 h-5" filled />
 		</div>

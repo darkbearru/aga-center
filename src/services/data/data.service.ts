@@ -20,12 +20,15 @@ import { sha256 } from 'ohash';
 import moment from 'moment/moment.js';
 import type { TReviewList } from '~/src/data/types/reviews';
 import type { IReviewsRepository } from '~/src/data/reviews.repository.interface';
+import type { TArticle } from '~/src/data/types/articles';
+import type { IArticlesRepository } from '~/src/data/articles.repository.interface';
 
 export class DataService implements IDataService {
 	private onPage: number = 20;
 	private currentRegion: number = 1;
 	constructor(
 		private newsRepository: INewsRepository,
+		private articlesRepository: IArticlesRepository,
 		private regionsRepository: IRegionsRepository,
 		private initiativeTypesRepository: IInitiativeTypesRepository,
 		private initiativeRepository: IInitiativeRepository,
@@ -83,13 +86,17 @@ export class DataService implements IDataService {
 		return undefined;
 	}
 
+	async article(slug?: string): Promise<TArticle | undefined> {
+		if (!slug) return undefined;
+		return await this.articlesRepository.text(slug);
+	}
+
 
 	async types(direction: number, regionId?: number, fnd?: string): Promise<TInitiativeTypes[] | undefined> {
 		return await this.initiativeTypesRepository.listGroup(direction, regionId || this.currentRegion, fnd);
 	}
 
 	async makeOrder(order: TOrder): Promise<TOrderResponse> {
-		console.log('makeOrder', order);
 		const result: TOrderResponse = {
 			errors: undefined,
 			order: undefined,

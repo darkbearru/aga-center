@@ -14,13 +14,14 @@ export class ArticlesRepository implements IArticlesRepository {
 					title: article.title,
 					slug: article.slug,
 					text: article.text,
-					active: article.active === 'true',
+					active: article.active === true,
 					Photos: {
 						connectOrCreate: items,
 					}
 				},
 			});
 		} catch (e) {
+			console.log(e);
 			return false;
 		}
 	}
@@ -61,21 +62,36 @@ export class ArticlesRepository implements IArticlesRepository {
 
 	async list(skip: number, take: number, client: boolean = false): Promise<TArticles | undefined> {
 		try {
-			return await prismaClient.articles.findMany({
+			const result = await prismaClient.articles.findMany({
 				select: {
 					id: true,
 					slug: true,
 					title: true,
 					active: true,
 					text: !client,
+					Photos: {
+						select: {
+							id: true,
+							path: true,
+						}
+					}
 				},
-				where: { active: true },
 				skip,
 				take,
 				orderBy: {
 					createdAt: 'desc'
 				}
 			});
+			return result.map(item => {
+				return {
+					id: item.id,
+					slug : item.slug,
+					title: item.title,
+					active: item.active,
+					text: item.text || '',
+					photos: item.Photos || []
+				}
+			})
 		} catch (e) {
 			return undefined
 		}
@@ -90,13 +106,14 @@ export class ArticlesRepository implements IArticlesRepository {
 					title: article.title,
 					slug: article.slug,
 					text: article.text,
-					active: article.active === 'true',
+					active: article.active === true,
 					Photos: {
 						connectOrCreate: items,
 					}
 				},
 			});
 		} catch (e) {
+			console.log(e);
 			return false;
 		}
 		return true;
@@ -104,7 +121,7 @@ export class ArticlesRepository implements IArticlesRepository {
 
 	async text(slug: string): Promise<TArticle | undefined> {
 		try {
-			return await prismaClient.articles.findFirst({
+			const item = await prismaClient.articles.findFirst({
 				where: { slug, active: true },
 				select: {
 					slug: true,
@@ -118,21 +135,28 @@ export class ArticlesRepository implements IArticlesRepository {
 					}
 				}
 			}) || undefined;
+			if (!item) return item;
+			return {
+				slug: item.slug,
+				title: item.title,
+				text: item.text,
+				photos: item.Photos || []
+			}
 		} catch (e) {
 			return undefined
 		}
 	}
 
-	private makePhotosLink(photos?: TPhotos, id?: number): TPhotosLink {
+	private makePhotosLink(photos?: TPhotos): TPhotosLink {
 		const items: TPhotosLink = [];
 		if (photos) {
 			photos.forEach((item: TPhotoItem) => {
 				items.push({
+					where: { id: item.id || 0},
 					create: {
 						path: item.path,
 						title: item.title || '',
 					},
-					where: { id },
 				});
 			});
 		}

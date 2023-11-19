@@ -29,7 +29,7 @@ const onDelete = () => {
 			<IconNotActive class="w-5 h-5 mr-1" filled v-else />
 			{{ (item as TArticle).title }}
 		</div>
-		<div class="w-4/12">/news/{{ (item as TArticle).slug }}</div>
+		<div class="w-4/12">/articles/{{ (item as TArticle).slug }}</div>
 		<div class="w-2/12 flex items-center justify-end">
 			<a href="" class="block w-5 h-5 mx-1 text-dark-main hover:text-main" @click.prevent="onClick"><IconEdit filled /></a>
 			<a href="" class="block w-5 h-5 mx-1 text-dark-main hover:text-main" @click.prevent="onDelete"><IconTrash filled /></a>
