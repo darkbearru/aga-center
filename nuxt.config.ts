@@ -66,6 +66,7 @@ export default defineNuxtConfig({
   },
   vite: {
     clearScreen: true,
+    envDir: '.'
   },
   formkit: {
     autoImport: true
@@ -74,4 +75,7 @@ export default defineNuxtConfig({
     "server": true,
     "client": true
   },
+  runtimeConfig: {
+    uploadPath : process.env.NODE_ENV === 'development' ? './public/upload' : './.output/public/upload',
+  }
 })

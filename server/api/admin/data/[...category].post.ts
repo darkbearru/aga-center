@@ -97,11 +97,12 @@ export default defineEventHandler(
 );
 
 function parseMultipartNodeRequest<T>(req: IncomingMessage): Promise<T> {
+	const config = useRuntimeConfig();
 	return new Promise((resolve, reject): void => {
 		/** @see https://github.com/node-formidable/formidable/ */
 		const form = formidable({
 			multiples: true,
-			uploadDir: './public/upload',
+			uploadDir: config.uploadPath, //'./.output/public/upload',
 			keepExtensions: true,
 			minFileSize: 10 * 1024,
 			maxFileSize: 3145728, //3 * 1024 * 1024,
