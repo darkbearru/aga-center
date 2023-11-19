@@ -417,6 +417,8 @@ export const useData = defineStore('data', {
 					},
 				});
 			if (error.value) return false;
+			console.log('updateArticle');
+			console.log(data.value);
 			const response: TArticleResponse = unref(data.value) as TArticleResponse;
 			if (!response.errors) {
 				this.updateArticleData(response.article as TArticle);

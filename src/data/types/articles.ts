@@ -10,8 +10,8 @@ export type TArticle = {
 }
 
 export type TArticleFormData = {
-	id?: string;
-	active?: string,
+	id?: number | string;
+	active?: string | boolean,
 	title: string,
 	text: string | null,
 	slug: string,

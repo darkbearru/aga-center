@@ -158,6 +158,9 @@ export class AdminService implements IAdminService {
 	}
 
 	async articlesSave(article: TArticleFormData): Promise<TArticleResponse> {
+		article.id = Number(article.id);
+		article.active = Boolean(article.active);
+
 		const check: boolean = await this.articlesRepository.check(article);
 		const response: TArticleResponse = {
 			errors: undefined,
@@ -194,7 +197,7 @@ export class AdminService implements IAdminService {
 			if (deletedPhotos) await this.deletePhotos(deletedPhotos);
 
 			if (await this.articlesRepository.save(article)) {
-				response.article = article
+				response.article = {...article}
 			} else {
 				response.errors = {other: 'Ошибка сохранения данных'}
 			}

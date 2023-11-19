@@ -1,12 +1,12 @@
 <script setup lang="ts">
 
-import NewsPage from '~/components/content/news/NewsPage.vue';
+import Article from '~/components/content/Article.vue';
 
 </script>
 
 <template>
 	<div>
-		<NewsPage />
+		<Article />
 	</div>
 </template>
 

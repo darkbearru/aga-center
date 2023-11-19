@@ -8,6 +8,7 @@ import type { TInitiativeList } from '~/src/data/types/initiatives';
 import type { TOrder, TOrderResponse, TOrders } from '~/src/data/types/order';
 import type { TCompany, TCompanyWithInitiatives } from '~/src/data/types/company';
 import type { TReviewList } from '~/src/data/types/reviews';
+import type { TArticle } from '~/src/data/types/articles';
 
 export const useClientData = defineStore('client', {
 	state: () => {
@@ -166,6 +167,22 @@ export const useClientData = defineStore('client', {
 					resolve(data as TReviewList);
 				}).catch(() => {
 					reject();
+				});
+			});
+		},
+
+		// получение статьи по её идентификатору
+		async articleBySlug(slug: string): Promise<TArticle> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/article/slug/${slug}`, {
+					method: 'get',
+				}).then((data) => {
+					if (typeof data !== 'undefined') {
+						resolve(data as TArticle);
+					}
+					if (!data) reject('not found');
+				}).catch((e) => {
+					reject(e);
 				});
 			});
 		}
