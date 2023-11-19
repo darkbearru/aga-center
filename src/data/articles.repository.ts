@@ -98,7 +98,7 @@ export class ArticlesRepository implements IArticlesRepository {
 	}
 
 	async save(article: TArticle | TArticleFormData): Promise<boolean> {
-		const items: TPhotosLink = this.makePhotosLink(article.photos, Number(article.id));
+		const items: TPhotosLink = this.makePhotosLink(article.photos);
 		try {
 			await prismaClient.articles.update({
 				where: { id: Number(article.id) },
