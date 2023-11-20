@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Order` MODIFY `code` VARCHAR(120) NOT NULL;
