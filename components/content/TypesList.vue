@@ -60,7 +60,7 @@ const openGroup = (value?: number) => {
 						По запросу «{{ clientData.searchText }}», ничего не найдено. Попробуйте уточнить запрос.
 					</div>
 					<div v-else>
-						Предложений по направлению «{{ clientData.direction ? 'Бизнес' : 'Отдых' }}»
+						Активных предложений по направлению «{{ clientData.direction ? 'Бизнес' : 'Отдых' }}» нет.
 					</div>
 				</div>
 			</div>

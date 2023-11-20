@@ -75,16 +75,15 @@ const login = async (): Promise<void> => {
 	await gotoClientArea();
 }
 
-const register = async (data: any): Promise<void> => {
+const register = async (): Promise<void> => {
 	if (!loginForm.mode) {
 		loginForm.loading = true;
 		const result = await authUser.register(loginForm.regEmail, loginForm.regFIO, loginForm.regCode);
 		if (result?.errors) {
-			console.log(result.errors);
 			setErrors('registration_form', result.errors?.other ? [result.errors?.other]  : [], result.errors);
 		}
 		loginForm.loading = false;
-		if (!result?.errors && result?.user) loginForm.mode = true;
+		if (!result?.errors) loginForm.mode = true;
 		return;
 	}
 
@@ -190,6 +189,7 @@ const gotoClientArea = async () => {
 						v-model="loginForm.regEmail"
 						validation="required|email"
 						validation-visibility="submit"
+						:disabled="loginForm.mode"
 						:validation-messages="{
 	              user_exists: 'Указанный пользователь уже существует',
 	              email: 'Введённый текст не соответствует формату Email',
@@ -205,6 +205,7 @@ const gotoClientArea = async () => {
 						v-model="loginForm.regFIO"
 						validation="required|length:5|contains_alpha_spaces"
 						validation-visibility="submit"
+						:disabled="loginForm.mode"
 						:validation-messages="{
 	              length: 'Длина ФИО должна быть не менее 5 символов',
 	              required: 'Необходимо указать ФИО',
@@ -233,8 +234,22 @@ const gotoClientArea = async () => {
 						type="checkbox"
 						name="confirm"
 						id="confirm"
-						:checked="true"
+						:checked=true
 						label="Согласен с правилами сайта"
+						:disabled="loginForm.mode"
+						:sections-schema="{
+				      label: {
+				        children: [
+				          'Согласен с ',
+				          {
+				            $el: 'a',
+				            attrs: { href: '/rules', class: 'text-main hover:underline decoration-main/80 underline-offset-4 decoration-2' },
+				            children: 'правилами сайта'
+				          },
+				          '.'
+				        ]
+				      },
+				    }"
 						validation="required"
 						:validation-messages="{
 	              required: 'Без согласия с правилами сайта регистрация невозможна',
@@ -242,9 +257,10 @@ const gotoClientArea = async () => {
 					/>
 					<ButtonRow class="h-12">
 						<Button
-						class="flex items-center justify-center grow bg-transparent border border-main text-main hover:text-white hover:bg-main hover:border-main group"
-						title="Войти"
-						@click="switchRegistration"
+						v-if="!loginForm.mode"
+							class="flex items-center justify-center grow bg-transparent border border-main text-main hover:text-white hover:bg-main hover:border-main group"
+							title="Войти"
+							@click="switchRegistration"
 						>
 							Авторизация
 						</Button>

@@ -46,13 +46,14 @@ const popupClose = (): void => {
 }
 
 const popupSubmit = async (): Promise<void> => {
+	const date = inputDate.value.split('-');
 	userData.updateNews({
 		id: inputId.value as number || undefined,
 		title: inputTitle.value as string,
 		slug: inputSlug.value as string,
 		active: inputActive.value as boolean,
 		text: inputText.value as string || null,
-		date: new Date(inputDate.value as string),
+		date: date.length >= 3 ? new Date(parseInt(date[0]), parseInt(date[1]), parseInt(date[2])) : new Date(),
 	}).then((result) => {
 		if (result) {
 			if (result?.errors) return setErrors('news_form', [], result.errors);
