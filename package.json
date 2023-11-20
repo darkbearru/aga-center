@@ -12,7 +12,7 @@
   "private": true,
   "scripts": {
     "start": "node .output/server/index.mjs",
-    "build": "nuxt build",
+    "build": "nuxt build && node ./src/after_build.mjs",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
