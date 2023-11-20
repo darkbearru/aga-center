@@ -261,7 +261,7 @@ onMounted(() => {
 				v-model="inputText"
 			/>
 			<FormKit
-				v-if="currentInitiative?.photos?.length < 3"
+				v-if="typeof (currentInitiative?.photos) === 'undefined' || currentInitiative?.photos?.length < 3"
 				type="file"
 				name="photos"
 				label="Фотографии"
