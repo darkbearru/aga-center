@@ -243,7 +243,7 @@ const gotoClientArea = async () => {
 				          'Согласен с ',
 				          {
 				            $el: 'a',
-				            attrs: { href: '/rules', class: 'text-main hover:underline decoration-main/80 underline-offset-4 decoration-2' },
+				            attrs: { href: '/articles/rules', class: 'text-main hover:underline decoration-main/80 underline-offset-4 decoration-2' },
 				            children: 'правилами сайта'
 				          },
 				          '.'
