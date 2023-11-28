@@ -13,7 +13,7 @@ const userData = useData();
 
 defineExpose({ setupCompany, updateInitiatives });
 
-;const initiatives = ref<TInitiative[]>(userData.initiatives as TInitiative[]);
+const initiatives = ref<TInitiative[]>(userData.initiatives as TInitiative[]);
 const titlePopup = ref('Добавить инициативу')
 const popup = ref();
 const initiativeForm = ref();
@@ -65,7 +65,7 @@ watch(initiatives, (newList) => {
 	}
 })
 
-const onDelete = (initiative: TInitiative, index: number) => {
+const onDelete = (initiative: TInitiative, index?: number) => {
 	userData.deleteInitiative(initiative).then(() => {
 		initiatives.value = userData?.initiatives || [];
 	}).catch(e => {
@@ -90,7 +90,7 @@ const onDelete = (initiative: TInitiative, index: number) => {
 		<InitiativeList ref="initiativeList" @onClick="popupOpen" @onDelete="onDelete" />
 
 		<PopupContainer ref="popup" @close="popupClose">
-			<Popup class="bg-gray-light/60 w-full max-h-full min-w-[300px] max-w-[600px] pb-0" :title="titlePopup" @close="popupClose">
+			<Popup class="bg-gray-light/60 w-full max-h-full min-w-[300px] max-w-[800px] pb-0" :title="titlePopup" @close="popupClose">
 				<InitiativeForm :company="company" ref="initiativeForm" @save="popupClose"/>
 			</Popup>
 		</PopupContainer>

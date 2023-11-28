@@ -17,7 +17,7 @@ export class EmailService implements IEmailService {
 	}
 
 	private async sender(email: TEmail): Promise<TEmailResponse> {
-		return new Promise((resolve, reject) => {
+		return new Promise(async (resolve, reject): Promise<void> => {
 			console.log('Email start Create transport');
 			const transporter: nodemailer.Transporter = nodemailer.createTransport({
 				host: process.env.MAIL_SERVER,
@@ -44,12 +44,11 @@ export class EmailService implements IEmailService {
 					}
 				});
 			} catch (e) {
-				reject({ error: `Send error`, e });
-			} finally {
 				transporter.close();
-				console.log('Email close transport');
+				reject({ error: `Send error`, e });
 			}
-		});	}
+		});
+	}
 
 	private async process(transporter: nodemailer.Transporter, email: TEmail): Promise<TEmailResponse> {
 		return new Promise(async (resolve, reject): Promise<void> => {

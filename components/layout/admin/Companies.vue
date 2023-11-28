@@ -84,7 +84,7 @@ userData.refreshCompaniesAndInitiatives(() => {
 	initiativesList?.value?.updateInitiatives();
 });
 
-watch(companyCurrentID, (id) => {
+watchImmediate(companyCurrentID, (id) => {
 	if (!userData?.companies) return;
 	companyCurrent.value = userData?.companies.find(item => item?.id === id);
 })

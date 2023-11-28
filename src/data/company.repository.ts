@@ -171,6 +171,7 @@ export class CompanyRepository implements ICompanyRepository {
 					nameFull: company.nameFull,
 					nameShort: company.nameShort,
 					requsites: company.requsites,
+					isApproved: company.isApproved,
 					isDeclined: company.isDeclined,
 					declineReason: company.declineReason,
 					contacts: company.contacts,
