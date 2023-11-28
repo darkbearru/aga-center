@@ -264,7 +264,16 @@ export class AdminService implements IAdminService {
 		const newsCount: number = await this.usersRepository.count();
 		const skip: number = Math.floor(newsCount / onPage) + (newsCount > onPage ? newsCount % onPage : 0);
 
-		return await this.usersRepository.list(skip, onPage);
+		let usersList = await this.usersRepository.list(skip, onPage);
+		if (usersList) {
+			moment.locale('ru');
+			usersList = usersList.map(user => {
+				const changedDate = moment(user.changedAt, 'YYYY-MM-DD HH:II:SS');
+				user.lastLoginDate = changedDate.format('LLLL');
+				return user;
+			});
+		}
+		return  usersList;
 	}
 
 	async regionSave(region: TRegion): Promise<TRegionResponse> {

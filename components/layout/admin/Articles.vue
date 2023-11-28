@@ -183,6 +183,7 @@ const createSlug = () => {
 					id="text"
 					label="Текст"
 					placeholder="Текст статьи"
+					rows="15"
 					v-model="inputText"
 					validation="required|length:15"
 					:validation-messages="{

@@ -13,6 +13,7 @@ export type TUser = {
 	companies?: TCompany[],
 	createdAt?: Date,
 	changedAt?: Date,
+	lastLoginDate?: string,
 }
 
 export type TUserResponse = {

@@ -190,7 +190,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="max-w-[600px] formkit-w-full" @click.stop="">
+	<div class="w-full max-w-[800px] formkit-w-full" @click.stop="">
 		<div v-if="currentInitiative && !currentInitiative?.isApproved && !currentInitiative.isDeclined" class="mb-4 flex flex-wrap justify-center text-center">
 			<div class="flex items-center text-center w-[140px] h-10 px-2 py-1 rounded bg-yellow-500 text-white text-xs">
 				ожидает модерации
@@ -257,6 +257,7 @@ onMounted(() => {
 				name="text"
 				id="text"
 				label="Текст"
+				rows="12"
 				placeholder="Введите текст инициативы"
 				v-model="inputText"
 			/>
