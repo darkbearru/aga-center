@@ -262,7 +262,7 @@ export class AdminService implements IAdminService {
 	}
 
 	private async getUsersList(page: number = 0): Promise<TUser[] | undefined> {
-		const onPage: number = Number(process.env?.USERS_ON_PAGE) || 20;
+		const onPage: number = Number(process.env?.USERS_ON_PAGE) || 50;
 		const newsCount: number = await this.usersRepository.count();
 		const skip: number = Math.floor(newsCount / onPage) + (newsCount > onPage ? newsCount % onPage : 0);
 
