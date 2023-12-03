@@ -13,6 +13,7 @@ import { OrderStatus } from '~/src/data/types/order';
 import { prismaClient } from '~/src/utils/prismaClient';
 import { Prisma } from '.prisma/client';
 import ms from 'ms';
+import type { TManageInitiatives } from './types/manage.initiatives';
 
 const selectFields = {
 	id: true,
@@ -71,17 +72,17 @@ const clientInitiativeFields = {
 			path: true,
 		}
 	},
-/*
-	Reviews: {
-		select: {
-			id: true,
-			title: true,
-			review: true,
-			rate: true,
-			createdAt: true,
-		}
-	},
-*/
+	/*
+		Reviews: {
+			select: {
+				id: true,
+				title: true,
+				review: true,
+				rate: true,
+				createdAt: true,
+			}
+		},
+	*/
 	Company: {
 		select: {
 			id: true,
@@ -220,6 +221,9 @@ export class InitiativeRepository implements IInitiativeRepository {
 					isDeleted: false,
 				},
 				select: selectFields,
+				orderBy: {
+					changedAt: 'desc'
+				}
 			});
 			return result.map(item => this.formatResult(item as TInitiativeResult));
 		} catch (e) {
@@ -521,6 +525,38 @@ export class InitiativeRepository implements IInitiativeRepository {
 			promo = null
 		}
 		return promo;
+	}
+
+	async saveInitiative(data: TManageInitiatives, companyId: number): Promise<boolean> {
+		const found = await prismaClient.initiative.findFirst({
+			select: { id: true },
+			where: { name: data.name }
+		});
+		try {
+			await prismaClient.initiative.upsert({
+				where: { id: found?.id || 0 },
+				create: {
+					status: true,
+					name: data.name,
+					text: data.text,
+					direction: data.direction,
+					regionsId: data.regionId,
+					initiativeTypesId: data.initiativeTypesId,
+					isApproved: true,
+					companyId,
+				},
+				update: {
+					name: data.name,
+					text: data.text,
+					direction: data.direction,
+					regionsId: data.regionId,
+					initiativeTypesId: data.initiativeTypesId,
+				},
+			});
+			return true;
+		} catch(e) {
+			return false;
+		}
 	}
 
 }

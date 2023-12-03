@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Ownership from '~/components/layout/admin/Ownership.vue';
+import Ownership from '~/components/content/admin/Ownership.vue';
 
 definePageMeta({
 	middleware: ["moderator"],

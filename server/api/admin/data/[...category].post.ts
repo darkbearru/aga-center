@@ -91,6 +91,10 @@ export default defineEventHandler(
 				if (!data.id) return '';
 				return await adminService.setPromo(data.id, data.isActivate || false);
 			}
+			case 'manage_initiative': {
+				const data = await readBody(event);
+				return { result: await adminService.saveInitiative(data) }
+			}
 		}
 		return '';
 	}

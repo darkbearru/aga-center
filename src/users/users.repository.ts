@@ -92,6 +92,21 @@ export class UsersRepository implements IUsersRepository {
 		});
 	}
 
+	async saveUser(email: string, fio: string): Promise<TUser | null> {
+		return prismaClient.users.upsert({
+			where: { email },
+			create: {
+				fio,
+				email,
+				isNew: true,
+				isAdmin: false,
+				isModerator: false,
+				isClient: false
+			},
+			update: { fio }
+		});
+	}
+
 	async save(user: TUser): Promise<TUser> {
 		if (!user?.id) {
 			return prismaClient.users.create({
@@ -178,9 +193,7 @@ export class UsersRepository implements IUsersRepository {
 				email: email
 			}
 		});
-		console.log('user check');
 		if (!user) {
-			console.log('User not found create new');
 			return prismaClient.users.create({
 				data: {
 					email: email,
@@ -192,9 +205,7 @@ export class UsersRepository implements IUsersRepository {
 		}
 		await this.saveCode(email, code);
 		user.confirmCode = code;
-		console.log('User found', user);
 		return user;
-
 	}
 
 

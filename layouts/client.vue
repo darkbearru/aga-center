@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Menu from '~/components/layout/admin/Menu.vue';
+import Menu from '~/components/content/admin/Menu.vue';
 import { useData } from '~/components/stores/useData';
 
 const data = useData();

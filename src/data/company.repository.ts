@@ -2,6 +2,8 @@ import type { ICompanyRepository } from '~/src/data/company.repository.interface
 import type { TCompany, TContact, TContacts } from '~/src/data/types/company';
 import type { TUser } from '~/src/users/types/users';
 import { prismaClient } from '~/src/utils/prismaClient';
+import { ContactsType } from '~/src/data/types/company';
+import type { TManageInitiatives } from '~/src/data/types/manage.initiatives';
 
 
 const companySelect = {
@@ -413,7 +415,39 @@ export class CompanyRepository implements ICompanyRepository {
 		} catch (e) {
 
 		}
+	}
 
+	async saveCompany(data: TManageInitiatives, userId: number): Promise<{id: number} | null> {
+		return prismaClient.company.upsert({
+			where: { slug: data.slug },
+			create: {
+				slug: data.slug,
+				nameFull: data.nameFull,
+				nameShort: data.nameShort,
+				requsites: '',
+				typeOwnershipId: data.ownershipId,
+				isApproved: true,
+				isDeclined: false,
+				contacts: {
+					create: {
+						type: ContactsType.email,
+						value: data.email
+					}
+				},
+				usersId: userId
+			},
+			update: {
+				nameFull: data.nameFull,
+				nameShort: data.nameShort,
+				requsites: '',
+				typeOwnershipId: data.ownershipId,
+				isApproved: true,
+				isDeclined: false,
+			},
+			select: {
+				id: true
+			}
+		});
 	}
 
 }

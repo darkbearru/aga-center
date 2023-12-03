@@ -3,9 +3,9 @@ import { useData } from '~/components/stores/useData';
 import type { TInitiative } from '~/src/data/types/initiatives';
 import type { TOrder } from '~/src/data/types/order';
 import { OrderAuthor, OrderStatus } from '~/src/data/types/order';
-import Initiative from '~/components/layout/order/Initiative.vue';
-import Messages from '~/components/layout/order/Messages.vue';
-import MessageForm from '~/components/layout/order/MessageForm.vue';
+import Initiative from '~/components/content/order/Initiative.vue';
+import Messages from '~/components/content/order/Messages.vue';
+import MessageForm from '~/components/content/order/MessageForm.vue';
 import Button from '~/components/ui/Button.vue';
 import SvgLoading from '~/components/ui/SvgLoading.vue';
 

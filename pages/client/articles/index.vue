@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import Articles from '~/components/layout/admin/Articles.vue';
+import Articles from '~/components/content/admin/Articles.vue';
 
 definePageMeta({
 	middleware: ["moderator"],

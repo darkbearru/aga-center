@@ -33,6 +33,7 @@ import ms from 'ms';
 import * as fs from 'fs';
 import moment from 'moment/moment.js';
 import type { IReviewsRepository } from '~/src/data/reviews.repository.interface';
+import type { TManageInitiatives } from '~/src/data/types/manage.initiatives';
 
 export class AdminService implements IAdminService {
 	constructor(
@@ -77,6 +78,7 @@ export class AdminService implements IAdminService {
 			menu['/client/types'] = 'Типы инициатив';
 			menu['/client/moderation'] = 'Модерация';
 			menu['/client/promo'] = 'Промо-блок';
+			menu['/client/companies'] = 'Управление инициативами';
 			news = await this.getNewsList();
 			articles = await this.getArticlesList();
 			companies  = await this.companyRepository.moderationList();
@@ -669,6 +671,16 @@ export class AdminService implements IAdminService {
 			}
 		});
 		return data;
+	}
+
+	async saveInitiative(data: TManageInitiatives): Promise<boolean> {
+		// Добавляем пользователя, или выбираем
+		const user: TUser | null = await this.usersRepository.saveUser(data.email, data.nameFull);
+		// Добавляем или выбираем компанию
+		const company = await this.companyRepository.saveCompany(data, user?.id || 0);
+		if (!company) return false;
+		// Добавляем инициативу
+		return await this.initiativeRepository.saveInitiative(data, company.id);
 	}
 
 }

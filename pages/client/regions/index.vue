@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import Regions from '~/components/layout/admin/Regions.vue';
+import Regions from '~/components/content/admin/Regions.vue';
 
 definePageMeta({
 	middleware: ["admin"],
