@@ -72,8 +72,8 @@ export default defineNuxtConfig({
     autoImport: true
   },
   sourcemap: {
-    "server": true,
-    "client": true
+    "server": process.env.NODE_ENV === 'development',
+    "client": process.env.NODE_ENV === 'development'
   },
   runtimeConfig: {
     uploadPath : process.env.NODE_ENV === 'development' ? './public/upload' : './.output/public/upload',
