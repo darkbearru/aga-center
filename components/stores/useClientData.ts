@@ -80,7 +80,7 @@ export const useClientData = defineStore('client', {
 		// Получение списка инициатив
 		async initiativesList(type?: TInitiativeTypes): Promise<TInitiativeList | undefined> {
 			return new Promise(async (resolve, reject) => {
-				await $fetch(`${this.path}/initiative/type/${type?.id}/direction/${this.direction}/region/${this.currentRegion}${this.searchText ? '/text/' + encodeURIComponent(this.searchText) : ''}`, {
+				await $fetch(`${this.path}/initiative/type/${type?.id}/direction/${this.direction}/${this.searchText ? '/text/' + encodeURIComponent(this.searchText) : ''}`, {
 					method: 'get',
 				}).then((data) => {
 					resolve(data as TInitiativeList);

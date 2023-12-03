@@ -366,12 +366,12 @@ export class InitiativeRepository implements IInitiativeRepository {
 		try {
 			const where: Prisma.InitiativeWhereInput = {
 				status: true,
-				direction: Number(direction || 0),
-				regionsId: Number(regionId || 0),
 				isApproved: true,
 				isDeleted: false,
 				initiativeTypesId: Number(typeId),
 			}
+			if (direction) where.direction = Number(direction);
+			if (regionId) where.regionsId = Number(regionId);
 			if (fnd) {
 				where.OR = [
 					{ name: { contains: fnd } },
