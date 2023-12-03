@@ -17,6 +17,7 @@ import type {
 import type { TArticle, TArticleFormData, TArticleResponse, TArticles } from '~/src/data/types/articles';
 import type { TOrder, TOrderMessage } from '~/src/data/types/order';
 import { OrderAuthor, OrderStatus } from '~/src/data/types/order';
+import type { TManageInitiatives } from '~/src/data/types/manage.initiatives';
 
 export const useData = defineStore('data', {
 	state: () => {
@@ -32,17 +33,20 @@ export const useData = defineStore('data', {
 		const initiatives: globalThis.Ref<TInitiative[] | undefined> = ref(undefined);
 		const articles: globalThis.Ref<TArticles | undefined> = ref(undefined);
 		const promo: globalThis.Ref<TInitiative[]> = ref([]);
+		const current: globalThis.Ref<TInitiative|undefined> = ref();
 		const accessToken = useCookie('ac_token');
 		const timer = ref();
+		const isLoaded = ref<boolean>(false);
 		return {
 			path, user, menu, news, users,
 			regions, ownership, types,
 			companies, articles, initiatives,
-			accessToken, timer, promo
+			accessToken, timer, promo, current, isLoaded
 		}
 	},
 	actions: {
 		async get(): Promise<boolean> {
+			this.isLoaded = true;
 			const { data, error } =
 				await useFetch(`${this.path}`, {
 					method: 'get',
@@ -782,6 +786,39 @@ export const useData = defineStore('data', {
 				});
 			});
 		},
+
+		async saveInitiative(data: TManageInitiatives): Promise<boolean> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/manage_initiative`, {
+					method: 'post',
+					body: data
+				}).then(async (data: any) => {
+					if (data.result) {
+						this.promo = data.result as TInitiative[];
+						resolve(true);
+					}
+					resolve(false);
+				}).catch(() => {
+					reject(false);
+				});
+			});
+		},
+
+/*
+		async listInitiatives(): Promise<TInitiative[] | undefined> {
+			return new Promise(async (resolve, reject) => {
+				await $fetch(`${this.path}/list`, {
+					method: 'get',
+				}).then((data) => {
+					this.promo = data as TInitiative[];
+					resolve(this.promo);
+				}).catch(() => {
+					reject(undefined);
+				});
+			});
+
+		}
+*/
 
 	}
 });

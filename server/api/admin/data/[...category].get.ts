@@ -1,7 +1,6 @@
 import { H3Event } from 'h3';
 import { AdminService } from '~/src/services/admin/admin.service';
 import { initAdminService } from '~/server/utils/initAdminService';
-import { useRoute } from 'nuxt/app';
 
 export default defineEventHandler(
 	async (event: H3Event) => {
@@ -24,6 +23,9 @@ export default defineEventHandler(
 				const query = getQuery(event);
 				if (query.code) return await adminService.orderByCode(query.code.toString());
 				return await adminService.ordersList();
+			}
+			case 'list' : {
+				return await adminService.getAllInitiatives();
 			}
 		}
 		return await adminService.data();

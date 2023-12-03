@@ -10,8 +10,8 @@ import { useData } from '~/components/stores/useData';
 import type { TInitiative } from '~/src/data/types/initiatives';
 import Popup from '~/components/ui/Popup.vue';
 import PopupContainer from '~/components/ui/PopupContainer.vue';
-import PhotosList from '~/components/layout/admin/photos/PhotosList.vue';
-import InitiativeListPromoItem from '~/components/layout/admin/initiatives/InitiativeListPromoItem.vue';
+import PhotosList from '~/components/content/admin/photos/PhotosList.vue';
+import InitiativeListPromoItem from '~/components/content/admin/initiatives/InitiativeListPromoItem.vue';
 import MessageButton from '~/components/ui/MessageButton.vue';
 
 const userData = useData();
@@ -20,9 +20,9 @@ const popup = ref();
 const photos = ref();
 const initiatives = ref<TInitiative[]>();
 const currentInitiative = ref<TInitiative>();
+if (!userData.isLoaded) userData.get();
 
-
-watch(userData.promo, () => updateList());
+watchImmediate(userData.promo, () => updateList());
 
 function updateList(): void {
 	initiatives.value = userData.promo;

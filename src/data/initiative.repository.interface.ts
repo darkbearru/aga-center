@@ -1,6 +1,7 @@
 import type { TInitiative, TInitiativeList, TInitiativeWithID, TShortInitiative } from '~/src/data/types/initiatives';
 import type { TUser } from '~/src/users/types/users';
 import type { TClientDataError } from '~/src/data/types/common.data';
+import type { TManageInitiatives } from '~/src/data/types/manage.initiatives';
 
 export interface IInitiativeRepository {
 	list(user: TUser): Promise<TInitiative[] | undefined>;
@@ -22,4 +23,5 @@ export interface IInitiativeRepository {
 	get(id: number): Promise<TShortInitiative | undefined>;
 	calcRating(id: number): Promise<void>;
 	setPromo(id: number, isActivate?: boolean): Promise<Date | null>;
+	saveInitiative(data: TManageInitiatives, companyId: number): Promise<boolean>;
 }

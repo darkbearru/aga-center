@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import Users from '~/components/layout/admin/Users.vue';
+import Users from '~/components/content/admin/Users.vue';
 
 definePageMeta({
 	middleware: ["admin"],

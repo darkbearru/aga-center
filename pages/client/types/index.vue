@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import InitiativeTypes from '~/components/layout/admin/InitiativeTypes.vue';
+import InitiativeTypes from '~/components/content/admin/InitiativeTypes.vue';
 
 definePageMeta({
 	middleware: ["moderator"],

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import PhotosList from '~/components/layout/admin/photos/PhotosList.vue';
+import PhotosList from '~/components/content/admin/photos/PhotosList.vue';
 import Button from '~/components/ui/Button.vue';
 import LoadingBg from '~/components/ui/LoadingBg.vue';
 import Popup from '~/components/ui/Popup.vue';

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import Moderation from '~/components/layout/admin/Moderation.vue';
+import Moderation from '~/components/content/admin/Moderation.vue';
 
 definePageMeta({
 	middleware: ["moderator"],
