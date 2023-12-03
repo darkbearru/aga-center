@@ -93,7 +93,11 @@ export default defineEventHandler(
 			}
 			case 'manage_initiative': {
 				const data = await readBody(event);
-				return { result: await adminService.saveInitiative(data) }
+				const result = await adminService.saveInitiative(data);
+				if (result) {
+					return { result: await adminService.getAllInitiatives() }
+				}
+				return false;
 			}
 		}
 		return '';
