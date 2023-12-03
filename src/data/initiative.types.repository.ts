@@ -10,7 +10,7 @@ export class InitiativeTypesRepository implements IInitiativeTypesRepository {
 			const typeWhere: Prisma.InitiativeTypesWhereInput = {}
 			const where: Prisma.InitiativeWhereInput = {
 				direction: Number(direction),
-				regionsId: region,
+				// regionsId: region,
 				isApproved: true,
 				isDeleted: false,
 			};
